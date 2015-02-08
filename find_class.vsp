@@ -1,0 +1,64 @@
+<?vsp
+-------------------------------------------------------------------------------
+-- Find the rdf:type objects that match a given string fragment              --
+--                                                                           --
+-- arguments                                                                 --
+--  * fragment - the string fragment to match                                --
+--  * position - the position to match the string,  Options are "any" and    --
+--    "start". Any wil match anwhere in the uri, start matches at the begining
+--    of the local part of the uri -  eg after the last '/','#', or ':'      --
+--    character.                                                             --
+--                                                                           --
+-- returns                                                                   --
+--  * A list of uris matching the string fragment supplied                   --
+--                                                                           --
+-- Author: Brian Walshe,                                                     --
+-- Knowledege and Data Engineering Group                                     --
+-- School of Computer Science and Statistics                                 --
+-- Trinity Colege Dublin                                                     --
+-- bwalshe@tcd.ie                                                            --
+--                                                                           --
+-- CENDARI 2015                                                              --
+-------------------------------------------------------------------------------
+?>
+
+<classes>
+<?vsp
+declare meta, data any;
+
+   declare regexPattern, query VARCHAR;
+   declare fragment, position VARCHAR;
+   fragment := {?'fragment'};
+   position := get_keyword('position',params,'any');
+    
+   if(fragment<>'NULL' and RDF_REGEX(fragment,'^[[:alnum:] ]+\$'))
+   {
+      http(sprintf('<fragment position="%s">%s</fragment>',
+         position,fragment));
+   if(position='start')
+   {
+      regexPattern := sprintf('HTTP://%%[#/:]%s%%',upper(fragment));
+   }
+   else
+   {
+       regexPattern := sprintf('HTTP://%%[#/:]%%%s%%',upper(fragment));
+   }
+  
+  
+   
+   query := sprintf('sparql select distinct(?type) where {?x rdf:type ?type.  FILTER ( bif:upper(?type) like "%s") }',
+      regexPattern);
+
+   declare stat, msg, data, meta any;
+   exec(query, stat, msg, vector (), 0, meta, data);
+   for (declare i, l int, i := 0, l := length (data); i < l; i := i + 1)
+   {
+      http(sprintf('<class>%s</class>\n',data[i][0]));  
+   }
+  }
+  else
+  {
+     http('no search string specified');
+  }
+?>
+</classes>

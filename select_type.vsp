@@ -1,0 +1,93 @@
+<?vsp
+-------------------------------------------------------------------------------
+-- Find a list of objects with a specified rdf:type.                         --
+-- If an inference rule graph is specified, inference will be used to        --
+-- determine the type of the objects.                                        --
+--                                                                           --
+-- arguments                                                                 --
+--  * type - the rdf:type to search for                                      --
+--  * inference - the inference graph to use                                 --
+--  * format - the format to return the list in. Default is                  --
+--    "application/xml". Other options are "text/html" and "application/json --
+--                                                                           --
+-- returns                                                                   --
+--  * A list of URIs which match the given type                              --
+--                                                                           --
+-- Author: Brian Walshe,                                                     --
+-- Knowledege and Data Engineering Group                                     --
+-- School of Computer Science and Statistics                                 --
+-- Trinity Colege Dublin                                                     --
+-- bwalshe@tcd.ie                                                            --
+--                                                                           --
+-- CENDARI 2015                                                              --
+-------------------------------------------------------------------------------
+ declare classtype varchar;
+ --declre limit, offset int;
+ --limit := get
+ 
+   classtype := {?'type'};
+
+   if( not starts_with(classtype,'http://'))
+      classtype := __xml_nsexpand_iristr(classtype);
+ 
+   http(sprintf('<class_set class_iri="%s">',classtype));
+?> 
+<instances>
+<?vsp
+
+ 
+if({?'inference'} <> '')
+{
+   -- An inference graph has been specified. Unfortuneately virtuoso does not 
+   -- allow the inference graph to be specified as a parameter, so this query
+   -- must be constructed using an sprintf statement
+   --
+   -- As this could provide an entry point for an SQL injection attack, we
+   -- take a precaution before executing the query. First, we check to see if
+   -- the specified graph exists in the database and only then will we execute
+   --
+
+   declare inferenceGraph varchar; 
+   inferenceGraph := {?'inference'};
+   
+   for(select distinct G from DB.DBA.RDF_QUAD where G=iri_to_id(inferenceGraph))
+   do
+   {
+      declare meta, data any;
+      exec(sprintf('sparql DEFINE input:inference <%s> select ?inst where { ?inst rdf:type <%s>}',inferenceGraph,classtype),
+     null, null, 
+     vector (), 
+     0, meta, data);
+
+     for(declare i, l int, i:=0, l:=length(data); i < l; i := i+1)
+     {
+         http (sprintf('<uri>%s</uri>\n',data[i][0]));
+     }
+   }
+
+ 
+}
+else
+{
+   for(select id_to_iri(S) as inst from DB.DBA.RDF_QUAD 
+        where P = iri_to_id('http://www.w3.org/1999/02/22-rdf-syntax-ns#type')
+         and O = iri_to_id(classtype))
+   
+      do http (sprintf('<uri>%s</uri>\n',inst));
+}
+
+declare format varchar;
+format := get_keyword('format',params,'application/xml');
+
+if(format = 'text/html')
+{
+   http_xslt ('file:CENDARI/xslt/instance_set_to_html.xslt');
+}
+else if(format = 'application/json')
+{
+   http_xslt ('file:CENDARI/xslt/instance_set_to_json.xslt');
+}
+   
+?>
+</instances>
+</class_set>

@@ -1,0 +1,75 @@
+<?vsp
+-------------------------------------------------------------------------------
+-- Describe a resource with a given URI                                      --
+--                                                                           --
+-- Arguements                                                                --
+--  * uri - the uri of the resource to describe                              --
+--  * format - the return format currently accepts "text/html", and          --
+--    "application/xml"                                                      --
+-- returns:                                                                  --
+--  A description of the triples which contain *uri* as a subject or object  --
+--                                                                           --
+-- Author: Brian Walshe,                                                     --
+-- Knowledege and Data Engineering Group                                     --
+-- School of Computer Science and Statistics                                 --
+-- Trinity Colege Dublin                                                     --
+-- bwalshe@tcd.ie                                                            --
+--                                                                           --
+-- CENDARI 2015                                                              --
+-------------------------------------------------------------------------------
+
+  declare fullURI VARCHAR;
+  --check to see if the uri supplied is long or short. If it is short, expand. 
+  if(starts_with({?'uri'},'http'))
+  {
+      fullURI := {? 'uri'};
+  }
+  else
+  {
+      fullURI := __xml_nsexpand_iristr( {? 'uri'});
+  }
+
+  http(sprintf('<description of="%s">',fullURI));
+?>
+
+
+<properties>
+
+<?vsp
+   -- Find the cases where the URI is the subject
+   for(sparql select ?p ?v where {?:fullURI ?p ?v} limit 300)
+   do
+      http(sprintf('<triple s="%s" p="%s" o="%s"/>\n',fullURI,p,v));
+  
+?>
+
+</properties>
+
+<references>
+
+<?vsp
+   -- Find the cases where the URI is the object.
+   -- This has to be done as an SQL query due to virtuoso's problems with constructing SPARQL queries with variables in them 
+
+   for(select top 300 S as subject, P as pred from DB.DBA.RDF_QUAD where O = iri_to_id(fullURI))
+   do
+   { 
+      http(sprintf('<triple s="%s" p="%s" o="%s"/>\n',
+         id_to_iri(subject),id_to_iri(pred),fullURI));
+   }
+   
+?>
+
+</references>
+
+</description>
+<?vsp 
+   -- perform XSLT transformation if a format other than XML was specified.
+   declare format VARCHAR;
+   format := get_keyword('format', params, 'application/xml');
+   if (format='text/html')
+   {
+      http_xslt ('file:CENDARI/xslt/description_to_html.xslt');
+   }
+
+?>
