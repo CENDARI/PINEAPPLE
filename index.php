@@ -1,5 +1,6 @@
 <?php
 require_once "pineapple.php";
+#require_once "dataspaceUtils.php";
 
 class PineappleRequest{
    public $verb;
@@ -88,9 +89,10 @@ class PineappleRequest{
 $pineapple = new Pineapple();
 
 $req = new PineappleRequest();
-
+//print_r($req);
 try
 {
+   getDataspaces();
    echo $req->execute($pineapple);
 } 
 catch(ResourceNotFoundExcetion $e)

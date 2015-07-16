@@ -43,7 +43,7 @@ function render_document_body($data_item, $document)
      </div>
    </div>
    <div id='all_info'>
-     <H2>All tripples<H2> 
+     <H2>All triples<H2> 
      $repository
    </div>
 

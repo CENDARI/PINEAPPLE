@@ -3,9 +3,36 @@ set_include_path(get_include_path() . PATH_SEPARATOR . '../lib/');
 require_once "EasyRdf.php";
 require_once "render_html.php";
 
+function getApiKey()
+{
 
+   $ch = curl_init("http://localhost:42042/v1/session");;
+   
+   $json_request = array("eppn" => $_SERVER['eppn'],
+      "mail" => $_SERVER['mail'],
+      "cn" => $_SERVER['cn']);
+   
 
+   curl_setopt($ch, CURLOPT_HTTPHEADER,array("Content-Type: application/json"));
+   curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+   curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json_request));
+   curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+ 
+   $response = json_decode(curl_exec($ch));
+   return $response->sessionKey;
+}
 
+function getDataspaces()
+{
+   $apiKey = getApiKey();
+   $headers = array("Authorization: $apiKey");
+   $ch = curl_init("http://localhost:42042/v1/dataspaces");
+   curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+   curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);  
+   $response=json_decode(curl_exec($ch));
+   return $response->data;
+
+}
 class ResourceNotFoundExcetion extends Exception {};
 class AccessDeniedExcetion extends Exception {};
 class MalformedAPIKeyException extends Exception{};
@@ -269,20 +296,11 @@ class Pineapple
                   $dataspaces[] = "litef://dataspaces/$uddi";
          else
          {
-            $api_key = apache_request_headers()["Authorisation"];
-            if(!preg_match("/^[a-f0-9\-]+$/",$api_key))
-               throw new MalformedAPIKeyException(
-                  "$api_key does not appear  to be a valid API key.");
-            $request = "curl -H 'Authorization: $api_key'  http://localhost:42042/v1/dataspaces";
-            $exec_output = array();
-            exec($request,$exec_output);
-            $response = json_decode(implode("",$exec_output));
-            foreach($response as $dataspace)
+            foreach(getDataspeces() as $dataspace)
                $dataspaces[] = "litef://dataspaces/".$dataspace["id"];
          }
 
          
-         #print_r($dataspaces);
          $filter = array();
          foreach($dataspaces as $ds)
            $filter[] = "?ds = <$ds>"; 
