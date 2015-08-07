@@ -1,17 +1,21 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . '../lib/');
-require_once "EasyRdf.php";
+require "vendor/autoload.php";
 require_once "render_html.php";
+
+function getAuthParam($key)
+{
+  return isset($_SERVER[$key]) ? $_SERVER[$key] : $_ENV[$key];
+}
 
 function getApiKey()
 {
 
-   $ch = curl_init("http://localhost:42042/v1/session");;
-   
-   $json_request = array("eppn" => $_SERVER['eppn'],
-      "mail" => $_SERVER['mail'],
-      "cn" => $_SERVER['cn']);
-   
+    $ch = curl_init("http://localhost:42042/v1/session");
+
+    $json_request = array("eppn" => getAuthParam("eppn"),
+      "mail" => getAuthParam("mail"),
+      "cn" => getAuthParam("cn"));
+
 
    curl_setopt($ch, CURLOPT_HTTPHEADER,array("Content-Type: application/json"));
    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
