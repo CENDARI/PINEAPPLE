@@ -33,8 +33,8 @@ function getDataspaces()
    return $response->data;
 
 }
-class ResourceNotFoundExcetion extends Exception {};
-class AccessDeniedExcetion extends Exception {};
+class ResourceNotFoundException extends Exception {};
+class AccessDeniedException extends Exception {};
 class MalformedAPIKeyException extends Exception{};
 class Pineapple
 {
@@ -99,7 +99,7 @@ class Pineapple
 
       if(!$this->_check_resource_exists($graph_uri))
       {
-         throw new ResourceNotFoundExcetion($graph_uri." not found.");
+         throw new ResourceNotFoundException($graph_uri." not found.");
       }
 
       $query = 
@@ -133,7 +133,7 @@ class Pineapple
 
       if(!$this->_check_resource_exists($graph_uri))
       {
-         throw new ResourceNotFoundExcetion($graph_uri." not found.");
+         throw new ResourceNotFoundException($graph_uri." not found.");
       }
 
       $query = 
@@ -164,7 +164,7 @@ class Pineapple
 
       if(!$this->_check_resource_exists($graph_uri))
       {
-         throw new ResourceNotFoundExcetion($graph_uri." not found.");
+         throw new ResourceNotFoundException($graph_uri." not found.");
       }
 
       $query_string = 
@@ -193,7 +193,7 @@ class Pineapple
 
       if(!$this->_check_resource_exists($uri))
       {
-         throw new ResourceNotFoundExcetion($uri." not found.");
+         throw new ResourceNotFoundException($uri." not found.");
       }
 
       $query_string = 
@@ -296,7 +296,7 @@ class Pineapple
                   $dataspaces[] = "litef://dataspaces/$uddi";
          else
          {
-            foreach(getDataspeces() as $dataspace)
+            foreach(getDataspaces() as $dataspace)
                $dataspaces[] = "litef://dataspaces/".$dataspace["id"];
          }
 

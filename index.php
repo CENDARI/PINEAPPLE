@@ -9,7 +9,7 @@ class PineappleRequest{
    public $resource_is_uddi;
    public $accept_types;
    public $options;
-   public $file_extention;
+   public $file_extension;
 
    static $FILE_MAPS = array (
       ".json" => "json",
@@ -29,7 +29,7 @@ class PineappleRequest{
          $this->content_type= $_SERVER["CONTENT_TYPE"];
 
       $this->action = false;
-      if(isset($_GET["funciton"]))
+      if(isset($_GET["function"]))
          $this->action = $_GET["function"];
 
       $this->resource = false;
@@ -95,7 +95,7 @@ try
    getDataspaces();
    echo $req->execute($pineapple);
 } 
-catch(ResourceNotFoundExcetion $e)
+catch(ResourceNotFoundException $e)
 {
    header("HTTP/1.0 404 Not Found");
    echo "404";
