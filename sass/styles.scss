@@ -1,0 +1,101 @@
+// Import Bootstrap Compass integration
+@import "bootstrap-compass";
+
+// Import custom Bootstrap variables
+@import "bootstrap-variables";
+
+// Import Bootstrap for Sass
+@import "bootstrap";
+
+/***
+	Table of Contents
+
+	1.	Globals
+	2.	Colours
+	3.	Dropdown forms
+
+***/
+
+/* 1. Globals */
+
+// Define custom font
+body {
+	font-family: "Open Sans", sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+#page-wrap {
+  margin-bottom: -150px;
+  min-height: 100%;
+}
+
+#page-wrap:after {
+  content: "";
+  display: block;
+}
+
+footer, #page-wrap:after {
+  height: 150px;
+}
+
+header,
+footer {
+	min-height: 100px;
+	padding: 1rem 0;
+}
+
+header,
+footer {
+	background: lighten($brand-secondary, 50%);
+}
+
+footer {
+	border-top: 1px solid lighten($brand-secondary, 40%);
+}
+
+section {
+	padding-bottom: 1em;
+}
+
+.content h2 {
+	font-weight: 700;
+	color: $brand-secondary;
+}
+
+.logo a {
+	background: url("../images/header_logo.png") top left no-repeat;
+	display: block;
+	width: 285px;
+	height: 83px;
+}
+
+footer p {
+	margin: 3rem 0 2rem;
+	font-size: .875em;
+}
+
+/* 2. Colours */
+
+.celest {
+	color: $brand-primary;
+}
+
+.bright-blue {
+	color: $bright-blue;
+}
+
+.gold {
+	color: $brand-secondary;
+}
+
+/* 3. Dropdown forms */
+
+.drop-form {
+	padding: .5em;
+}
+.drop-form * {
+	margin: .5em 0;
+}

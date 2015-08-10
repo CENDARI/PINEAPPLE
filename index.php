@@ -1,5 +1,8 @@
 <?php
-require_once "pineapple.php";
+require "vendor/autoload.php";
+require_once "Pineapple.class.php";
+require_once "render_html.php";
+
 
 class PineappleRequest
 {
@@ -19,9 +22,8 @@ class PineappleRequest
         ".htm" => "html");
 
 
-    public function __construct($pineapple = null)
+    public function __construct()
     {
-        $this->pineapple = $pineapple;
         $this->verb = $_SERVER["REQUEST_METHOD"];
 
         $this->content_type = false;
@@ -35,8 +37,9 @@ class PineappleRequest
         $this->resource = false;
         $this->resource_is_uddi = false;
         if (isset($_GET["resource"])) {
-            $this->resource = $_GET["resource"];
-            $this->resource_is_uddi = preg_match("/^[a-f0-9\-]+$/", $this->resource);
+            $raw = $_GET["resource"];
+            $this->resource = urldecode($raw);
+            $this->resource_is_uddi = preg_match("/^[a-f0-9\-]+$/", $raw);
         }
 
         $this->accept_types = array();
@@ -58,33 +61,37 @@ class PineappleRequest
 
     }
 
-    function execute($pineapple = null)
+    function execute(Pineapple $pineapple, Twig_Environment $twig)
     {
 
-        if ($pineapple == null)
-            $pineapple = $this->pineapple;
-
-        $output = null;
+        $document = null;
 
         if ($this->action = "describe" && $this->resource_is_uddi) {
-            $output = $pineapple->describe_document($this->resource, $this->file_extension);
+            error_log("Fetching resource: " . $this->resource);
+            $document = $pineapple->get_document_graph($this->resource, $this->inference);
         } else if ($this->action = "describe" && !$this->resource_is_uddi) {
-            $output = $pineapple->describe_resource($this->resource, $this->file_extension);
+            $document = $pineapple->get_resource_graph($this->resource, "", $this->inference);
         }
 
-        return $output;
+        if ($this->file_extension != "html") {
+            return $document->graph->serialise($this->file_extension);
+        } else {
+            //return render_document_html($resource_graph);
+
+            return $twig->render("describe.html.twig", ["document" => $document]);
+        }
     }
-
-
 }
+
+$loader = new Twig_Loader_Filesystem("templates");
+$twig = new Twig_Environment($loader, ["debug" => getenv("APP_DEBUG"), "cache" => "cache"]);
 
 $pineapple = new Pineapple();
 
 $req = new PineappleRequest();
 
 try {
-    getDataspaces();
-    echo $req->execute($pineapple);
+    echo $req->execute($pineapple, $twig);
 } catch (ResourceNotFoundException $e) {
     header("HTTP/1.0 404 Not Found");
     echo "404";

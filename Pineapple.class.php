@@ -1,42 +1,7 @@
 <?php
 require "vendor/autoload.php";
+require_once "Document.class.php";
 require_once "render_html.php";
-
-function getAuthParam($key)
-{
-    return isset($_SERVER[$key]) ? $_SERVER[$key] : $_ENV[$key];
-}
-
-function getApiKey()
-{
-
-    $ch = curl_init("http://localhost:42042/v1/session");
-
-    $json_request = array("eppn" => getAuthParam("eppn"),
-        "mail" => getAuthParam("mail"),
-        "cn" => getAuthParam("cn"));
-
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json_request));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-
-    $response = json_decode(curl_exec($ch));
-    return $response->sessionKey;
-}
-
-function getDataspaces()
-{
-    $apiKey = getApiKey();
-    $headers = array("Authorization: $apiKey");
-    $ch = curl_init("http://localhost:42042/v1/dataspaces");
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    $response = json_decode(curl_exec($ch));
-    return $response->data;
-
-}
 
 class ResourceNotFoundException extends Exception
 {
@@ -56,8 +21,32 @@ class Pineapple
 
     private $endpoints = array();
 
-    function Pineapple(
-        $endpointURLs = null, $namespaces = null)
+    private function getAuthParam($key)
+    {
+        return isset($_SERVER[$key]) ? $_SERVER[$key] : $_ENV[$key];
+    }
+
+    private function getApiKey()
+    {
+        $data = [
+            "eppn" => $this->getAuthParam("eppn"),
+            "mail" => $this->getAuthParam("mail"),
+            "cn" => $this->getAuthParam("cn")
+        ];
+
+        $out = Requests::post("http://localhost:42042/v1/session",
+            ["Content-type" => "application/json"], json_encode($data));
+        return json_decode($out->body)->sessionKey;
+    }
+
+    private function getDataspaces()
+    {
+        $out = Requests::get("http://localhost:42042/v1/dataspaces",
+            ["Authorization" => $this->getApiKey()]);
+        return json_decode($out->body)->data;
+    }
+
+    function Pineapple($endpointURLs = null, $namespaces = null)
     {
         $this->pineapple_settings = parse_ini_file("settings.ini");
         #print_r($this->pineapple_settings);
@@ -76,28 +65,6 @@ class Pineapple
             EasyRdf_Namespace::set($prefix, $uri);
         }
     }
-
-
-    function describe_document($uddi, $format)
-    {
-        $doc_graph = $this->get_document_graph($uddi);
-        if ($format != "html") {
-            return $doc_graph->serialise($format);
-        } else {
-            return render_document_html($doc_graph);
-        }
-    }
-
-    function describe_resource($uddi, $format)
-    {
-        $resource_graph = $this->get_resource_graph($uddi, "");
-        if ($format != "html") {
-            return $resource_graph->serialise($format);
-        } else {
-            return render_document_html($resource_graph);
-        }
-    }
-
 
     function get_document_graph($uddi, $inference = null)
     {
@@ -125,7 +92,7 @@ class Pineapple
             }
         }
 
-        return $combined_graph;
+        return new Document($combined_graph);
 
     }
 
@@ -185,7 +152,7 @@ class Pineapple
     function get_resource_graph($uri, $permission_filter, $inference = null)
     {
         $uri = EasyRdf_Namespace::expand($uri);
-        if (strpos($uri, "://") == false)
+        if (strpos($uri, "://") === false)
             $uri = "cendari://resources/" . $uri;
 
         if (!$this->_check_resource_exists($uri)) {
@@ -215,7 +182,7 @@ class Pineapple
             }
         }
 
-        return $combined_graph;
+        return new Document($combined_graph);
 
     }
 
@@ -233,7 +200,7 @@ class Pineapple
                 $out[] = $row->concept;
         }
 
-        return out;
+        return $out;
 
 
     }
@@ -273,20 +240,15 @@ class Pineapple
 
     function _get_permission_filter()
     {
-        if ($this->pineapple_settings["AUTHORISATION_TYPE"]
-            == "NONE"
-        )
+        if ($this->pineapple_settings["AUTHORISATION_TYPE"] === "NONE")
             return "";
         else {
             $dataspaces = array();
-            if ($this->pineapple_settings["AUTHORISATION_TYPE"]
-                == "DEBUG"
-            )
-                foreach ($this->pineapple_settings["AUTHORISED_DATASPACES"]
-                         as $uddi)
+            if ($this->pineapple_settings["AUTHORISATION_TYPE"] === "DEBUG") {
+                foreach ($this->pineapple_settings["AUTHORISED_DATASPACES"] as $uddi)
                     $dataspaces[] = "litef://dataspaces/$uddi";
-            else {
-                foreach (getDataspaces() as $dataspace)
+            } else {
+                foreach ($this->getDataspaces() as $dataspace)
                     $dataspaces[] = "litef://dataspaces/" . $dataspace["id"];
             }
 
@@ -315,7 +277,6 @@ class Pineapple
 
 
             return $output;
-
         }
     }
 }
