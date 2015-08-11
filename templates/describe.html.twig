@@ -6,6 +6,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
+            {% if document %}
             <h1>Document: {{ document.getName }}</h1>
             <dl class="dl-horizontal">
                 <dt>Plain Text</dt>
@@ -25,6 +26,9 @@
                     <li><a href="index.php?function=describe&resource={{ resource.getUri|url_encode }}&format=.html">{{  resource.getName }}</a></li>
                 {% endfor %}
             </ul>
+            {% else %}
+
+            {% endif %}
         </div>
     </div>
 </div>

@@ -47,7 +47,7 @@ class PineappleRequest
             $this->accept_types = explode(",", $_SERVER["ACCEPT"]);
         }
 
-        $this->file_extension = null;
+        $this->file_extension = "html";
         if (isset($_GET["format"])) {
             $this->file_extension = PineappleRequest::$FILE_MAPS[$_GET["format"]];
         }
@@ -65,19 +65,17 @@ class PineappleRequest
     {
 
         $document = null;
-
-        if ($this->action = "describe" && $this->resource_is_uddi) {
-            error_log("Fetching resource: " . $this->resource);
-            $document = $pineapple->get_document_graph($this->resource, $this->inference);
-        } else if ($this->action = "describe" && !$this->resource_is_uddi) {
-            $document = $pineapple->get_resource_graph($this->resource, "", $this->inference);
+        if ($this->resource) {
+            if ($this->action = "describe" && $this->resource_is_uddi) {
+                $document = $pineapple->get_document_graph($this->resource, $this->inference);
+            } else if ($this->action = "describe" && !$this->resource_is_uddi) {
+                $document = $pineapple->get_resource_graph($this->resource, "", $this->inference);
+            }
         }
 
         if ($this->file_extension != "html") {
             return $document->graph->serialise($this->file_extension);
         } else {
-            //return render_document_html($resource_graph);
-
             return $twig->render("describe.html.twig", ["document" => $document]);
         }
     }
