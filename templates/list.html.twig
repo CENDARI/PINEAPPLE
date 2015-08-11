@@ -1,0 +1,18 @@
+{% extends "main.html.twig" %}
+
+{% block title %}All graphs{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>All graphs</h1>
+            <ul>
+                {% for resource, count in documents %}
+                    <li><a href="index.php?function=describe&resource={{ resource|url_encode }}&format=.html">{{  resource }} ({{ count }})</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

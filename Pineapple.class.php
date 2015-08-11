@@ -82,6 +82,7 @@ class Pineapple
             " graph $graph_uri" .
             " {?s ?p ?o} }";
 
+        error_log("Query: " . $query);
 
         $combined_graph = new EasyRdf_Graph($graph_uri);
         foreach ($this->endpoints as $endpoint) {
@@ -93,6 +94,32 @@ class Pineapple
         }
 
         return new Document($combined_graph);
+
+    }
+
+    function get_all_graphs($from = 0, $to = 20)
+    {
+        $query =
+
+            "select distinct ?g count(?o) as ?count " .
+            $this->_get_permission_filter() .
+            " where {" .
+            "   graph ?g {" .
+            "       ?s schema:mentions ?o ".
+            "   } " .
+            "} offset $from limit $to";
+
+
+        $out = array();
+        foreach ($this->endpoints as $endpoint) {
+            $result = $endpoint->query($query);
+
+            foreach ($result as $row) {
+                $out[$row->g->getUri()] = $row->count;
+            }
+        }
+
+        return $out;
 
     }
 

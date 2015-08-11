@@ -29,7 +29,8 @@ class Resource
 
     public function getName()
     {
-        return $this->resource->getLiteral('schema:name');
+        $name = $this->resource->getLiteral('schema:name');
+        return $name ? $name : $this->getURI();
     }
 
     public function getSource()
@@ -40,5 +41,10 @@ class Resource
     public function getLastModified()
     {
         return $this->resource->getLiteral('nao:lastModified');
+    }
+
+    public function getProperties()
+    {
+        return $this->resource->toRdfPhp();
     }
 }

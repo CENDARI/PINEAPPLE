@@ -13,6 +13,8 @@ class PineappleRequest
     public $accept_types;
     public $options;
     public $file_extension;
+    public $offset;
+    public $limit;
 
     static $FILE_MAPS = array(
         ".json" => "json",
@@ -58,7 +60,15 @@ class PineappleRequest
                 $this->inference[] = $g;
         }
 
+        $this->offset = 0;
+        if (isset($_GET["offset"])) {
+            $this->offset = intval($_GET["offset"]);
+        }
 
+        $this->limit = 100;
+        if (isset($_GET["limit"])) {
+            $this->limit = intval($_GET["limit"]);
+        }
     }
 
     function execute(Pineapple $pineapple, Twig_Environment $twig)
@@ -71,12 +81,19 @@ class PineappleRequest
             } else if ($this->action = "describe" && !$this->resource_is_uddi) {
                 $document = $pineapple->get_resource_graph($this->resource, "", $this->inference);
             }
-        }
-
-        if ($this->file_extension != "html") {
-            return $document->graph->serialise($this->file_extension);
+            if ($this->file_extension != "html") {
+                return $document->graph->serialise($this->file_extension);
+            } else {
+                return $twig->render("describe.html.twig", ["document" => $document]);
+            }
         } else {
-            return $twig->render("describe.html.twig", ["document" => $document]);
+            $list = $pineapple->get_all_graphs($this->offset, $this->limit);
+            if ($this->file_extension != "html") {
+                // TODO: Format support
+                return serialize($list);
+            } else {
+                return $twig->render("list.html.twig", ["documents" => $list]);
+            }
         }
     }
 }

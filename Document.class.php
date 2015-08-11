@@ -63,4 +63,9 @@ class Document
         }
         return $out;
     }
+
+    public function getProperties()
+    {
+        return $this->graph->toRdfPhp();
+    }
 }
