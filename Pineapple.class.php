@@ -18,6 +18,7 @@ class MalformedAPIKeyException extends Exception
 class Pineapple
 {
     static $DEFAULT_ENDPOINT_URLS = array("http://localhost:8890/sparql");
+    const DEFAULT_PAGINATION_LIMIT = 40;
 
     private $endpoints = array();
 
@@ -97,7 +98,7 @@ class Pineapple
 
     }
 
-    function get_all_graphs($from = 0, $to = 20)
+    function get_all_graphs($from = 0, $to = Pineapple::DEFAULT_PAGINATION_LIMIT)
     {
         $query =
 
@@ -115,7 +116,7 @@ class Pineapple
             $result = $endpoint->query($query);
 
             foreach ($result as $row) {
-                $out[$row->g->getUri()] = $row->count;
+                $out[(string) new Resource($row->g)] = $row->count;
             }
         }
 

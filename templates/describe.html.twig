@@ -23,7 +23,7 @@
             <h2>Mentions</h2>
             <ul>
                 {% for resource in document.getLinkedResources %}
-                    <li><a href="index.php?function=describe&resource={{ resource.getUri|url_encode }}&format=.html">{{  resource.getName }}</a></li>
+                    <li><a href="index.php?function=describe&resource={{ resource.getUrlIdent|url_encode }}&format=.html">{{  resource.getName }}</a></li>
                 {% endfor %}
             </ul>
             {% else %}

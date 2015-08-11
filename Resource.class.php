@@ -1,5 +1,7 @@
 <?php
 
+include_once("Renderable.trait.php");
+
 /**
  * Class Document
  *
@@ -7,6 +9,8 @@
  */
 class Resource
 {
+    use Renderable;
+
     public $resource;
 
     /**
@@ -27,10 +31,9 @@ class Resource
         return $this->resource->getLiteral('nao:identifier');
     }
 
-    public function getName()
+    public function getSchemaName()
     {
-        $name = $this->resource->getLiteral('schema:name');
-        return $name ? $name : $this->getURI();
+        return $this->resource->getLiteral('schema:name');
     }
 
     public function getSource()

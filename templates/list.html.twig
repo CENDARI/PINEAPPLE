@@ -7,10 +7,27 @@
     <div class="row">
         <div class="col-md-12">
             <h1>All graphs</h1>
-            <ul>
+            <ul class="list-unstyled">
                 {% for resource, count in documents %}
                     <li><a href="index.php?function=describe&resource={{ resource|url_encode }}&format=.html">{{  resource }} ({{ count }})</a></li>
                 {% endfor %}
+            </ul>
+            <ul class="pagination">
+                {% if offset > limit %}
+                    <li>
+                        <a href="?offset=0&limit={{ limit }}">Start</a>
+                    </li>
+                {% endif %}
+                {% if offset > 0 %}
+                    <li>
+                        <a href="?offset={{ max(0, offset - limit) }}&limit={{ limit }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% if (documents|length == limit) %}
+                    <li>
+                        <a href="?offset={{ offset + limit }}&limit={{ limit }}">Next</a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>

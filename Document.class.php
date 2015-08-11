@@ -1,6 +1,7 @@
 <?php
 
 include_once("Resource.class.php");
+include_once("Renderable.trait.php");
 
 /**
  * Class Document
@@ -9,6 +10,8 @@ include_once("Resource.class.php");
  */
 class Document
 {
+    use Renderable;
+
     public $graph;
 
     /**
@@ -39,7 +42,7 @@ class Document
         return $this->graph->get($this->graph->getUri(), 'nie:plainTextContent');
     }
 
-    public function getName()
+    public function getSchemaName()
     {
         return $this->graph->get($this->graph->getUri(), 'schema:name');
     }

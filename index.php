@@ -65,7 +65,7 @@ class PineappleRequest
             $this->offset = intval($_GET["offset"]);
         }
 
-        $this->limit = 100;
+        $this->limit = Pineapple::DEFAULT_PAGINATION_LIMIT;
         if (isset($_GET["limit"])) {
             $this->limit = intval($_GET["limit"]);
         }
@@ -92,7 +92,11 @@ class PineappleRequest
                 // TODO: Format support
                 return serialize($list);
             } else {
-                return $twig->render("list.html.twig", ["documents" => $list]);
+                return $twig->render("list.html.twig", [
+                    "documents" => $list,
+                    "offset" => $this->offset,
+                    "limit" => $this->limit
+                ]);
             }
         }
     }
