@@ -11,6 +11,14 @@ More functionality and documentation.
 
  - Install composer: `wget -O - https://getcomposer.org/installer | php`
  - Run `php composer.phar update` to install dependencies
+ - Compile the css file from sass (using the Leafo compiler):
+ 
+```
+cd sass
+../vendor/leafo/scssphp/pscss -f scss_formatter_compressed < styles.scss > ../stylesheets/styles.css
+cd ..
+```
+ 
  - The app relies on the CENDARI CKAN repository and Virtuoso DB. To make life easier you
    can set up a port forward via SSH, e.g. `ssh [SERVER] -Nv -L8890:localhost:8890 -L42042:localhost:42042`
  - The app _also_ requires Shibboleth authentication to access the CKAN repository. While testing
