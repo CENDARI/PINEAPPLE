@@ -12,13 +12,15 @@ class Resource
     use Renderable;
 
     public $resource;
+    public $settings;
 
     /**
      * Document constructor.
      */
-    public function __construct(EasyRdf_Resource $resource)
+    public function __construct(EasyRdf_Resource $resource, Pineapple $settings)
     {
         $this->resource = $resource;
+        $this->settings = $settings;
     }
 
     public function getURI()

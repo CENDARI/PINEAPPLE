@@ -13,7 +13,7 @@ trait Renderable
 
     public function getUrlIdent()
     {
-        $prefix = "cendari://resources/";
+        $prefix = "litef://resource/";
         return substr($this->getUri(), strlen($prefix));
     }
 

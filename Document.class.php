@@ -13,18 +13,15 @@ class Document
     use Renderable;
 
     public $graph;
+    public $pineapple;
 
     /**
      * Document constructor.
      */
-    public function __construct(EasyRdf_Graph $graph)
+    public function __construct(EasyRdf_Graph $graph, Pineapple $pineapple)
     {
         $this->graph = $graph;
-    }
-
-    public static function from(EasyRdf_Graph $graph)
-    {
-        return new Document($graph);
+        $this->pineapple = $pineapple;
     }
 
     public function getURI()
@@ -62,7 +59,7 @@ class Document
         $out = array();
         foreach ($this->graph->allResources($this->graph->getUri(), 'schema:mentions') as $res)
         {
-            array_push($out, new Resource($res));
+            array_push($out, new Resource($res, $this->pineapple));
         }
         return $out;
     }

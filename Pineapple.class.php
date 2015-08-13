@@ -49,13 +49,13 @@ class Pineapple
 
     function Pineapple($endpointURLs = null, $namespaces = null)
     {
-        $this->pineapple_settings = parse_ini_file("settings.ini");
+        $this->settings = parse_ini_file("settings.ini");
         #print_r($this->pineapple_settings);
 
         if ($endpointURLs == null)
-            $endpointURLs =& $this->pineapple_settings["endpoints"];
+            $endpointURLs =& $this->settings["endpoints"];
         if ($namespaces == null)
-            $namespaces =& $this->pineapple_settings["namespaces"];
+            $namespaces =& $this->settings["namespaces"];
 
         foreach ($endpointURLs as $url) {
             $sparql = new EasyRdf_Sparql_Client($url);
@@ -94,7 +94,7 @@ class Pineapple
             }
         }
 
-        return new Document($combined_graph);
+        return new Document($combined_graph, $this);
 
     }
 
@@ -106,7 +106,8 @@ class Pineapple
             $this->_get_permission_filter() .
             " where {" .
             "   graph ?g {" .
-            "       ?s schema:mentions ?o ".
+            "       ?s schema:mentions ?o . ".
+            "       ?s nie:plainTextContent [] . ".
             "   } " .
             "} offset $from limit $to";
 
@@ -116,7 +117,10 @@ class Pineapple
             $result = $endpoint->query($query);
 
             foreach ($result as $row) {
-                $out[(string) new Resource($row->g)] = $row->count;
+                array_push($out, [
+                    "resource" => new Resource($row->g, $this),
+                    "count" => $row->count
+                ]);
             }
         }
 
@@ -210,7 +214,7 @@ class Pineapple
             }
         }
 
-        return new Document($combined_graph);
+        return new Document($combined_graph, $this);
 
     }
 
@@ -268,12 +272,12 @@ class Pineapple
 
     function _get_permission_filter()
     {
-        if ($this->pineapple_settings["AUTHORISATION_TYPE"] === "NONE")
+        if ($this->settings["AUTHORISATION_TYPE"] === "NONE")
             return "";
         else {
             $dataspaces = array();
-            if ($this->pineapple_settings["AUTHORISATION_TYPE"] === "DEBUG") {
-                foreach ($this->pineapple_settings["AUTHORISED_DATASPACES"] as $uddi)
+            if ($this->settings["AUTHORISATION_TYPE"] === "DEBUG") {
+                foreach ($this->settings["AUTHORISED_DATASPACES"] as $uddi)
                     $dataspaces[] = "litef://dataspaces/$uddi";
             } else {
                 foreach ($this->getDataspaces() as $dataspace)
