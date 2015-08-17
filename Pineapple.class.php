@@ -18,7 +18,7 @@ class MalformedAPIKeyException extends Exception
 class Pineapple
 {
     static $DEFAULT_ENDPOINT_URLS = array("http://localhost:8890/sparql");
-    const DEFAULT_PAGINATION_LIMIT = 40;
+    const DEFAULT_PAGINATION_LIMIT = 20;
 
     private $endpoints = array();
 
