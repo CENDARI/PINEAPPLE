@@ -17,6 +17,7 @@ $view->parserOptions = array(
 );
 $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
+    new Twig_Extensions_Extension_I18n
 );
 
 $pineapple = new Pineapple();

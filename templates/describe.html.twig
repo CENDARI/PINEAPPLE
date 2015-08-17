@@ -6,21 +6,20 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            {% if document %}
             <h1>{{ document.getTitle }}</h1>
             <dl class="dl-horizontal">
-                <dt>Source</dt>
+                <dt>{% trans "Source" %}</dt>
                 <dd>{{ document.getSource }}</dd>
-                <dt>Last Modified</dt>
+                <dt>{% trans "Last modified" %}</dt>
                 <dd>{{ document.getLastModifiedDate }}</dd>
-                <dt>Plain Text</dt>
+                <dt>{% trans "Plain Text" %}</dt>
                 <dd id='raw_text' style="max-height: 300px; overflow-y: scroll">
                     <pre>
                         {{  document.getPlainText }}
                     </pre>
                 </dd>
             </dl>
-            <h2>Mentions</h2>
+            <h2>{% trans "Mentions" %}</h2>
             <ul class="reference-list">
                 {% for resource in document.getLinkedResources %}
                     <li>
@@ -28,9 +27,6 @@
                     </li>
                 {% endfor %}
             </ul>
-            {% else %}
-
-            {% endif %}
         </div>
     </div>
 </div>
