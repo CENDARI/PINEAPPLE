@@ -13,11 +13,11 @@ class PineappleRequest
     public $limit;
 
     static $FILE_MAPS = array(
-        ".json" => "json",
-        ".xml" => "rdf",
-        ".rdf" => "rdf",
-        ".html" => "html",
-        ".htm" => "html");
+        "json" => "json",
+        "xml" => "rdf",
+        "rdf" => "rdf",
+        "html" => "html",
+        "htm" => "html");
 
 
     public function __construct()
@@ -83,7 +83,7 @@ class PineappleRequest
                 return $twig->render("describe.html.twig", ["document" => $document]);
             }
         } else {
-            $list = $pineapple->get_all_graphs($this->offset, $this->limit);
+            $list = $pineapple->get_all_resources($this->offset, $this->limit);
             if ($this->file_extension != "html") {
                 // TODO: Format support
                 return serialize($list);

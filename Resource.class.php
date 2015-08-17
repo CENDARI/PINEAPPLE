@@ -33,6 +33,11 @@ class Resource
         return $this->resource->getLiteral('nao:identifier');
     }
 
+    public function getTitle()
+    {
+        return $this->resource->getLiteral('dc11:title');
+    }
+
     public function getSchemaName()
     {
         return $this->resource->getLiteral('schema:name');

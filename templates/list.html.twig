@@ -6,10 +6,17 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>All graphs</h1>
-            <ul class="list-unstyled">
+            <h1>All documents</h1>
+            <ul class="resource-list">
                 {% for item in documents %}
-                    <li><a href="{{ urlFor("describe", {"id": item.resource.getUrlIdent}) }}">{{  item.resource }} ({{ item.count }})</a></li>
+                    <li class="resource-list-item">
+                        <a class="title" href="{{ urlFor("describe", {"id": item.resource.getUrlIdent}) }}">{{  item.title }}</a>
+                        <ul class="details">
+                            <li>Mentions: {{ item.count }}</li>
+                            <li>Last modified: {{ item.lastModified }}</li>
+                        </ul>
+
+                    </li>
                 {% endfor %}
             </ul>
             <ul class="pagination">

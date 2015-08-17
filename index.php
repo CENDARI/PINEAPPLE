@@ -23,7 +23,7 @@ $pineapple = new Pineapple();
 $req = new PineappleRequest();
 
 $app->get("/", function() use($app, &$pineapple, &$req) {
-    $list = $pineapple->get_all_graphs($req->offset, $req->limit);
+    $list = $pineapple->get_all_resources($req->offset, $req->limit);
     $app->render("list.html.twig", [
         "documents" => $list,
         "offset" => $req->offset,
@@ -33,7 +33,11 @@ $app->get("/", function() use($app, &$pineapple, &$req) {
 
 $app->get("/describe/:id+", function($id) use($app, &$pineapple, &$req) {
     $document = $pineapple->get_document_graph(join("/", $id));
-    $app->render("describe.html.twig", ["document" => $document]);
+    if ($req->file_extension === "html") {
+        $app->render("describe.html.twig", ["document" => $document]);
+    } else {
+        echo $document->graph->serialise($req->file_extension);
+    }
 })->name("describe");
 
 

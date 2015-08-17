@@ -70,47 +70,41 @@ class Pineapple
     function get_document_graph($uddi, $inference = null)
     {
         $graph_uri = sprintf("resource:%s", $uddi);
-
         if (!$this->_check_resource_exists($graph_uri)) {
             throw new ResourceNotFoundException($graph_uri . " not found.");
         }
-
         $query =
-
             "select ?s ?p ?o " .
             $this->_get_permission_filter() .
             " where {" .
             " graph $graph_uri" .
             " {?s ?p ?o} }";
-
         error_log("Query: " . $query);
-
         $combined_graph = new EasyRdf_Graph($graph_uri);
         foreach ($this->endpoints as $endpoint) {
             $result = $endpoint->query($query);
-
             foreach ($result as $row) {
                 $combined_graph->add($row->s, $row->p, $row->o);
             }
         }
-
         return new Document($combined_graph, $this);
-
     }
 
-    function get_all_graphs($from = 0, $to = Pineapple::DEFAULT_PAGINATION_LIMIT)
+    function get_all_resources($from = 0, $to = Pineapple::DEFAULT_PAGINATION_LIMIT)
     {
         $query =
 
-            "select distinct ?g count(?o) as ?count " .
+            "select distinct ?g ?title ?identifier ?lastModified count(?m) as ?count " .
             $this->_get_permission_filter() .
-            " where {" .
-            "   graph ?g {" .
-            "       ?s schema:mentions ?o . ".
-            "       ?s nie:plainTextContent [] . ".
-            "   } " .
-            "} offset $from limit $to";
-
+            "where {" .
+            "  graph ?g {" .
+            "    [] schema:mentions ?m ; ".
+            "       dc11:title ?title ; ".
+            "       nao:lastModified ?lastModified ; ".
+            "       nao:identifier ?identifier . ".
+            "  }" .
+            "} order by ASC(?title) " . // FIXME: Why doesn't this work???
+            "offset $from limit $to";
 
         $out = array();
         foreach ($this->endpoints as $endpoint) {
@@ -119,13 +113,14 @@ class Pineapple
             foreach ($result as $row) {
                 array_push($out, [
                     "resource" => new Resource($row->g, $this),
+                    "title" => $row->title,
+                    "lastModified" => date("d-m-Y H:i", intval($row->lastModified->getValue()) / 1000),
                     "count" => $row->count
                 ]);
             }
         }
 
         return $out;
-
     }
 
     function get_document_mention_types($uddi, $inference = null)

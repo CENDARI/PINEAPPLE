@@ -29,6 +29,11 @@ class Document
         return $this->graph->getUri();
     }
 
+    public function getTitle()
+    {
+        return $this->graph->get($this->graph->getUri(), 'dc11:title');
+    }
+
     public function getId()
     {
         return $this->graph->get($this->graph->getUri(), 'nao:identifier');

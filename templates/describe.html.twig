@@ -7,24 +7,24 @@
     <div class="row">
         <div class="col-md-12">
             {% if document %}
-            <h1>Document: {{ document.getName }}</h1>
+            <h1>{{ document.getTitle }}</h1>
             <dl class="dl-horizontal">
+                <dt>Source</dt>
+                <dd>{{ document.getSource }}</dd>
+                <dt>Last Modified</dt>
+                <dd>{{ document.getLastModifiedDate }}</dd>
                 <dt>Plain Text</dt>
                 <dd id='raw_text' style="max-height: 300px; overflow-y: scroll">
                     <pre>
                         {{  document.getPlainText }}
                     </pre>
                 </dd>
-                <dt>Source</dt>
-                <dd>{{ document.getSource }}</dd>
-                <dt>Last Modified</dt>
-                <dd>{{ document.getLastModified }}</dd>
             </dl>
             <h2>Mentions</h2>
             <ul>
                 {% for resource in document.getLinkedResources %}
                     <li>
-                        <a href="{{ urlFor("describe", {"id": resource.getUrlIdent()}) }}">{{  resource.getName }}</a>
+                        <a href="{{ urlFor("describe", {"id": resource}) }}">{{  resource.getName }}</a>
                     </li>
                 {% endfor %}
             </ul>
