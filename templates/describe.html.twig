@@ -21,10 +21,10 @@
                 </dd>
             </dl>
             <h2>Mentions</h2>
-            <ul>
+            <ul class="reference-list">
                 {% for resource in document.getLinkedResources %}
                     <li>
-                        <a href="{{ urlFor("describe", {"id": resource}) }}">{{  resource.getName }}</a>
+                        <a title="{{ resource.getUri }}" href="{{ urlFor("mention", {"type": resource.getType, "name": resource.getSchemaName}) }}">{{  resource.getName }}</a>
                     </li>
                 {% endfor %}
             </ul>

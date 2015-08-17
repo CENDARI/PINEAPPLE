@@ -9,7 +9,7 @@
             <h1>All documents</h1>
             <ul class="resource-list">
                 {% for item in documents %}
-                    <li class="resource-list-item">
+                    <li>
                         <a class="title" href="{{ urlFor("describe", {"id": item.resource.getUrlIdent}) }}">{{  item.title }}</a>
                         <ul class="details">
                             <li>Mentions: {{ item.count }}</li>

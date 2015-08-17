@@ -102,7 +102,7 @@ footer p {
 
 .resource-list {
   @extend .list-unstyled;
-  .resource-list-item {
+  >li {
     margin-bottom: 15px;
     a.title {
       font-size: 1.2em;

@@ -38,6 +38,23 @@ class Resource
         return $this->resource->getLiteral('dc11:title');
     }
 
+    public function getNamespacePrefix()
+    {
+        $uri = $this->getURI();
+        foreach ($this->settings->settings["namespaces"] as $prefix => $ns) {
+            if (strpos($uri, $ns, 0) === 0) {
+                return $prefix;
+            }
+        }
+        // Fallback to regular type???
+        return $this->getType();
+    }
+
+    public function getType()
+    {
+        return $this->resource->type();
+    }
+
     public function getSchemaName()
     {
         return $this->resource->getLiteral('schema:name');

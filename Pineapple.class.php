@@ -1,7 +1,7 @@
 <?php
 require "vendor/autoload.php";
 require_once "Document.class.php";
-require_once "render_html.php";
+
 
 class ResourceNotFoundException extends Exception
 {
@@ -150,29 +150,35 @@ class Pineapple
         return $out;
     }
 
-    function get_document_mention_individuals($uddi, $type, $inference = null)
+    function get_document_mention_individuals($type, $name, $inference = null)
     {
-        $graph_uri = "litef://resource:$uddi";
-        $type = EasyRdf_Namespace::expand($type);
+        $query =
 
-        if (!$this->_check_resource_exists($graph_uri)) {
-            throw new ResourceNotFoundException($graph_uri . " not found.");
-        }
-
-        $query_string =
-            "select distinct ?x " .
+            "select distinct ?s ?title ?identifier " .
             $this->_get_permission_filter() .
-            " where {" .
-            " $graph_uri schema:mentions ?x." .
-            " ?x rdf:type <$type>}}";
+            "where {" .
+            "  ?m a $type ; " .
+            // FIXME: literal type? why is this needed?
+            "     schema:name \"$name\"^^xsd:string . " .
+            "  ?s schema:mentions ?m ; ".
+            "     dc11:title ?title ; ".
+            "     nao:identifier ?identifier . ".
+            "} order by ASC(?title) "; // FIXME: Why doesn't this work???
+
+        error_log("Query: $query");
 
         $out = array();
-
         foreach ($this->endpoints as $endpoint) {
-            $result = $endpoint->query($query_string);
-            foreach ($result as $row)
-                $out[] = $row->x;
+            $result = $endpoint->query($query);
+
+            foreach ($result as $row) {
+                array_push($out, [
+                    "resource" => new Resource($row->s, $this),
+                    "title" => $row->title
+                ]);
+            }
         }
+
         return $out;
     }
 
