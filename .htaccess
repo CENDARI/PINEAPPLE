@@ -2,8 +2,10 @@ RewriteEngine On
 
 RewriteBase /pineapple/
 
-#RewriteCond %{REQUEST_FILENAME} !-d
-#RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^ index.php [QSA,L]
 
 #RewriteRule ^([a-zA*Z0-9]*)/?([a-zA-Z0-9\-:/]+)*(.[a-z]+)$ index.php?function=$1&resource=$2&format=$3 [QSA,L]
 
