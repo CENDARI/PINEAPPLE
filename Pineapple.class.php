@@ -151,7 +151,7 @@ class Pineapple
         return $out;
     }
 
-    function get_document_mention_individuals($type, $name, $inference = null)
+    function get_document_mention_individuals($type, $name, $from = 0, $to = Pineapple::DEFAULT_PAGINATION_LIMIT, $inference = null)
     {
         $query =
 
@@ -164,7 +164,8 @@ class Pineapple
             "  ?s schema:mentions ?m ; ".
             "     dc11:title ?title ; ".
             "     nao:identifier ?identifier . ".
-            "} order by ASC(?title) "; // FIXME: Why doesn't this work???
+            "}" .
+            "offset $from limit $to";
 
         error_log("Query: $query");
 

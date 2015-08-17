@@ -43,11 +43,14 @@ $app->get("/describe/:id+", function($id) use($app, &$pineapple, &$req) {
 })->name("describe");
 
 $app->get("/mention/:type/:name", function($type, $name) use($app, &$pineapple, &$req) {
-    $mentions = $pineapple->get_document_mention_individuals($type, $name);
+    $mentions = $pineapple->get_document_mention_individuals(
+        $type, $name, $req->offset, $req->limit);
     $app->render("mention.html.twig", [
             "name" => $name,
             "type" => $type,
-            "mentions" => $mentions
+            "mentions" => $mentions,
+            "offset" => $req->offset,
+            "limit" => $req->limit,
         ]
     );
 })->name("mention");
