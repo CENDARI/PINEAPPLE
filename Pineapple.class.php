@@ -90,7 +90,7 @@ class Pineapple
         return new Document($combined_graph, $this);
     }
 
-    function get_all_resources($from = 0, $to = Pineapple::DEFAULT_PAGINATION_LIMIT)
+    function get_all_resources($q = null, $from = 0, $to = Pineapple::DEFAULT_PAGINATION_LIMIT)
     {
         $query =
 
@@ -102,6 +102,7 @@ class Pineapple
             "       dc11:title ?title ; ".
             "       nao:lastModified ?lastModified ; ".
             "       nao:identifier ?identifier . ".
+            $this->_get_search_filter("?title", $q) .
             "  }" .
             "} order by ASC(?title) " . // FIXME: Why doesn't this work???
             "offset $from limit $to";
@@ -310,6 +311,23 @@ class Pineapple
 
 
             return $output;
+        }
+    }
+
+    private function _get_search_filter($pred, $q)
+    {
+        if ($q == null) {
+            return "";
+        } else {
+            // Sadness. Apparently there's no way to parameterize
+            // queries with Easy_RDF, so this rubbish thing will have
+            // to do.
+            $chars = preg_replace("/\W/", '', $q);
+            if (strlen($chars) === 0) {
+                return "";
+            } else {
+                return " FILTER regex ($pred, \"$chars\", \"i\" )";
+            }
         }
     }
 }

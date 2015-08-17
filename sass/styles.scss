@@ -101,6 +101,7 @@ footer p {
 }
 
 .resource-list {
+  margin: 15px 0 15px 0;
   @extend .list-unstyled;
   >li {
     margin-bottom: 15px;

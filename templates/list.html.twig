@@ -6,7 +6,15 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <h1>All documents</h1>
+            <form action="{{ currentUrl() }}" method="get" class="form-inline">
+            <h1>Resources</h1>
+            {#<div class="form-group">#}
+                {#<label for="id_q" class="sr-only">Filter</label>#}
+                {#<div class="input-group">#}
+                    {#<input name="q" type="search" class="form-control" id="id_q" placeholder="Type a query" value="{{ query }}">#}
+                {#</div>#}
+                {#<button type="submit" class="btn btn-default">Search</button>#}
+            {#</div>#}
             <ul class="resource-list">
                 {% for item in documents %}
                     <li>
@@ -36,6 +44,7 @@
                     </li>
                 {% endif %}
             </ul>
+            </form>
         </div>
     </div>
 </div>

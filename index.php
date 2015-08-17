@@ -23,11 +23,13 @@ $pineapple = new Pineapple();
 $req = new PineappleRequest();
 
 $app->get("/", function() use($app, &$pineapple, &$req) {
-    $list = $pineapple->get_all_resources($req->offset, $req->limit);
+    $q = isset($_GET["q"]) ? $_GET["q"] : null;
+    $list = $pineapple->get_all_resources($q, $req->offset, $req->limit);
     $app->render("list.html.twig", [
         "documents" => $list,
         "offset" => $req->offset,
-        "limit" => $req->limit
+        "limit" => $req->limit,
+        "query" => $q
     ]);
 })->name("home");
 
