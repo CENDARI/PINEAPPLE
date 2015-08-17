@@ -1,0 +1,17 @@
+<ul class="pagination">
+    {% if offset > limit %}
+        <li>
+            <a href="?offset=0&limit={{ limit }}">Start</a>
+        </li>
+    {% endif %}
+    {% if offset > 0 %}
+        <li>
+            <a href="?offset={{ max(0, offset - limit) }}&limit={{ limit }}">Previous</a>
+        </li>
+    {% endif %}
+    {% if (items|length == limit) %}
+        <li>
+            <a href="?offset={{ offset + limit }}&limit={{ limit }}">Next</a>
+        </li>
+    {% endif %}
+</ul>

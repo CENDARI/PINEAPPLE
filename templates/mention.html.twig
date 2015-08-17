@@ -16,6 +16,7 @@
                     </li>
                 {% endfor %}
             </ul>
+            {%  include "_pagination.html.twig" with {'items': mentions} %}
         </div>
     </div>
 </div>

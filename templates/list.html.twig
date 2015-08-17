@@ -3,49 +3,34 @@
 {% block title %}All graphs{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <form action="{{ currentUrl() }}" method="get" class="form-inline">
-            <h1>Resources</h1>
-            {#<div class="form-group">#}
-                {#<label for="id_q" class="sr-only">Filter</label>#}
-                {#<div class="input-group">#}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="{{ currentUrl() }}" method="get" class="form-inline">
+                    <h1>Resources</h1>
+                    {#<div class="form-group">#}
+                    {#<label for="id_q" class="sr-only">Filter</label>#}
+                    {#<div class="input-group">#}
                     {#<input name="q" type="search" class="form-control" id="id_q" placeholder="Type a query" value="{{ query }}">#}
-                {#</div>#}
-                {#<button type="submit" class="btn btn-default">Search</button>#}
-            {#</div>#}
-            <ul class="resource-list">
-                {% for item in documents %}
-                    <li>
-                        <a class="title" href="{{ urlFor("describe", {"id": item.resource.getUrlIdent}) }}">{{  item.title }}</a>
-                        <ul class="details">
-                            <li>Mentions: {{ item.count }}</li>
-                            <li>Last modified: {{ item.lastModified }}</li>
-                        </ul>
+                    {#</div>#}
+                    {#<button type="submit" class="btn btn-default">Search</button>#}
+                    {#</div>#}
+                    <ul class="resource-list">
+                        {% for item in documents %}
+                            <li>
+                                <a class="title"
+                                   href="{{ urlFor("describe", {"id": item.resource.getUrlIdent}) }}">{{ item.title }}</a>
+                                <ul class="details">
+                                    <li>Mentions: {{ item.count }}</li>
+                                    <li>Last modified: {{ item.lastModified }}</li>
+                                </ul>
 
-                    </li>
-                {% endfor %}
-            </ul>
-            <ul class="pagination">
-                {% if offset > limit %}
-                    <li>
-                        <a href="?offset=0&limit={{ limit }}">Start</a>
-                    </li>
-                {% endif %}
-                {% if offset > 0 %}
-                    <li>
-                        <a href="?offset={{ max(0, offset - limit) }}&limit={{ limit }}">Previous</a>
-                    </li>
-                {% endif %}
-                {% if (documents|length == limit) %}
-                    <li>
-                        <a href="?offset={{ offset + limit }}&limit={{ limit }}">Next</a>
-                    </li>
-                {% endif %}
-            </ul>
-            </form>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% include "_pagination.html.twig" with {'items': documents} %}
+                </form>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
