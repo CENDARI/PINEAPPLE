@@ -15,6 +15,6 @@ RewriteRule ^ index.php [QSA,L]
 
 # This is a stopgap till the webroot is moved
 <Files "settings.ini">
-    Order allow, deny
+    Order allow,deny
     Deny from all
 </Files>
