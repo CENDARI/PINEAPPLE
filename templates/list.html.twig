@@ -8,27 +8,29 @@
             <div class="col-md-12">
                 <form action="{{ currentUrl() }}" method="get" class="form-inline">
                     <h1>{% trans "Resources" %}</h1>
-                    {#<div class="form-group">#}
-                    {#<label for="id_q" class="sr-only">Filter</label>#}
-                    {#<div class="input-group">#}
-                    {#<input name="q" type="search" class="form-control" id="id_q" placeholder="Type a query" value="{{ query }}">#}
-                    {#</div>#}
-                    {#<button type="submit" class="btn btn-default">Search</button>#}
-                    {#</div>#}
+                    <div class="form-group">
+                    <label for="id_q" class="sr-only">{% trans "Query" %}</label>
+                    <div class="input-group">
+                    <input name="q" type="search" class="form-control" id="id_q" placeholder="{%  trans "Type a query" %}" value="{{ query }}">
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                    </div>
                     <ul class="resource-list">
-                        {% for item in documents %}
+                        {% for item in resources %}
                             <li>
                                 <a class="title"
-                                   href="{{ urlFor("describe", {"id": item.resource.getUrlIdent}) }}">{{ item.title }}</a>
+                                   href="{{ urlFor("resource", {"id": item.id}) }}">{{ item.title }}</a>
                                 <ul class="details">
-                                    <li>Mentions: {{ item.count }}</li>
-                                    <li>Last modified: {{ item.lastModified }}</li>
+                                    <li>Mentions: {{ item.numMentions }}</li>
+                                    <li>Last modified: {{ item.lastModified|prettyDate }}</li>
                                 </ul>
 
                             </li>
+                        {% else %}
+                            <li>{% trans "No results found" %}</li>
                         {% endfor %}
                     </ul>
-                    {% include "_pagination.html.twig" with {'items': documents} %}
+                    {% include "_pagination.html.twig" with {'items': resources} %}
                 </form>
             </div>
         </div>

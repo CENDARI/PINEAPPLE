@@ -1,11 +1,11 @@
 <?php
 require "vendor/autoload.php";
-require_once "Pineapple.class.php";
-require_once "PineappleRequest.class.php";
-require_once "render_html.php";
+require_once "Pineapple.php";
+
 
 $app = new \Slim\Slim(array(
-    "view" => new \Slim\Views\Twig()
+    "view" => new \Slim\Views\Twig(),
+    "debug" => getenv("APP_DEBUG")
 ));
 
 $log = $app->getLog();
@@ -20,41 +20,82 @@ $view->parserExtensions = array(
     new Twig_Extensions_Extension_I18n
 );
 
-$pineapple = new Pineapple();
-$req = new PineappleRequest();
+// Add a simple template function to format the millisecond date strings
+// we get back from the triplestore
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("prettyDate", function ($milliseconds) {
+    return date("d-m-Y H:i", intval($milliseconds) / 1000);
+}));
 
-$app->get("/", function() use($app, &$pineapple, &$req) {
-    $q = isset($_GET["q"]) ? $_GET["q"] : null;
-    $list = $pineapple->get_all_resources($q, $req->offset, $req->limit);
-    $app->render("list.html.twig", [
-        "documents" => $list,
-        "offset" => $req->offset,
-        "limit" => $req->limit,
+// Instantiate the Pineapple object where the interesting
+// stuff happens
+$pineapple = new Pineapple();
+
+
+/**
+ * Return a response. The app supports HTML and JSON. JSON
+ * will be render if either the accept header contains
+ * application/json or the format parameter is `json`.
+ *
+ * @param \Slim\Slim $app
+ * @param $template
+ * @param $data
+ */
+function respond(\Slim\Slim $app, $template, $data) {
+    $accept = $app->request->headers("accept");
+    $format = $app->request->get("format");
+    if (($accept != null && preg_match("/\/json/i", $accept))
+        || ($format != null && strtolower($format) === "json")
+    ) {
+        $app->response->headers()->set("Content-type", "application/json");
+        echo json_encode($data);
+    } else {
+        $app->render($template, $data);
+    }
+}
+
+
+$app->get("/", function () use ($app, &$pineapple) {
+    $q = $app->request->get("q");
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", Pineapple::DEFAULT_PAGINATION_LIMIT);
+
+    $list = $pineapple->getResources($q, $offset, $limit);
+    $data = [
+        "resources" => $list,
+        "offset" => $offset,
+        "limit" => $limit,
         "query" => $q
-    ]);
+    ];
+    respond($app, "list.html.twig", $data);
 })->name("home");
 
-$app->get("/describe/:id+", function($id) use($app, &$pineapple, &$req) {
-    $document = $pineapple->get_document_graph(join("/", $id));
-    if ($req->file_extension === "html") {
-        $app->render("describe.html.twig", ["document" => $document]);
-    } else {
-        echo $document->graph->serialise($req->file_extension);
-    }
-})->name("describe");
 
-$app->get("/mention/:type/:name", function($type, $name) use($app, &$pineapple, &$req) {
-    $mentions = $pineapple->get_document_mention_individuals(
-        $type, $name, $req->offset, $req->limit);
-    $app->render("mention.html.twig", [
-            "name" => $name,
-            "type" => $type,
-            "mentions" => $mentions,
-            "offset" => $req->offset,
-            "limit" => $req->limit,
-        ]
-    );
+$app->get("/resource/:id", function ($id) use ($app, &$pineapple) {
+    $data = $pineapple->getResource($id);
+    respond($app, "resource.html.twig", $data);
+})->name("resource");
+
+
+$app->get("/mention/:type/:name", function ($type, $name) use ($app, &$pineapple) {
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", Pineapple::DEFAULT_PAGINATION_LIMIT);
+
+    $mentions = $pineapple->getMentionResources($type, $name, $offset, $limit);
+    $data = [
+        "name" => $name,
+        "type" => $type,
+        "mentions" => $mentions,
+        "offset" => $offset,
+        "limit" => $limit
+    ];
+    respond($app, "mention.html.twig", $data);
 })->name("mention");
+
+
+$app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
+    $mentions = $pineapple->getResourceMentions($id);
+    respond($app, "_mentions.html.twig", $mentions);
+})->name("mentions");
 
 
 $app->run();

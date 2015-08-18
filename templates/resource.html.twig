@@ -1,0 +1,26 @@
+{% extends "main.html.twig" %}
+
+{% block title %}{{ name }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{{ title }}</h1>
+                <dl class="dl-horizontal">
+                    <dt>{% trans "Source" %}</dt>
+                    <dd>{{ source }}</dd>
+                    <dt>{% trans "Last modified" %}</dt>
+                    <dd>{{ lastModified|prettyDate }}</dd>
+                    <dt>{% trans "Plain Text" %}</dt>
+                    <dd class="raw-text">
+                        <pre>
+                            {{ plainText }}
+                        </pre>
+                    </dd>
+                </dl>
+                {% include "_mentions.html.twig" %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
