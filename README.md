@@ -40,78 +40,67 @@ The app will respond with JSON if:
  
 Typical responses are as follows:
 
-    http http://localhost:8000 Accept:application/json q=='Amiens Cathedral'    
-    
-    HTTP/1.1 200 OK
-    Connection: close
-    Content-Type: application/json
-    Host: localhost:8000
-    X-Powered-By: PHP/5.5.12-2ubuntu4.6
-    
-    {
-        "limit": 20, 
-        "offset": 0, 
-        "query": "Amiens Cathedral", 
-        "resources": [
-            {
-                "id": "bcc950c1-6984-4f9a-802d-3571d04d0adf", 
-                "lastModified": "1419000522000", 
-                "numMentions": 15, 
-                "title": "View inside Amiens Cathedral"
-            },
-            ...
-        }
-    }
+```bash
+http http://localhost:8000 Accept:application/json q=='Amiens Cathedral'
+```
 
+```json
+{
+    "limit": 20,
+    "offset": 0,
+    "query": "Amiens Cathedral",
+    "resources": [
+        {
+            "id": "bcc950c1-6984-4f9a-802d-3571d04d0adf",
+            "lastModified": "1419000522000",
+            "numMentions": 15,
+            "title": "View inside Amiens Cathedral"
+        },
+        ...
+    ]
+}
+```
 
-    http localhost:8000/resource/bcc950c1-6984-4f9a-802d-3571d04d0adf Accept:application/json    
+```bash
+http localhost:8000/resource/bcc950c1-6984-4f9a-802d-3571d04d0adf Accept:application/json
+```
 
-    HTTP/1.1 200 OK
-    Connection: close
-    Content-Type: application/json
-    Host: localhost:8000
-    X-Powered-By: PHP/5.5.12-2ubuntu4.6
-    
-    {
-        "id": "bcc950c1-6984-4f9a-802d-3571d04d0adf", 
-        "title": "View inside Amiens Cathedral",
-        "lastModified": "1419000522000", 
-        "plainText": "...", 
-        "source": "c1-6984-4f9a-802d-3571d04d0adf", 
-        "mentions": [
-            {
-                "title": "France", 
-                "type": "schema:Place", 
-                "uri": "cendari://resources/Place/France"
-            },
-             
-            ...
-        ] 
-    }
-    
-    
-    http localhost:8000/mention/schema:Place/France Accept:application/json
-    
-    HTTP/1.1 200 OK
-    Connection: close
-    Content-Type: application/json
-    Host: localhost:8000
-    X-Powered-By: PHP/5.5.12-2ubuntu4.6
-    
-    {
-        "limit": 20, 
-        "mentions": [
-            {
-                "id": "71a62833-7c4d-41a5-90aa-6f047eafd4c6", 
-                "title": "One of our big guns with which we annoy the enemy"
-            },
-            
-            ...
-        ], 
-        "name": "France", 
-        "type": "schema:Place"
-    }
+```json
+{
+    "id": "bcc950c1-6984-4f9a-802d-3571d04d0adf",
+    "title": "View inside Amiens Cathedral",
+    "lastModified": "1419000522000",
+    "plainText": "...",
+    "source": "c1-6984-4f9a-802d-3571d04d0adf",
+    "mentions": [
+        {
+            "title": "France",
+            "type": "schema:Place",
+            "uri": "cendari://resources/Place/France"
+        },
+        ...
+    ]
+}
+```
 
+```bash
+http localhost:8000/mention/schema:Place/France Accept:application/json
+```
+
+```json
+{
+    "limit": 20,
+    "mentions": [
+        {
+            "id": "71a62833-7c4d-41a5-90aa-6f047eafd4c6",
+            "title": "One of our big guns with which we annoy the enemy"
+        },
+        ...
+    ],
+    "name": "France",
+    "type": "schema:Place"
+}
+```
 
 ### TODO
 
