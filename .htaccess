@@ -10,5 +10,11 @@ RewriteRule ^ index.php [QSA,L]
 #RewriteRule ^([a-zA*Z0-9]*)/?([a-zA-Z0-9\-:/]+)*(.[a-z]+)$ index.php?function=$1&resource=$2&format=$3 [QSA,L]
 
 <Files "index.php">
-AcceptPathInfo On
+    AcceptPathInfo On
+</Files>
+
+# This is a stopgap till the webroot is moved
+<Files "settings.ini">
+    Order allow, deny
+    Deny from all
 </Files>

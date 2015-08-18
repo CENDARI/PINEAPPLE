@@ -1,6 +1,8 @@
 <?php
 require "vendor/autoload.php";
 require_once "Pineapple.php";
+require_once "FileRepository.php";
+require_once "TripleStore.php";
 
 
 $app = new \Slim\Slim(array(
@@ -26,9 +28,13 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("prettyDate", function 
     return date("d-m-Y H:i", intval($milliseconds) / 1000);
 }));
 
+$settings = parse_ini_file("settings.ini");
+$filerepo = new FileRepository($settings);
+$triplestore = new TripleStore($settings);
+
 // Instantiate the Pineapple object where the interesting
 // stuff happens
-$pineapple = new Pineapple();
+$pineapple = new Pineapple($filerepo, $triplestore, $settings);
 
 
 /**

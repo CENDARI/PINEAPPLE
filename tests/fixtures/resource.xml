@@ -1,0 +1,89 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+    <head>
+        <variable name="s"/>
+        <variable name="p"/>
+        <variable name="o"/>
+    </head>
+    <results distinct="false" ordered="true">
+        <result>
+            <binding name="s">
+                <uri>cendari://resources/Event/World War</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</uri>
+            </binding>
+            <binding name="o">
+                <uri>http://schema.org/Event</uri>
+            </binding>
+        </result>
+        <result>
+            <binding name="s">
+                <uri>cendari://resources/Event/World War</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://schema.org/name</uri>
+            </binding>
+            <binding name="o">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">World War</literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="s">
+                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://purl.org/dc/elements/1.1/source</uri>
+            </binding>
+            <binding name="o">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">f4-8452-44e5-aea0-75edc3bc77d7</literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="s">
+                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://www.semanticdesktop.org/ontologies/2007/01/19/nie#plainTextContent</uri>
+            </binding>
+            <binding name="o">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">2005
+                    United Kingdom
+                </literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="s">
+                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://purl.org/dc/elements/1.1/title</uri>
+            </binding>
+            <binding name="o">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Race in progress</literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="s">
+                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://www.semanticdesktop.org/ontologies/2007/08/15/nao#lastModified</uri>
+            </binding>
+            <binding name="o">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000335000</literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="s">
+                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+            </binding>
+            <binding name="p">
+                <uri>http://www.semanticdesktop.org/ontologies/2007/08/15/nao#identifier</uri>
+            </binding>
+            <binding name="o">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">c87de1f4-8452-44e5-aea0-75edc3bc77d7
+                </literal>
+            </binding>
+        </result>
+    </results>
+</sparql>

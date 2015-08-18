@@ -1,0 +1,40 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <head>
+        <variable name="title"/>
+        <variable name="identifier"/>
+        <variable name="lastModified"/>
+        <variable name="count"/>
+    </head>
+    <results distinct="false" ordered="true">
+        <result>
+            <binding name="title">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Race in progress</literal>
+            </binding>
+            <binding name="identifier">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">c87de1f4-8452-44e5-aea0-75edc3bc77d7
+                </literal>
+            </binding>
+            <binding name="lastModified">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000335000</literal>
+            </binding>
+            <binding name="count">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#integer">10</literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="title">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Colonel of the regiment watching the greasy pole competition</literal>
+            </binding>
+            <binding name="identifier">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">f22c70aa-c640-4773-884d-076ac2f536c4
+                </literal>
+            </binding>
+            <binding name="lastModified">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000347000</literal>
+            </binding>
+            <binding name="count">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#integer">9</literal>
+            </binding>
+        </result>
+    </results>
+</sparql>

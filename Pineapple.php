@@ -12,50 +12,17 @@ class MalformedAPIKeyException extends Exception {
 }
 
 class Pineapple {
-    static $DEFAULT_ENDPOINT_URLS = array("http://localhost:8890/sparql");
+
     const DEFAULT_PAGINATION_LIMIT = 20;
 
-    private $endpoints = array();
+    private $triplestore;
+    private $filerepo;
+    private $settings;
 
-    private function getAuthParam($key) {
-        return isset($_SERVER[$key]) ? $_SERVER[$key] : $_ENV[$key];
-    }
-
-    private function getApiKey() {
-        $data = [
-            "eppn" => $this->getAuthParam("eppn"),
-            "mail" => $this->getAuthParam("mail"),
-            "cn" => $this->getAuthParam("cn")
-        ];
-
-        $out = Requests::post("http://localhost:42042/v1/session",
-            ["Content-type" => "application/json"], json_encode($data));
-        return json_decode($out->body)->sessionKey;
-    }
-
-    private function getDataspaces() {
-        $out = Requests::get("http://localhost:42042/v1/dataspaces",
-            ["Authorization" => $this->getApiKey()]);
-        return json_decode($out->body)->data;
-    }
-
-    function Pineapple($endpointURLs = null, $namespaces = null) {
-        $this->settings = parse_ini_file("settings.ini");
-        #print_r($this->pineapple_settings);
-
-        if ($endpointURLs == null)
-            $endpointURLs =& $this->settings["endpoints"];
-        if ($namespaces == null)
-            $namespaces =& $this->settings["namespaces"];
-
-        foreach ($endpointURLs as $url) {
-            $sparql = new EasyRdf_Sparql_Client($url);
-            array_push($this->endpoints, $sparql);
-        }
-
-        foreach ($namespaces as $prefix => $uri) {
-            EasyRdf_Namespace::set($prefix, $uri);
-        }
+    function __construct(FileRepository $filerepo, TripleStore $triplestore, $settings) {
+        $this->filerepo = $filerepo;
+        $this->triplestore = $triplestore;
+        $this->settings = $settings;
     }
 
     function getResource($uddi) {
@@ -80,14 +47,9 @@ class Pineapple {
             " graph $graph_uri" .
             " {?s ?p ?o} }";
 
-        error_log("Query: " . $query);
-
         $combined_graph = new EasyRdf_Graph($graph_uri);
-        foreach ($this->endpoints as $endpoint) {
-            $result = $endpoint->query($query);
-            foreach ($result as $row) {
-                $combined_graph->add($row->s, $row->p, $row->o);
-            }
+        foreach ($this->triplestore->query($query) as $row) {
+            $combined_graph->add($row->s, $row->p, $row->o);
         }
         return $combined_graph;
     }
@@ -134,17 +96,13 @@ class Pineapple {
             "offset $from limit $to";
 
         $out = [];
-        foreach ($this->endpoints as $endpoint) {
-            $result = $endpoint->query($query);
-
-            foreach ($result as $row) {
-                array_push($out, [
-                    "id" => $row->identifier->getValue(),
-                    "title" => $row->title->getValue(),
-                    "lastModified" => $row->lastModified->getValue(),
-                    "numMentions" => $row->count->getValue()
-                ]);
-            }
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "id" => $row->identifier->getValue(),
+                "title" => $row->title->getValue(),
+                "lastModified" => $row->lastModified->getValue(),
+                "numMentions" => $row->count->getValue()
+            ]);
         }
 
         return $out;
@@ -166,18 +124,12 @@ class Pineapple {
             "}" .
             "offset $from limit $to";
 
-        error_log("Query: $query");
-
         $out = [];
-        foreach ($this->endpoints as $endpoint) {
-            $result = $endpoint->query($query);
-
-            foreach ($result as $row) {
-                array_push($out, [
-                    "id" => $row->identifier->getValue(),
-                    "title" => $row->title->getValue()
-                ]);
-            }
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "id" => $row->identifier->getValue(),
+                "title" => $row->title->getValue()
+            ]);
         }
 
         return $out;
@@ -186,13 +138,7 @@ class Pineapple {
     private function checkResourceExists($uri) {
         $full_uri = EasyRdf_Namespace::expand($uri);
         $query_string = "ask { <$full_uri> ?p  ?o}";
-
-        foreach ($this->endpoints as $ep) {
-            if ($ep->query($query_string)->isTrue()) {
-                return true;
-            }
-        }
-        return false;
+        return $this->triplestore->ask($query_string);
     }
 
 
@@ -206,7 +152,7 @@ class Pineapple {
             foreach ($this->settings["AUTHORISED_DATASPACES"] as $uddi)
                 $dataspaces[] = "litef://dataspaces/$uddi";
         } else {
-            foreach ($this->getDataspaces() as $dataspace)
+            foreach ($this->filerepo->getDataspaces() as $dataspace)
                 $dataspaces[] = "litef://dataspaces/" . $dataspace["id"];
         }
 
@@ -220,11 +166,8 @@ class Pineapple {
             " FILTER (" . implode(" || ", $filter) . ")}";
 
         $graphs = [];
-        foreach ($this->endpoints as $endpoint) {
-            $result = $endpoint->query($graphs_query);
-            foreach ($result as $row) {
-                $graphs[] = $row->g;
-            }
+        foreach ($this->triplestore->query($graphs_query) as $row) {
+            $graphs[] = $row->g;
         }
 
         $output = "";

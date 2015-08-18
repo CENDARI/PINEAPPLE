@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CENDARI/PINEAPPLE.svg?branch=master)](https://travis-ci.org/CENDARI/PINEAPPLE)
+
 Pineapple
 =========
 
@@ -102,8 +104,16 @@ http localhost:8000/mention/schema:Place/France Accept:application/json
 }
 ```
 
+### Testing
+
+To run the tests (few that there are) run:
+
+```bash
+./vendor/phpunit/phpunit/phpunit tests
+```
+
 ### TODO
 
- - Tests
- - Lots more...
+ - Lots more functionality
+ - More tests
 
