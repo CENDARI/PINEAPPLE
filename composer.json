@@ -9,5 +9,11 @@
     "twig/extensions": "^1.2",
     "php": "^5.5",
     "phpunit/phpunit": "~4.4.0@stable"
+  },
+
+  "autoload": {
+    "psr-4": {
+      "Pineapple\\": "src"
+    }
   }
 }

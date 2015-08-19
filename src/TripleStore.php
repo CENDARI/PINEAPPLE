@@ -1,4 +1,9 @@
 <?php
+namespace Pineapple;
+
+use EasyRdf_Sparql_Client, EasyRdf_Namespace;
+use Generator;
+
 
 /**
  * Class TripleStore

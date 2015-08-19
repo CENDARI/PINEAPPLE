@@ -1,5 +1,8 @@
 <?php
-require "vendor/autoload.php";
+namespace Pineapple;
+
+use Exception;
+use EasyRdf_Graph, EasyRdf_Namespace;
 
 
 class ResourceNotFoundException extends Exception {

@@ -1,8 +1,9 @@
 <?php
+namespace Pineapple;
 
-require_once realpath(__DIR__) . DIRECTORY_SEPARATOR . "../Pineapple.php";
-require_once realpath(__DIR__) . DIRECTORY_SEPARATOR . "../TripleStore.php";
-require_once realpath(__DIR__) . DIRECTORY_SEPARATOR . "../FileRepository.php";
+use PHPUnit_Framework_TestCase;
+use EasyRdf_Sparql_Result;
+
 
 class PineappleTest extends PHPUnit_Framework_TestCase {
 
@@ -15,13 +16,14 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             realpath(__DIR__) . DIRECTORY_SEPARATOR . "../settings.ini"
         );
 
-        $this->repo = $this->getMockBuilder("FileRepository")
+        $this->repo = $this->getMockBuilder('\Pineapple\FileRepository')
             ->setConstructorArgs([$this->settings])
             ->getMock();
-        $this->store = $this->getMockStore();
+        $this->store = $this->getMockBuilder('\Pineapple\TripleStore')
+            ->setConstructorArgs([$this->settings, null, null])
+            ->getMock();
         $this->assertEquals("NONE", $this->settings["AUTHORISATION_TYPE"]);
     }
-
 
     public function testGetResource() {
         $this->store
@@ -39,7 +41,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @expectedException ResourceNotFoundException
+     * @expectedException \Pineapple\ResourceNotFoundException
      * @expectedExceptionMessage resource:not-here not found.
      */
     public function testGetResourceNotFound() {
@@ -118,11 +120,5 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
     private function getMockResult($name) {
         return new EasyRdf_Sparql_Result(
             $this->getFixture($name), "application/sparql-results+xml");
-    }
-
-    private function getMockStore() {
-        return $this->getMockBuilder("TripleStore")
-            ->setConstructorArgs([$this->settings, null, null])
-            ->getMock();
     }
 }

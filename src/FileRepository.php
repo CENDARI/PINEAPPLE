@@ -1,6 +1,7 @@
 <?php
+namespace Pineapple;
 
-require "vendor/autoload.php";
+use Requests;
 
 class FileRepository {
 
