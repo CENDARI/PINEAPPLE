@@ -30,7 +30,7 @@ export mail=joe.blogs@example.com
 export eppn=JoeBlogs@dariah.eu
 APP_DEBUG=true
 
-php -d variables_order=EGPCS -S localhost:8000 # dev server will run at http://localhost:8000 -t public
+php -d variables_order=EGPCS -S localhost:8000 -t public # dev server will run at http://localhost:8000
 ```
 
 ### API
