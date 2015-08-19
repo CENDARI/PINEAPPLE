@@ -12,7 +12,7 @@ Pineapple is a simple UI for the CENDARI semantic repository.
  - Compile the css file from sass (using the Leafo compiler):
  
 ```
-vendor/leafo/scssphp/bin/pscss -f compressed -i .:sass sass/styles.scss > stylesheets/styles.css
+vendor/leafo/scssphp/bin/pscss -f compressed -i .:sass sass/styles.scss > public/stylesheets/styles.css
 ```
  
  - The app relies on the CENDARI CKAN repository and Virtuoso DB. To make life easier you
@@ -30,7 +30,7 @@ export mail=joe.blogs@example.com
 export eppn=JoeBlogs@dariah.eu
 APP_DEBUG=true
 
-php -d variables_order=EGPCS -S localhost:8000 # dev server will run at http://localhost:8000
+php -d variables_order=EGPCS -S localhost:8000 # dev server will run at http://localhost:8000 -t public
 ```
 
 ### API

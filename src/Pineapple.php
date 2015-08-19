@@ -16,8 +16,6 @@ class MalformedAPIKeyException extends Exception {
 
 class Pineapple {
 
-    const DEFAULT_PAGINATION_LIMIT = 20;
-
     private $triplestore;
     private $filerepo;
     private $settings;

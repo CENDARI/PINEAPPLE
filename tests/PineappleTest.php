@@ -13,7 +13,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         $this->settings = parse_ini_file(
-            realpath(__DIR__) . DIRECTORY_SEPARATOR . "../settings.ini"
+            realpath(__DIR__) . "/../settings.ini"
         );
 
         $this->repo = $this->getMockBuilder('\Pineapple\FileRepository')
@@ -114,7 +114,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
     }
 
     private function getFixture($name) {
-        return file_get_contents(realpath(__DIR__) . DIRECTORY_SEPARATOR . "fixtures/$name.xml");
+        return file_get_contents(realpath(__DIR__) . "/fixtures/$name.xml");
     }
 
     private function getMockResult($name) {
