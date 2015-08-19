@@ -18,9 +18,8 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->repo = $this->getMockBuilder("FileRepository")
             ->setConstructorArgs([$this->settings])
             ->getMock();
-        $this->repo->method("getDataspaces")
-            ->willReturn([]);
         $this->store = $this->getMockStore();
+        $this->assertEquals("NONE", $this->settings["AUTHORISATION_TYPE"]);
     }
 
 
@@ -55,7 +54,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $pineapple->getResource("not-here");
     }
 
-    public function testListResources() {
+    public function testGetResources() {
         $this->store
             ->method("query")
             ->willReturn($this->getMockResult("list"));
@@ -65,6 +64,51 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals("Race in progress", $resources[0]["title"]);
         $this->assertEquals("Colonel of the regiment watching the greasy pole competition",
             $resources[1]["title"]);
+    }
+
+    public function testGetMentionResources() {
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("mention_resources"));
+        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $resources = $pineapple->getMentionResources("schema:Event", "World War",  0, 20);
+
+        $this->assertEquals("Race in progress", $resources[0]["title"]);
+        $this->assertEquals("Colonel of the regiment watching the greasy pole competition",
+            $resources[1]["title"]);
+    }
+
+    public function testCheckResourceExists() {
+        // Mock the ask method so the result is always true...
+        $this->store
+            ->method("ask")
+            ->willReturn(true);
+        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $this->assertTrue($pineapple->checkResourceExists("mock-item-uri"));
+    }
+
+    public function testGetPermisionFilter() {
+        // This assumes a lot of knowledge about the getPermissionFilter
+        // function, but it's difficult to test otherwise. Here we mock
+        // the return value of getDataspaces with a known value, assert
+        // that it produces the right Sparql query, and the right FROM
+        // clause with mocked data from the triplestore.
+        $this->settings["AUTHORISATION_TYPE"] = "ENFORCING";
+        $this->repo
+            ->method("getDataspaces")
+            ->willReturn([
+                [
+                    "id" => "mock-ds-id",
+                    "name" => "Mock Dataspace"
+                ]
+            ]);
+        $this->store
+            ->method("query")
+            ->with("select ?g where { ?g rdfs:member ?ds FILTER (?ds = <litef://dataspaces/mock-ds-id>)}")
+            ->willReturn($this->getMockResult("dataspace_members"));
+        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $fromClause = $pineapple->getPermissionFilter();
+        $this->assertEquals("FROM <litef://resource/mock1>\nFROM <litef://resource/mock2>\n", $fromClause);
     }
 
     private function getFixture($name) {

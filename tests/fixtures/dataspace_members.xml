@@ -1,0 +1,13 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+    <head>
+        <variable name="g"/>
+    </head>
+    <results distinct="false" ordered="true">
+        <result>
+            <binding name="g"><uri>litef://resource/mock1</uri></binding>
+        </result>
+        <result>
+            <binding name="g"><uri>litef://resource/mock2</uri></binding>
+        </result>
+    </results>
+</sparql>

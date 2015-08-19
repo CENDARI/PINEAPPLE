@@ -25,16 +25,37 @@ class Pineapple {
         $this->settings = $settings;
     }
 
+    /**
+     * Fetch data for a given resource.
+     *
+     * @param string $uddi the resource identifier
+     * @return array an map of item data, including mentions
+     * @throws ResourceNotFoundException
+     */
     function getResource($uddi) {
         $graph = $this->getResourceGraph($uddi);
         return $this->getResourceData($graph);
     }
 
+    /**
+     * Fetch mentions for a given resource.
+     *
+     * @param string $uddi the resource identifier
+     * @return array a list of mention data
+     * @throws ResourceNotFoundException
+     */
     function getResourceMentions($uddi) {
         $graph = $this->getResourceGraph($uddi);
         return $this->getResourceMentionData($graph);
     }
 
+    /**
+     * Fetch the named graph for a given resource.
+     *
+     * @param $uddi
+     * @return EasyRdf_Graph
+     * @throws ResourceNotFoundException
+     */
     function getResourceGraph($uddi) {
         $graph_uri = sprintf("resource:%s", $uddi);
         if (!$this->checkResourceExists($graph_uri)) {
@@ -52,6 +73,90 @@ class Pineapple {
             $combined_graph->add($row->s, $row->p, $row->o);
         }
         return $combined_graph;
+    }
+
+    /**
+     * Fetch a list of resource data, with an optional
+     * filter on the title value.
+     *
+     * @param null $q an optional title filter string
+     * @param int $from the start offset
+     * @param int $limit the maximum returned items
+     * @return array
+     */
+    function getResources($q = null, $from, $limit) {
+        $query =
+
+            "select distinct ?title ?identifier ?lastModified count(?m) as ?count " .
+            $this->getPermissionFilter() .
+            "where {" .
+            "  [] schema:mentions ?m ; " .
+            "     dc11:title ?title ; " .
+            "     nao:lastModified ?lastModified ; " .
+            "     nao:identifier ?identifier . " .
+            $this->getSearchFilter("?title", $q) .
+            "} order by ASC(?title) " . // FIXME: Why doesn't this work???
+            "offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "id" => $row->identifier->getValue(),
+                "title" => $row->title->getValue(),
+                "lastModified" => $row->lastModified->getValue(),
+                "numMentions" => $row->count->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Fetch resources mentioned by a given item.
+     *
+     * @param string $type the prefixed item type
+     * @param string $name the item's name
+     * @param int $from the start offset
+     * @param int $limit the maximum returned items
+     * @return array
+     */
+    function getMentionResources($type, $name, $from, $limit) {
+        $query =
+
+            "select distinct ?identifier ?title " .
+            $this->getPermissionFilter() .
+            "where {" .
+            "  [] schema:mentions [" .
+            "        a $type ; " .
+            // FIXME: literal type? why is this needed?
+            "        schema:name \"$name\"^^xsd:string " .
+            "     ] ; " .
+            "     dc11:title ?title ; " .
+            "     nao:identifier ?identifier . " .
+            "} " .
+            "offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "id" => $row->identifier->getValue(),
+                "title" => $row->title->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Check if a resource exists.
+     *
+     * @param string $uri the resource URI
+     * @return bool
+     */
+    function checkResourceExists($uri) {
+        $full_uri = EasyRdf_Namespace::expand($uri);
+        $query_string = "ask { <$full_uri> ?p  ?o}";
+        return $this->triplestore->ask($query_string);
     }
 
     private function getResourceData(EasyRdf_Graph $graph) {
@@ -81,98 +186,48 @@ class Pineapple {
         return $out;
     }
 
-    function getResources($q = null, $from, $to) {
-        $query =
-
-            "select distinct ?title ?identifier ?lastModified count(?m) as ?count " .
-            $this->getPermissionFilter() .
-            "where {" .
-            "  [] schema:mentions ?m ; " .
-            "     dc11:title ?title ; " .
-            "     nao:lastModified ?lastModified ; " .
-            "     nao:identifier ?identifier . " .
-            $this->getSearchFilter("?title", $q) .
-            "} order by ASC(?title) " . // FIXME: Why doesn't this work???
-            "offset $from limit $to";
-
-        $out = [];
-        foreach ($this->triplestore->query($query) as $row) {
-            array_push($out, [
-                "id" => $row->identifier->getValue(),
-                "title" => $row->title->getValue(),
-                "lastModified" => $row->lastModified->getValue(),
-                "numMentions" => $row->count->getValue()
-            ]);
-        }
-
-        return $out;
-    }
-
-    function getMentionResources($type, $name, $from, $to) {
-        $query =
-
-            "select distinct ?title ?identifier " .
-            $this->getPermissionFilter() .
-            "where {" .
-            "  [] schema:mentions [" .
-            "        a $type ; " .
-            // FIXME: literal type? why is this needed?
-            "        schema:name \"$name\"^^xsd:string " .
-            "     ] ; " .
-            "     dc11:title ?title ; " .
-            "     nao:identifier ?identifier . " .
-            "}" .
-            "offset $from limit $to";
-
-        $out = [];
-        foreach ($this->triplestore->query($query) as $row) {
-            array_push($out, [
-                "id" => $row->identifier->getValue(),
-                "title" => $row->title->getValue()
-            ]);
-        }
-
-        return $out;
-    }
-
-    private function checkResourceExists($uri) {
-        $full_uri = EasyRdf_Namespace::expand($uri);
-        $query_string = "ask { <$full_uri> ?p  ?o}";
-        return $this->triplestore->ask($query_string);
-    }
-
-
-    private function getPermissionFilter() {
-        if ($this->settings["AUTHORISATION_TYPE"] === "NONE") {
+    /**
+     * Looks up which CKAN dataspaces the user
+     * is allowed to access given the API key
+     * and constructs a Sparql FROM clause for
+     * named graphs that have an rdfs:member to
+     * the litef://dataspaces/{DS} resource.
+     * The config AUTHORISATION_TYPE value can
+     * be one of: NONE, DEBUG, or ENFORCING, with
+     * ENFORCING being the default.
+     *
+     * @return string a Sparql FROM clause
+     */
+    function getPermissionFilter() {
+        $authType = $this->getAuthType();
+        if ($this->getAuthType() === "NONE") {
             return "";
         }
 
         $dataspaces = [];
-        if ($this->settings["AUTHORISATION_TYPE"] === "DEBUG") {
-            foreach ($this->settings["AUTHORISED_DATASPACES"] as $uddi)
+
+        if ($authType === "DEBUG") {
+            foreach ($this->settings["AUTHORISED_DATASPACES"] as $uddi) {
                 $dataspaces[] = "litef://dataspaces/$uddi";
-        } else {
-            foreach ($this->filerepo->getDataspaces() as $dataspace)
+            }
+        } elseif ($authType === "ENFORCING") {
+            foreach ($this->filerepo->getDataspaces() as $dataspace) {
                 $dataspaces[] = "litef://dataspaces/" . $dataspace["id"];
+            }
         }
 
-
         $filter = [];
-        foreach ($dataspaces as $ds)
+        foreach ($dataspaces as $ds) {
             $filter[] = "?ds = <$ds>";
+        }
         $graphs_query =
             "select ?g where {" .
             " ?g rdfs:member ?ds" .
             " FILTER (" . implode(" || ", $filter) . ")}";
 
-        $graphs = [];
-        foreach ($this->triplestore->query($graphs_query) as $row) {
-            $graphs[] = $row->g;
-        }
-
         $output = "";
-        foreach ($graphs as $g) {
-            $output = $output . "FROM <$g>\n";
+        foreach ($this->triplestore->query($graphs_query) as $row) {
+            $output = $output . "FROM <" . $row->g . ">\n";
         }
 
         return $output;
@@ -194,5 +249,12 @@ class Pineapple {
         } else {
             return " FILTER regex ($pred, \"$alts\", \"i\" )";
         }
+    }
+
+    private function getAuthType() {
+        if (!isset($this->settings["AUTHORISATION_TYPE"])) {
+            return "ENFORCING";
+        }
+        return $this->settings["AUTHORISATION_TYPE"];
     }
 }

@@ -1,0 +1,26 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+    <head>
+        <variable name="title"/>
+        <variable name="identifier"/>
+    </head>
+    <results distinct="false" ordered="true">
+        <result>
+            <binding name="title">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Race in progress</literal>
+            </binding>
+            <binding name="identifier">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">c87de1f4-8452-44e5-aea0-75edc3bc77d7
+                </literal>
+            </binding>
+        </result>
+        <result>
+            <binding name="title">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Colonel of the regiment watching the greasy pole competition</literal>
+            </binding>
+            <binding name="identifier">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">f22c70aa-c640-4773-884d-076ac2f536c4
+                </literal>
+            </binding>
+        </result>
+    </results>
+</sparql>

@@ -28,10 +28,15 @@ class FileRepository {
         return json_decode($out->body)->sessionKey;
     }
 
+    /**
+     * Fetch a list of dataspaces
+     *
+     * @return array
+     */
     public function getDataspaces() {
         $out = Requests::get($this->url."/dataspaces", [
             "Authorization" => $this->getApiKey()
         ]);
-        return json_decode($out->body)->data;
+        return json_decode($out->body, true)["data"];
     }
 }
