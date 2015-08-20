@@ -1,6 +1,6 @@
 {% extends "main.html.twig" %}
 
-{% block title %}All graphs{% endblock %}
+{% block title %} - {% trans "Resources" %}{% endblock %}
 
 {% block content %}
     <div class="container">
@@ -13,16 +13,15 @@
                     <div class="input-group">
                     <input name="q" type="search" class="form-control" id="id_q" placeholder="{%  trans "Type a query" %}" value="{{ query }}">
                     </div>
-                    <button type="submit" class="btn btn-default">Search</button>
+                    <button type="submit" class="btn btn-default">{% trans "Search" %}</button>
                     </div>
                     <ul class="resource-list">
                         {% for item in resources %}
                             <li>
-                                <a class="title"
-                                   href="{{ urlFor("resource", {"id": item.id}) }}">{{ item.title }}</a>
+                                <a class="title" href="{{ urlFor("resource", {"id": item.id}) }}">{{ item.title }}</a>
                                 <ul class="details">
-                                    <li>Mentions: {{ item.numMentions }}</li>
-                                    <li>Last modified: {{ item.lastModified|prettyDate }}</li>
+                                    <li>{% trans "Mentions" %}: {{ item.numMentions }}</li>
+                                    <li>{% trans "Last modified" %}: {{ item.lastModified|prettyDate }}</li>
                                 </ul>
 
                             </li>
