@@ -53,7 +53,7 @@ class Pineapple {
     /**
      * Fetch the named graph for a given resource.
      *
-     * @param $uddi
+     * @param string $uddi the resource identifier
      * @return EasyRdf_Graph
      * @throws ResourceNotFoundException
      */
@@ -134,6 +134,42 @@ class Pineapple {
             "     ] ; " .
             "     dc11:title ?title ; " .
             "     nao:identifier ?identifier . " .
+            "} " .
+            "offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "id" => $row->identifier->getValue(),
+                "title" => $row->title->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Fetch resources related to the current one via
+     * mentions.
+     *
+     * @param string $uddi the resource identifier
+     * @param int $from the start offset
+     * @param int $limit the maximum returned items
+     * @return array
+     */
+    function getRelatedResources($uddi, $from, $limit) {
+        $query =
+
+            "select distinct ?identifier ?title " .
+            $this->getPermissionFilter() .
+            "where {" .
+            //"  <$graph_uri> schema:mentions ?m . " .
+            "  ?s nao:identifier \"$uddi\"^^xsd:string . " .
+            "  ?s schema:mentions ?m . " .
+            "  ?r schema:mentions ?m . ".
+            "  ?r dc11:title ?title ; " .
+            "     nao:identifier ?identifier . " .
+            "  FILTER (?r != ?s ) " .
             "} " .
             "offset $from limit $limit";
 

@@ -78,7 +78,15 @@ $app->get("/", function () use ($app, &$pineapple) {
 
 $app->get("/resource/:id", function ($id) use ($app, &$pineapple) {
     $data = $pineapple->getResource($id);
-    respond($app, "resource.html.twig", $data);
+
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+    $more = [
+        "related" => $pineapple->getRelatedResources($id, $offset, $limit),
+        "offset" => $offset,
+        "limit" => $limit
+    ];
+    respond($app, "resource.html.twig", array_merge($data, $more));
 })->name("resource");
 
 

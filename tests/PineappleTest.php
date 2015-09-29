@@ -80,6 +80,20 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             $resources[1]["title"]);
     }
 
+    public function testGetRelatedResources() {
+        // NB: Re-using the mention_resources fixture here
+        // since it's just a list of resources
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("mention_resources"));
+        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $resources = $pineapple->getRelatedResources("test",  0, 20);
+
+        $this->assertEquals("Race in progress", $resources[0]["title"]);
+        $this->assertEquals("Colonel of the regiment watching the greasy pole competition",
+            $resources[1]["title"]);
+    }
+
     public function testCheckResourceExists() {
         // Mock the ask method so the result is always true...
         $this->store
