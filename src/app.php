@@ -59,6 +59,20 @@ function respond(\Slim\Slim $app, $template, $data) {
     }
 }
 
+function accessPointListPage(\Slim\Slim $app, \Pineapple\Pineapple $pineapple, $name, $type) {
+    $q = $app->request->get("q");
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+    $items = $pineapple->getAccessPoints($type, $q, $offset, $limit);
+    $data = [
+        "type" => $name,
+        "offset" => $offset,
+        "limit" => $limit,
+        "query" => $q,
+        "accessPoints" => $items,
+    ];
+    respond($app, "access_points.html.twig", $data);
+}
 
 $app->get("/", function () use ($app, &$pineapple) {
     $q = $app->request->get("q");
@@ -72,9 +86,8 @@ $app->get("/", function () use ($app, &$pineapple) {
         "limit" => $limit,
         "query" => $q
     ];
-    respond($app, "list.html.twig", $data);
+    respond($app, "resources.html.twig", $data);
 })->name("home");
-
 
 $app->get("/resource/:id", function ($id) use ($app, &$pineapple) {
     $data = $pineapple->getResource($id);
@@ -110,3 +123,19 @@ $app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
     $mentions = $pineapple->getResourceMentions($id);
     respond($app, "_mentions.html.twig", $mentions);
 })->name("mentions");
+
+$app->get("/people", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "People", "schema:Person");
+})->name("people");
+
+$app->get("/organisations", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "Organisations", "schema:Organisation");
+})->name("organisations");
+
+$app->get("/places", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "Places", "schema:Place");
+})->name("places");
+
+$app->get("/events", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "Events", "schema:Event");
+})->name("events");

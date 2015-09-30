@@ -94,6 +94,17 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             $resources[1]["title"]);
     }
 
+    public function testGetAccessPoints() {
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("access_points"));
+        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $resources = $pineapple->getAccessPoints("schema:Person", "",  0, 20);
+
+        $this->assertEquals("Race", $resources[0]["title"]);
+        $this->assertEquals("Attribution", $resources[1]["title"]);
+    }
+
     public function testCheckResourceExists() {
         // Mock the ask method so the result is always true...
         $this->store

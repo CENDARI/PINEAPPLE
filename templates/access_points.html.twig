@@ -1,0 +1,28 @@
+{% extends "main.html.twig" %}
+
+{% block title %} - {% trans type %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <form action="{{ currentUrl() }}" method="get" class="form-inline">
+                    <h1>{% trans type %}</h1>
+                    {% include "_search_form.html.twig" %}
+
+                    <ul class="reference-list">
+                        {% for access in accessPoints %}
+                            <li>
+                                <a title="{{ access.title }}"
+                                   href="{{ urlFor("mention", {"type": access.type, "name": access.title }) }}">{{
+                                    access.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    {% include "_pagination.html.twig" with {'items': accessPoints} %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

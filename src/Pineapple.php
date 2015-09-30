@@ -185,6 +185,42 @@ class Pineapple {
     }
 
     /**
+     * Fetch a list of access points of a given type which relate to
+     * at least one other resource.
+     *
+     * @param string $type the (prefixed) rdf type
+     * @param null $q an optional title filter string
+     * @param int $from the start offset
+     * @param int $limit the maximum returned items
+     * @return array
+     */
+    public function getAccessPoints($type, $q = null, $from, $limit) {
+        $typeUri = EasyRdf_Namespace::expand($type);
+        $query =
+
+            "select distinct ?s ?title " .
+            $this->getPermissionFilter() .
+            "where {" .
+            "  ?s a <$typeUri> ; " .
+            "     schema:name ?title . " .
+            $this->getSearchFilter("?title", $q) .
+            "  FILTER EXISTS { [] schema:mentions ?s } " .
+            "} " .
+            "offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "uri" => $row->s->getUri(),
+                "type" => $type,
+                "title" => $row->title->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+
+    /**
      * Check if a resource exists.
      *
      * @param string $uri the resource URI
@@ -279,7 +315,7 @@ class Pineapple {
         // queries with Easy_RDF, so this rubbish thing will have
         // to do.
         error_log("Raw query: $q");
-        $chars = preg_replace("/[^\+\s\w]/", ' ', $q);
+        $chars = preg_replace("/[^\+\s\w]/", ' ', trim($q));
         $alts = implode("|", explode(" ", $chars));
         if (strlen($chars) === 0) {
             return "";
