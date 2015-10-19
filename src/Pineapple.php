@@ -1,8 +1,9 @@
 <?php
 namespace Pineapple;
 
+use EasyRdf_Graph;
+use EasyRdf_Namespace;
 use Exception;
-use EasyRdf_Graph, EasyRdf_Namespace;
 
 
 class ResourceNotFoundException extends Exception {
@@ -42,7 +43,8 @@ class Pineapple {
      * Fetch mentions for a given resource.
      *
      * @param string $uddi the resource identifier
-     * @return array a list of mention data
+     * @return array an associative array of mention data, with
+     *               mentions keyed to the type (event, person, etc)
      * @throws ResourceNotFoundException
      */
     function getResourceMentions($uddi) {
@@ -166,7 +168,7 @@ class Pineapple {
             //"  <$graph_uri> schema:mentions ?m . " .
             "  ?s nao:identifier \"$uddi\"^^xsd:string . " .
             "  ?s schema:mentions ?m . " .
-            "  ?r schema:mentions ?m . ".
+            "  ?r schema:mentions ?m . " .
             "  ?r dc11:title ?title ; " .
             "     nao:identifier ?identifier . " .
             "  FILTER (?r != ?s ) " .
@@ -249,11 +251,14 @@ class Pineapple {
 
         $out = [];
         foreach ($graph->allResources($uri, 'schema:mentions') as $res) {
-            array_push($out, [
+            $type = $res->type();
+            $types = array_key_exists($type, $out) ? $out[$type] : [];
+            array_push($types, [
                 "uri" => $res->getUri(),
-                "type" => $res->type(),
+                "type" => $type,
                 "title" => $res->getLiteral("schema:name")->getValue()
             ]);
+            $out[$type] = $types;
         }
 
         return $out;

@@ -16,7 +16,7 @@
                                 <a class="title" href="{{ urlFor("resource", {"id": item.id}) }}">{{ item.title }}</a>
                                 <ul class="details">
                                     <li>{% trans "Mentions" %}: {{ item.numMentions }}</li>
-                                    <li>{% trans "Last modified" %}: {{ item.lastModified|prettyDate }}</li>
+                                    <li>{% trans "Last modified" %}: {{ item.lastModified|pretty_date }}</li>
                                 </ul>
 
                             </li>

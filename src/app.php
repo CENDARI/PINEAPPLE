@@ -3,6 +3,16 @@ require __DIR__ . '/../vendor/autoload.php';
 
 const DEFAULT_PAGINATION_LIMIT = 20;
 
+function type_to_name($type) {
+    $name = [
+        "schema:Event" => "Events",
+        "schema:Place" => "Places",
+        "schema:Person" => "People",
+        "schema:Organisation" => "Organisations"
+    ];
+    return array_key_exists($type, $name) ? $name[$type] : $type;
+}
+
 $app = new \Slim\Slim(array(
     "view" => new \Slim\Views\Twig(),
     "debug" => getenv("APP_DEBUG")
@@ -24,8 +34,13 @@ $view->parserExtensions = array(
 
 // Add a simple template function to format the millisecond date strings
 // we get back from the triplestore
-$view->getEnvironment()->addFilter(new Twig_SimpleFilter("prettyDate", function ($milliseconds) {
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("pretty_date", function ($milliseconds) {
     return date("d-m-Y H:i", intval($milliseconds) / 1000);
+}));
+
+// Access type-to-name via templates
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("type_to_name", function ($type) {
+    return type_to_name($type);
 }));
 
 $settings = parse_ini_file(__DIR__ . '/../settings.ini');
@@ -59,13 +74,13 @@ function respond(\Slim\Slim $app, $template, $data) {
     }
 }
 
-function accessPointListPage(\Slim\Slim $app, \Pineapple\Pineapple $pineapple, $name, $type) {
+function accessPointListPage(\Slim\Slim $app, \Pineapple\Pineapple $pineapple, $type) {
     $q = $app->request->get("q");
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
     $items = $pineapple->getAccessPoints($type, $q, $offset, $limit);
     $data = [
-        "type" => $name,
+        "type" => type_to_name($type),
         "offset" => $offset,
         "limit" => $limit,
         "query" => $q,
@@ -125,17 +140,17 @@ $app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
 })->name("mentions");
 
 $app->get("/people", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "People", "schema:Person");
+    accessPointListPage($app, $pineapple, "schema:Person");
 })->name("people");
 
 $app->get("/organisations", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "Organisations", "schema:Organisation");
+    accessPointListPage($app, $pineapple, "schema:Organisation");
 })->name("organisations");
 
 $app->get("/places", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "Places", "schema:Place");
+    accessPointListPage($app, $pineapple, "schema:Place");
 })->name("places");
 
 $app->get("/events", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "Events", "schema:Event");
+    accessPointListPage($app, $pineapple, "schema:Event");
 })->name("events");

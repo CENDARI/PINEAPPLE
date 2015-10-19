@@ -1,9 +1,12 @@
 <h2>{% trans "Mentions" %}</h2>
-<ul class="reference-list">
-    {% for mention in mentions %}
-        <li>
-            <a title="{{ mention.title }}"
-               href="{{ urlFor("mention", {"type": mention.type, "name": mention.title }) }}">{{ mention.title }}</a>
-        </li>
-    {% endfor %}
-</ul>
+{% for type, mentionList in mentions %}
+    <h3>{{ type|type_to_name }}</h3>
+    <ul class="reference-list">
+        {% for mention in mentionList %}
+            <li>
+                <a title="{{ mention.title }}"
+                   href="{{ urlFor("mention", {"type": mention.type, "name": mention.title }) }}">{{ mention.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
