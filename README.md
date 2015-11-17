@@ -7,6 +7,8 @@ Pineapple is a simple UI for the CENDARI semantic repository.
 
 ### Development
 
+**NB: When developing on OS X El Capitan you may need to install the php mbstring extension (via Homebrew, or elsewise.)**
+
  - Install composer: `wget -O - https://getcomposer.org/installer | php`
  - Run `php composer.phar update` to install dependencies
  - Compile the css file from sass (using the Leafo compiler):
