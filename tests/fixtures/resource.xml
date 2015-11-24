@@ -7,7 +7,7 @@
     <results distinct="false" ordered="true">
         <result>
             <binding name="s">
-                <uri>cendari://resources/Event/World War</uri>
+                <uri>http://resources.cendari.dariah.eu/Event/World War</uri>
             </binding>
             <binding name="p">
                 <uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</uri>
@@ -18,7 +18,7 @@
         </result>
         <result>
             <binding name="s">
-                <uri>cendari://resources/Event/World War</uri>
+                <uri>http://resources.cendari.dariah.eu/Event/World War</uri>
             </binding>
             <binding name="p">
                 <uri>http://schema.org/name</uri>
@@ -29,7 +29,7 @@
         </result>
         <result>
             <binding name="s">
-                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
             </binding>
             <binding name="p">
                 <uri>http://purl.org/dc/elements/1.1/source</uri>
@@ -40,7 +40,7 @@
         </result>
         <result>
             <binding name="s">
-                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
             </binding>
             <binding name="p">
                 <uri>http://www.semanticdesktop.org/ontologies/2007/01/19/nie#plainTextContent</uri>
@@ -53,7 +53,7 @@
         </result>
         <result>
             <binding name="s">
-                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
             </binding>
             <binding name="p">
                 <uri>http://purl.org/dc/elements/1.1/title</uri>
@@ -64,7 +64,7 @@
         </result>
         <result>
             <binding name="s">
-                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
             </binding>
             <binding name="p">
                 <uri>http://www.semanticdesktop.org/ontologies/2007/08/15/nao#lastModified</uri>
@@ -75,7 +75,7 @@
         </result>
         <result>
             <binding name="s">
-                <uri>litef://resource/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
             </binding>
             <binding name="p">
                 <uri>http://www.semanticdesktop.org/ontologies/2007/08/15/nao#identifier</uri>

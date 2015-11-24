@@ -44,12 +44,12 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("type_to_name", functio
 }));
 
 $settings = parse_ini_file(__DIR__ . '/../settings.ini');
-$filerepo = new \Pineapple\FileRepository($settings);
+$api = new \Pineapple\Api($settings);
 $triplestore = new \Pineapple\TripleStore($settings);
 
 // Instantiate the Pineapple object where the interesting
 // stuff happens
-$pineapple = new \Pineapple\Pineapple($filerepo, $triplestore, $settings);
+$pineapple = new \Pineapple\Pineapple($api, $triplestore, $settings);
 
 
 /**

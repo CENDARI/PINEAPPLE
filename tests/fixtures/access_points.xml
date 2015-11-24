@@ -5,11 +5,11 @@
     </head>
     <results distinct="false" ordered="true">
         <result>
-            <binding name="s"><uri>cendari://resources/Person/Race</uri></binding>
+            <binding name="s"><uri>http://resources.cendari.dariah.eu/persons/Race</uri></binding>
             <binding name="title"><literal datatype="http://www.w3.org/2001/XMLSchema#string">Race</literal></binding>
         </result>
         <result>
-            <binding name="s"><uri>cendari://resources/Person/Attribution</uri></binding>
+            <binding name="s"><uri>http://resources.cendari.dariah.eu/persons/Attribution</uri></binding>
             <binding name="title"><literal datatype="http://www.w3.org/2001/XMLSchema#string">Attribution</literal></binding>
         </result>
     </results>

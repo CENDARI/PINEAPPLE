@@ -1,0 +1,20 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+    <head>
+        <variable name="m"/>
+        <variable name="type"/>
+        <variable name="title"/>
+    </head>
+    <results distinct="false" ordered="true">
+        <result>
+            <binding name="m">
+                <uri>http://resources.cendari.dariah.eu/Event/World War</uri>
+            </binding>
+            <binding name="type">
+                <uri>http://schema.org/Event</uri>
+            </binding>
+            <binding name="title">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">World War</literal>
+            </binding>
+        </result>
+    </results>
+</sparql>

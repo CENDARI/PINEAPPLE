@@ -18,11 +18,11 @@ class MalformedAPIKeyException extends Exception {
 class Pineapple {
 
     private $triplestore;
-    private $filerepo;
+    private $api;
     private $settings;
 
-    function __construct(FileRepository $filerepo, TripleStore $triplestore, $settings) {
-        $this->filerepo = $filerepo;
+    function __construct(Api $api, TripleStore $triplestore, $settings) {
+        $this->api = $api;
         $this->triplestore = $triplestore;
         $this->settings = $settings;
     }
@@ -36,7 +36,7 @@ class Pineapple {
      */
     function getResource($uddi) {
         $graph = $this->getResourceGraph($uddi);
-        return $this->getResourceData($graph);
+        return $this->getResourceData($uddi, $graph);
     }
 
     /**
@@ -48,8 +48,32 @@ class Pineapple {
      * @throws ResourceNotFoundException
      */
     function getResourceMentions($uddi) {
-        $graph = $this->getResourceGraph($uddi);
-        return $this->getResourceMentionData($graph);
+
+        $full_uri = EasyRdf_Namespace::expand("resource:" . $uddi);
+        $query =
+
+            "select distinct ?m ?type ?title " .
+            $this->getPermissionFilter() .
+            "where {" .
+            "  <$full_uri> schema:mentions ?m ." .
+            "  ?m a ?type ; " .
+            "     schema:name ?title ." .
+            "}";
+
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            $type = EasyRdf_Namespace::shorten($row->type->getUri());
+            $types = array_key_exists($type, $out) ? $out[$type] : [];
+            array_push($types, [
+                "uri" => $row->m->getUri(),
+                "type" => $type,
+                "title" => $row->title->getValue()
+            ]);
+            $out[$type] = $types;
+        }
+
+        return $out;
     }
 
     /**
@@ -206,7 +230,11 @@ class Pineapple {
             "  ?s a <$typeUri> ; " .
             "     schema:name ?title . " .
             $this->getSearchFilter("?title", $q) .
-            "  FILTER EXISTS { [] schema:mentions ?s } " .
+            "  FILTER EXISTS { ".
+            "    ?m schema:mentions ?s ;".
+            "       nao:identifier [] ; ".
+            "       dc11:title []. ".
+            "  } " .
             "} " .
             "offset $from limit $limit";
 
@@ -234,7 +262,7 @@ class Pineapple {
         return $this->triplestore->ask($query_string);
     }
 
-    private function getResourceData(EasyRdf_Graph $graph) {
+    private function getResourceData($uddi, EasyRdf_Graph $graph) {
         $uri = $graph->getUri();
         return [
             "id" => $graph->get($uri, 'nao:identifier')->getValue(),
@@ -242,26 +270,8 @@ class Pineapple {
             "plainText" => $graph->get($uri, "nie:plainTextContent")->getValue(),
             "source" => $graph->get($uri, "dc11:source")->getValue(),
             "lastModified" => $graph->get($uri, "nao:lastModified")->getValue(),
-            "mentions" => $this->getResourceMentionData($graph)
+            "mentions" => $this->getResourceMentions($uddi)
         ];
-    }
-
-    private function getResourceMentionData(EasyRdf_Graph $graph) {
-        $uri = $graph->getUri();
-
-        $out = [];
-        foreach ($graph->allResources($uri, 'schema:mentions') as $res) {
-            $type = $res->type();
-            $types = array_key_exists($type, $out) ? $out[$type] : [];
-            array_push($types, [
-                "uri" => $res->getUri(),
-                "type" => $type,
-                "title" => $res->getLiteral("schema:name")->getValue()
-            ]);
-            $out[$type] = $types;
-        }
-
-        return $out;
     }
 
     /**
@@ -286,11 +296,11 @@ class Pineapple {
 
         if ($authType === "DEBUG") {
             foreach ($this->settings["AUTHORISED_DATASPACES"] as $uddi) {
-                $dataspaces[] = "litef://dataspaces/$uddi";
+                $dataspaces[] = $this->settings["dataspaces"] . $uddi;
             }
         } elseif ($authType === "ENFORCING") {
-            foreach ($this->filerepo->getDataspaces() as $dataspace) {
-                $dataspaces[] = "litef://dataspaces/" . $dataspace["id"];
+            foreach ($this->api->getDataspaces() as $dataspace) {
+                $dataspaces[] = $this->settings["dataspaces"] . $dataspace["id"];
             }
         }
 
@@ -300,7 +310,7 @@ class Pineapple {
         }
         $graphs_query =
             "select ?g where {" .
-            " ?g rdfs:member ?ds" .
+            " ?ds rdfs:member ?g" .
             " FILTER (" . implode(" || ", $filter) . ")}";
 
         $output = "";

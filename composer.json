@@ -8,7 +8,7 @@
     "slim/views": "^0.1.3",
     "twig/extensions": "^1.2",
     "php": "^5.5",
-    "phpunit/phpunit": "~4.4.0@stable"
+    "phpunit/phpunit": "~4.8.0@stable"
   },
 
   "autoload": {

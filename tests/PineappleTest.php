@@ -8,7 +8,7 @@ use EasyRdf_Sparql_Result;
 class PineappleTest extends PHPUnit_Framework_TestCase {
 
     protected $settings;
-    protected $repo;
+    protected $api;
     protected $store;
 
     protected function setUp() {
@@ -16,7 +16,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             realpath(__DIR__) . "/../settings.ini"
         );
 
-        $this->repo = $this->getMockBuilder('\Pineapple\FileRepository')
+        $this->api = $this->getMockBuilder('\Pineapple\Api')
             ->setConstructorArgs([$this->settings])
             ->getMock();
         $this->store = $this->getMockBuilder('\Pineapple\TripleStore')
@@ -31,9 +31,11 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->willReturn(true);
         $this->store
             ->method("query")
-            ->willReturn($this->getMockResult("resource"));
+            ->will($this->onConsecutiveCalls(
+                $this->getMockResult("resource"),
+                $this->getMockResult("resource_mentions")));
 
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
 
         $resource = $pineapple->getResource("c87de1f4-8452-44e5-aea0-75edc3bc77d7");
 
@@ -52,7 +54,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("resource"));
 
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $pineapple->getResource("not-here");
     }
 
@@ -60,7 +62,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->store
             ->method("query")
             ->willReturn($this->getMockResult("list"));
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $resources = $pineapple->getResources("test", 0, 20);
 
         $this->assertEquals("Race in progress", $resources[0]["title"]);
@@ -72,7 +74,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->store
             ->method("query")
             ->willReturn($this->getMockResult("mention_resources"));
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $resources = $pineapple->getMentionResources("schema:Event", "World War",  0, 20);
 
         $this->assertEquals("Race in progress", $resources[0]["title"]);
@@ -86,7 +88,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->store
             ->method("query")
             ->willReturn($this->getMockResult("mention_resources"));
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $resources = $pineapple->getRelatedResources("test",  0, 20);
 
         $this->assertEquals("Race in progress", $resources[0]["title"]);
@@ -98,7 +100,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->store
             ->method("query")
             ->willReturn($this->getMockResult("access_points"));
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $resources = $pineapple->getAccessPoints("schema:Person", "",  0, 20);
 
         $this->assertEquals("Race", $resources[0]["title"]);
@@ -110,18 +112,19 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->store
             ->method("ask")
             ->willReturn(true);
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $this->assertTrue($pineapple->checkResourceExists("mock-item-uri"));
     }
 
-    public function testGetPermisionFilter() {
+    public function testGetPermissionFilter() {
         // This assumes a lot of knowledge about the getPermissionFilter
         // function, but it's difficult to test otherwise. Here we mock
         // the return value of getDataspaces with a known value, assert
         // that it produces the right Sparql query, and the right FROM
         // clause with mocked data from the triplestore.
         $this->settings["AUTHORISATION_TYPE"] = "ENFORCING";
-        $this->repo
+        $this->settings["dataspaces"] = "http://resources.cendari.dariah.eu/dataspaces/";
+        $this->api
             ->method("getDataspaces")
             ->willReturn([
                 [
@@ -131,11 +134,11 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ]);
         $this->store
             ->method("query")
-            ->with("select ?g where { ?g rdfs:member ?ds FILTER (?ds = <litef://dataspaces/mock-ds-id>)}")
+            ->with("select ?g where { ?ds rdfs:member ?g FILTER (?ds = <http://resources.cendari.dariah.eu/dataspaces/mock-ds-id>)}")
             ->willReturn($this->getMockResult("dataspace_members"));
-        $pineapple = new Pineapple($this->repo, $this->store, $this->settings);
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $fromClause = $pineapple->getPermissionFilter();
-        $this->assertEquals("FROM <litef://resource/mock1>\nFROM <litef://resource/mock2>\n", $fromClause);
+        $this->assertEquals("FROM <http://resources.cendari.dariah.eu/dataspaces/mock1>\nFROM <http://resources.cendari.dariah.eu/dataspaces/mock2>\n", $fromClause);
     }
 
     private function getFixture($name) {

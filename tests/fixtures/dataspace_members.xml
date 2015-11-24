@@ -4,10 +4,10 @@
     </head>
     <results distinct="false" ordered="true">
         <result>
-            <binding name="g"><uri>litef://resource/mock1</uri></binding>
+            <binding name="g"><uri>http://resources.cendari.dariah.eu/dataspaces/mock1</uri></binding>
         </result>
         <result>
-            <binding name="g"><uri>litef://resource/mock2</uri></binding>
+            <binding name="g"><uri>http://resources.cendari.dariah.eu/dataspaces/mock2</uri></binding>
         </result>
     </results>
 </sparql>

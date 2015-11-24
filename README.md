@@ -17,11 +17,11 @@ Pineapple is a simple UI for the CENDARI semantic repository.
 vendor/leafo/scssphp/bin/pscss -f compressed -i .:sass sass/styles.scss > public/stylesheets/styles.css
 ```
  
- - The app relies on the CENDARI CKAN repository and Virtuoso DB. To make life easier you
+ - The app relies on the CENDARI API and Virtuoso DB. To make life easier you
    can set up a port forward via SSH, e.g. `ssh [SERVER] -Nv -L8890:localhost:8890 -L42042:localhost:42042`
  - The env var `APP_DEBUG` being set to `true` will prevent the Twig templates from caching, which you do
    not want when editing them.
- - The app _also_ requires Shibboleth authentication to access the CKAN repository. While testing
+ - The app _also_ requires Shibboleth authentication to access the CENDARI API. While testing
    while the php development server you can set the `eppn`, `mail`, and `cn` Shibboleth auth parameters
    locally as environment variables and use the `-d variables_order=EGPCS` in php to pass them through
    to `$_ENV` (more [here](http://stackoverflow.com/a/16275594/285374)), for example:

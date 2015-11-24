@@ -3,13 +3,18 @@ namespace Pineapple;
 
 use Requests;
 
-class FileRepository {
+/**
+ * Interface for the CENDARI REST API.
+ *
+ * @package Pineapple
+ */
+class Api {
 
     private $url;
     private $settings;
 
     function __construct($settings) {
-        $this->url = $settings["ckan"];
+        $this->url = $settings["api"];
         $this->settings = $settings;
     }
 
@@ -35,7 +40,7 @@ class FileRepository {
      * @return array
      */
     public function getDataspaces() {
-        $out = Requests::get($this->url."/dataspaces", [
+        $out = Requests::get($this->url."/dataspaces?state=active", [
             "Authorization" => $this->getApiKey()
         ]);
         return json_decode($out->body, true)["data"];
