@@ -44,7 +44,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
 
     /**
      * @expectedException \Pineapple\ResourceNotFoundException
-     * @expectedExceptionMessage resource:not-here not found.
+     * @expectedExceptionMessage not-here
      */
     public function testGetResourceNotFound() {
         $this->store
