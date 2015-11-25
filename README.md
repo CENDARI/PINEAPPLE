@@ -121,7 +121,9 @@ To run the tests (few that there are) run:
 
 ### Known Issues
 
-Pineapple uses the textual name of resources and/or access points (people, places, events)
-in URL path sections. When these contain a period (.) the PHP development server will 
-erroneously respond with a 404. However, the Apache production environment will work with
-no problems.
+ - Pineapple uses the textual name of resources and/or access points (people, places, events)
+   in URL path sections. When these contain a period (.) the PHP development server will 
+   erroneously respond with a 404. However, the Apache production environment will work with
+   no problems.
+ - When APP_DEBUG is set to true (e.g. during development), the custom 404 handler for the
+   `ResourceNotFoundException` will not get invoked.

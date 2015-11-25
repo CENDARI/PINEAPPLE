@@ -32,6 +32,15 @@ $view->parserExtensions = array(
     new Twig_Extensions_Extension_I18n
 );
 
+$app->notFound(function() use ($app) {
+    $app->render("404.html.twig", ["error" => ""]);
+});
+
+$app->error(function(\Pineapple\ResourceNotFoundException $e) use ($app) {
+    $app->response->setStatus(404);
+    $app->render("404.html.twig", ["error" => $e->getMessage()]);
+});
+
 // Add a simple template function to format the millisecond date strings
 // we get back from the triplestore
 $view->getEnvironment()->addFilter(new Twig_SimpleFilter("pretty_date", function ($milliseconds) {

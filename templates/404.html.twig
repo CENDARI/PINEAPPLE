@@ -1,0 +1,18 @@
+{% extends "main.html.twig" %}
+
+{% block title %} - {% trans "Resource Not Found" %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                {% if error %}
+                    <h1>{% trans "Resource Not Found" %}</h1>
+                    <p>{{ error }}</p>
+                {% else %}
+                    <h1>{% trans "Page Not Found" %}</h1>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

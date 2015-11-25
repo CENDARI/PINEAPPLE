@@ -12,9 +12,6 @@ class ResourceNotFoundException extends Exception {
 class AccessDeniedException extends Exception {
 }
 
-class MalformedAPIKeyException extends Exception {
-}
-
 class Pineapple {
 
     private $triplestore;
@@ -86,7 +83,7 @@ class Pineapple {
     function getResourceGraph($uddi) {
         $graph_uri = sprintf("resource:%s", $uddi);
         if (!$this->checkResourceExists($graph_uri)) {
-            throw new ResourceNotFoundException($graph_uri . " not found.");
+            throw new ResourceNotFoundException($uddi);
         }
         $query =
             "select ?s ?p ?o " .
