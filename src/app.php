@@ -64,11 +64,17 @@ $pineapple = new \Pineapple\Pineapple($api, $triplestore, $settings);
 function respond(\Slim\Slim $app, $template, $data) {
     $accept = $app->request->headers("accept");
     $format = $app->request->get("format");
-    if (($accept != null && preg_match("/\/json/i", $accept))
+    if (($accept != null && preg_match("/\/json|javascript/i", $accept))
         || ($format != null && strtolower($format) === "json")
     ) {
-        $app->response->headers()->set("Content-type", "application/json");
-        echo json_encode($data);
+        // JSONP callback
+        $callback = $app->request->get("callback") !== null
+            ? preg_replace("/[^a-z0-9\$_]/si", "", $app->request->get("callback"))
+            : false;
+        $app->response->headers()->set("Access-Control-Allow-Origin", "*");
+        $app->response->headers()->set("Content-type",
+            "application/" . ($callback ? 'x-javascript' : 'json') . "; charset=UTF-8");
+        echo ($callback ? $callback . "(" : "") . json_encode($data) . ($callback ? ")" : "");
     } else {
         $app->render($template, $data);
     }
