@@ -36,9 +36,14 @@ $app->notFound(function() use ($app) {
     $app->render("404.html.twig", ["error" => ""]);
 });
 
-$app->error(function(\Pineapple\ResourceNotFoundException $e) use ($app) {
-    $app->response->setStatus(404);
-    $app->render("404.html.twig", ["error" => $e->getMessage()]);
+$app->error(function(\Exception $e) use ($app) {
+    if ($e instanceof \Pineapple\ResourceNotFoundException) {
+        $app->render("404.html.twig", ["error" => $e->getMessage()], 404);
+    } else {
+        //Invoke error handler
+        error_log($e->getMessage());
+        $app->render("500.html.twig", ["error" => $e->getMessage()], 500);
+    }
 });
 
 // Add a simple template function to format the millisecond date strings

@@ -8,7 +8,8 @@
             <div class="col-md-12">
                 <h1>{{ name }}</h1>
 
-                <h2>{% trans "Referencing documents" %}</h2>
+                {% if not mentions is empty %}
+                <h2>{% trans "Referencing resources" %}</h2>
                 <ul class="reference-list">
                     {% for item in mentions %}
                         <li>
@@ -17,6 +18,9 @@
                     {% endfor %}
                 </ul>
                 {% include "_pagination.html.twig" with {'items': mentions} %}
+                {% else %}
+                    <p>{% trans "No referencing resources found" %}</p>
+                {% endif %}
             </div>
         </div>
     </div>

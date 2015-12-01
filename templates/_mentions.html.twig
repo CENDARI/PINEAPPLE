@@ -1,12 +1,16 @@
-<h2>{% trans "Mentions" %}</h2>
-{% for type, mentionList in mentions %}
-    <h3>{{ type|type_to_name }}</h3>
-    <ul class="reference-list">
-        {% for mention in mentionList %}
-            <li>
-                <a title="{{ mention.title }}"
-                   href="{{ urlFor("mention", {"type": mention.type, "name": mention.title }) }}">{{ mention.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endfor %}
+{% if not mentions is empty %}
+    <h2>{% trans "Mentions" %}</h2>
+    {% for type, mentionList in mentions %}
+        <h3>{{ type|type_to_name }}</h3>
+        <ul class="reference-list">
+            {% for mention in mentionList %}
+                <li>
+                    <a title="{{ mention.title }}"
+                       href="{{ urlFor("mention", {"type": mention.type, "name": mention.title }) }}">{{ mention.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% else %}
+    <p>{% trans "No mentioned items found" %}</p>
+{% endif %}

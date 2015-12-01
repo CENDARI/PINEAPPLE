@@ -114,12 +114,12 @@ class Pineapple {
             "select distinct ?title ?identifier ?lastModified count(?m) as ?count " .
             $this->getPermissionFilter() .
             "where {" .
-            "  [] schema:mentions ?m ; " .
-            "     dc11:title ?title ; " .
+            "  ?s dc11:title ?title ; " .
             "     nao:lastModified ?lastModified ; " .
             "     nao:identifier ?identifier . " .
+            " OPTIONAL { ?s schema:mentions ?m } ." .
             $this->getSearchFilter("?title", $q) .
-            "} order by ASC(?title) " . // FIXME: Why doesn't this work???
+            "} order by ASC(?title) " .
             "offset $from limit $limit";
 
         $out = [];
@@ -227,11 +227,13 @@ class Pineapple {
             "  ?s a <$typeUri> ; " .
             "     schema:name ?title . " .
             $this->getSearchFilter("?title", $q) .
-            "  FILTER EXISTS { ".
-            "    ?m schema:mentions ?s ;".
-            "       nao:identifier [] ; ".
-            "       dc11:title []. ".
-            "  } " .
+            ($this->settings["limit_related_access_points"] ? (
+                "  FILTER EXISTS { ".
+                "    ?m schema:mentions ?s ;".
+                "       nao:identifier [] ; ".
+                "       dc11:title []. ".
+                "  } "
+            ) : "") .
             "} " .
             "offset $from limit $limit";
 
