@@ -57,6 +57,11 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("type_to_name", functio
     return type_to_name($type);
 }));
 
+// Turn skos:Concept into Concept
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("strip_rdf_prefix", function ($type) {
+    return substr($type, mb_strpos($type, ":") + 1);
+}));
+
 $settings = parse_ini_file(__DIR__ . '/../settings.ini');
 $api = new \Pineapple\Api($settings);
 $triplestore = new \Pineapple\TripleStore($settings);
@@ -158,6 +163,28 @@ $app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
     $mentions = $pineapple->getResourceMentions($id);
     respond($app, "_mentions.html.twig", $mentions);
 })->name("mentions");
+
+$app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
+    $q = $app->request->get("q");
+    $type = $app->request->get("type");
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+    $limit_ontologies = $app->request->get("ontology", []);
+    $ontologies = array_values(array_filter($settings["ontologies"], function($k) use ($limit_ontologies) {
+       return empty($limit_ontologies) ? true : in_array($limit_ontologies, $k);
+    }));
+
+    $data = [
+        "types" => $pineapple->getOntologyResourceTypes($ontologies, $q, $type),
+        "resources" => $pineapple->getOntologyResources($ontologies, $q, $type, $offset, $limit),
+        "offset" => $offset,
+        "limit" => $limit,
+        "query" => $q,
+        "type_facet" => $type
+    ];
+
+    respond($app, "ontology_resources.html.twig", $data);
+})->name("ontologies");
 
 $app->get("/people", function () use ($app, &$pineapple) {
     accessPointListPage($app, $pineapple, "schema:Person");

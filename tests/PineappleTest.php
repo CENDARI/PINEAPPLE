@@ -107,6 +107,27 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals("Attribution", $resources[1]["title"]);
     }
 
+    public function testGetOntologyResourceTypes() {
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("ontology_resource_types"));
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
+        $resources = $pineapple->getOntologyResourceTypes([], null, null);
+
+        $this->assertEquals("skos:Concept", $resources[0]["type"]);
+        $this->assertEquals(2257, $resources[0]["count"]);
+    }
+
+    public function testGetOntologyResources() {
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("ontology_resources"));
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
+        $resources = $pineapple->getOntologyResources([], null, null,  0, 20);
+
+        $this->assertEquals("Italian", $resources[0]["prefLabel"]);
+    }
+
     public function testCheckResourceExists() {
         // Mock the ask method so the result is always true...
         $this->store

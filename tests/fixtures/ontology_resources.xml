@@ -1,0 +1,14 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+ <head>
+  <variable name="s"/>
+  <variable name="type"/>
+  <variable name="prefLabel"/>
+ </head>
+ <results distinct="false" ordered="true">
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/wet_Italian#this</uri></binding>
+   <binding name="type"><uri>http://www.w3.org/2004/02/skos/core#Concept</uri></binding>
+   <binding name="prefLabel"><literal xml:lang="en">Italian</literal></binding>
+  </result>
+ </results>
+</sparql>
