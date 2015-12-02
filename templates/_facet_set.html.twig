@@ -1,0 +1,21 @@
+{% if not facets is empty %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Filter {{ facet_class }}</div>
+        <ul class="list-group">
+            {% for facet in facets %}
+                <li class="list-group-item">
+                    {% if facet_param == facet.type %}
+                        <strong>{{ facet.type|strip_rdf_prefix }}</strong>
+                        <a href="?{{ {"offset": offset, "q": query}|url_encode }}">
+                            <small>[remove filter]</small>
+                        </a>
+                    {% else %}
+                        <a href="?{{ {"offset": null, "q": query, "type": facet.type}|url_encode }}">
+                            {{ facet.type|strip_rdf_prefix }} ({{ facet.count }})
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

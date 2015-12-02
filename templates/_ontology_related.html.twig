@@ -1,0 +1,12 @@
+{% if not related is empty %}
+    <h2>{{ relation_name|strip_rdf_prefix|camel_to_title }}</h2>
+    <ul class="reference-list">
+        {% for item in related %}
+            <li>
+                <a title="{{ item.prefLabel }}" href="{{ urlFor("ontology-resource") }}?uri={{ item.uri|url_encode }}">
+                    {{ item.prefLabel }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

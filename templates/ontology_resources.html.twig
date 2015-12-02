@@ -16,7 +16,10 @@
                                 {% for item in resources %}
                                     <li>
                                         <div class="resource">
-                                            <strong>{{ item.prefLabel }}</strong> <span class="type">{{ item.type|strip_rdf_prefix }}</span>
+                                            <strong>
+                                                <a href="{{ urlFor("ontology-resource") }}?uri={{ item.uri|url_encode }}">{{ item.prefLabel }}</a>
+                                            </strong>
+                                            <span class="type">{{ item.type|strip_rdf_prefix }}</span>
                                             <div class="note">
                                                 {{ item.note }}
                                             </div>
@@ -29,27 +32,8 @@
                             {% include "_pagination.html.twig" with {"items": resources, "extra": {"type": type_facet}} %}
                         </div>
                         <div class="col-md-3">
-                            {% if not types is empty %}
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">{% trans "Filter Resource Types" %}</div>
-                                    <ul class="list-group">
-                                        {% for type in types %}
-                                            <li class="list-group-item">
-                                            {% if type_facet == type.type %}
-                                                <strong>{{ type.type|strip_rdf_prefix }}</strong>
-                                                <a href="?{{ {"offset": offset, "q": query}|url_encode }}">
-                                                    <small>[remove filter]</small>
-                                                </a>
-                                            {% else %}
-                                                <a href="?{{ {"offset": null, "q": query, "type": type.type}|url_encode }}">
-                                                    {{ type.type|strip_rdf_prefix }} ({{ type.count }})
-                                                </a>
-                                            {% endif %}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
+                            {% include "_facet_set.html.twig" with {"facets": types, "facet_class": "Resource Type", "facet_param": type_facet} %}
+                            {% include "_facet_set.html.twig" with {"facets": ontologies} %}
                         </div>
                     </form>
                 </div>

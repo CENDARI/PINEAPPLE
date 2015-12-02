@@ -252,32 +252,32 @@ class Pineapple {
     /**
      * Get distinct entity types contained within the specified ontology graphs.
      *
-     * @param array $ontologies a list of named graph URIs
      * @param null $q an optional title filter string
+     * @param null $t an optional (prefixed) type
+     * @param array $ont_ids a list of ontology IDs to constrain the search
      * @return array
      */
-    public function getOntologyResourceTypes($ontologies, $q = null, $t = null) {
-
-        $from_clause = join("\n", array_map(function ($v) {
-            return "FROM <$v>";
-        }, $ontologies));
+    public function getOntologyResourceTypes($q = null, $t = null, $ont = null) {
 
         $query =
 
             "select distinct ?type (count (?s) as ?count) " .
-            $from_clause .
+            $this->getOntologyFromClause($ont) .
             "where {" .
             "  ?s a ?type . " .
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . " .
-               $this->getSearchFilter("?prefLabel", $q)) : "") .
+                $this->getSearchFilter("?prefLabel", $q)) : "") .
             "}";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
             $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
+            $type = $short_type ? $short_type : $row->type->getUri();
             array_push($out, [
-                "type" => $short_type ? $short_type : $row->type->getUri(),
+                "type" => $type,
+                // FIXME: Temporary solution
+                "name" => substr($type, strpos($type, ":") + 1),
                 "count" => $row->count->getValue()
             ]);
         }
@@ -287,23 +287,19 @@ class Pineapple {
     /**
      * Get data for resources contained within a set of given named graphs.
      *
-     * @param array $ontologies a list of named graph URIs
      * @param null $q an optional title filter string
      * @param null $t an optional type constraint
+     * @param null $ont the ID of a specific ontology URI, as defined in the settings.ini
      * @param int $offset
      * @param int $limit
      * @return array
      */
-    public function getOntologyResources($ontologies, $q = null, $t = null, $from, $limit) {
-
-        $from_clause = join("\n", array_map(function ($v) {
-            return "FROM <$v> ";
-        }, $ontologies));
+    public function getOntologyResources($q = null, $t = null, $ont = null, $from, $limit) {
 
         $query =
 
             "select distinct ?s ?type ?prefLabel ?note " .
-            $from_clause .
+            $this->getOntologyFromClause($ont) .
             "where {" .
             "  ?s a ?type ; " .
             ($t ? " a $t ; " : "") .
@@ -315,12 +311,96 @@ class Pineapple {
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
             $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
-            error_log(json_encode($row));
             array_push($out, [
                 "uri" => $row->s->getUri(),
                 "type" => $short_type ? $short_type : $row->type->getUri(),
                 "prefLabel" => $row->prefLabel->getValue(),
                 "note" => property_exists($row, "note") ? $row->note->getValue() : ""
+            ]);
+        }
+        return $out;
+    }
+
+    /**
+     * Get data for an ontology resource.
+     *
+     * @param string $uri an ontology resource URI
+     * @return array
+     */
+    public function getOntologyResource($uri) {
+
+        $query =
+
+            "select ?type ?prefLabel ?note ?lat ?long " .
+            $this->getOntologyFromClause() .
+            "where {" .
+            "  <$uri> a ?type ; " .
+            "    skos:prefLabel ?prefLabel . " .
+            "    OPTIONAL { <$uri> skos:note ?note . }." .
+            "    OPTIONAL {" .
+            "      <$uri> geo:lat ?lat ;" .
+            "             geo:lat ?long ." .
+            "    }." .
+            "}";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
+            array_push($out, [
+                "uri" => $uri,
+                "type" => $short_type ? $short_type : $row->type->getUri(),
+                "prefLabel" => $row->prefLabel->getValue(),
+                "note" => property_exists($row, "note") ? $row->note->getValue() : "",
+                "lat" => property_exists($row, "lat") ? $row->lat->getValue() : "",
+                "long" => property_exists($row, "long") ? $row->long->getValue() : ""
+            ]);
+        }
+        if (empty($out)) {
+            throw new ResourceNotFoundException($uri);
+        }
+
+        $out[0]["relations"] = $this->getOntologyResourceRelations($uri);
+
+        return $out[0];
+    }
+
+    /**
+     * Get data for an ontology resource.
+     *
+     * @param string $uri an ontology resource URI
+     * @return array
+     */
+    public function getOntologyResourceRelations($uri) {
+
+        $query =
+
+            "select ?r ?p ?type ?prefLabel ?note ?lat ?long " .
+            $this->getOntologyFromClause() .
+            "where {" .
+            "  <$uri> ?p ?r ." .
+            "  ?r a ?type ; " .
+            "    skos:prefLabel ?prefLabel . " .
+            "    OPTIONAL { <$uri> skos:note ?note . }." .
+            "    OPTIONAL {" .
+            "      <$uri> geo:lat ?lat ;" .
+            "            geo:lat ?long ." .
+            "    }." .
+            "}";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            $short_pred = EasyRdf_Namespace::shorten($row->p->getUri());
+            $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
+            if (!array_key_exists($short_pred, $out)) {
+                $out[$short_pred] = [];
+            }
+            array_push($out[$short_pred], [
+                "uri" => $row->r->getUri(),
+                "type" => $short_type ? $short_type : $row->type->getUri(),
+                "prefLabel" => $row->prefLabel->getValue(),
+                "note" => property_exists($row, "note") ? $row->note->getValue() : "",
+                "lat" => property_exists($row, "lat") ? $row->lat->getValue() : "",
+                "long" => property_exists($row, "long") ? $row->long->getValue() : ""
             ]);
         }
         return $out;
@@ -411,8 +491,8 @@ class Pineapple {
         if (strlen($chars) === 0) {
             return "";
         } else {
-            return " FILTER isLiteral($pred) .".
-                   " FILTER regex ($pred, \"$alts\", \"i\" ) .";
+            return " FILTER isLiteral($pred) ." .
+            " FILTER regex ($pred, \"$alts\", \"i\" ) .";
         }
     }
 
@@ -421,5 +501,16 @@ class Pineapple {
             return "ENFORCING";
         }
         return $this->settings["AUTHORISATION_TYPE"];
+    }
+
+    private function getOntologyFromClause($filter = null) {
+
+        $uris = array_filter(array_values($this->settings["ontologies"]), function ($v) use ($filter) {
+            return empty($filter) ? true : $filter == $v;
+        });
+
+        return join("\n", array_map(function ($v) {
+            return "FROM <$v> ";
+        }, $uris));
     }
 }

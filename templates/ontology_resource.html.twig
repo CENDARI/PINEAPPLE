@@ -1,0 +1,25 @@
+{% extends "main.html.twig" %}
+
+{% block title %} - {{ prefLabel }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{{ prefLabel }}</h1>
+                <dl class="dl-horizontal">
+                    <dt>{% trans "type" %}</dt>
+                    <dd>{{ type|strip_rdf_prefix }}</dd>
+                    {% if note %}
+                        <dt>{% trans "note" %}</dt>
+                        <dd>{{ note }}</dd>
+                    {% endif %}
+                </dl>
+
+                {% for name, set in relations %}
+                    {% include "_ontology_related.html.twig" with {"relation_name" : name, "related": set} %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

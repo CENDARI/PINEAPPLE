@@ -62,6 +62,14 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("strip_rdf_prefix", fun
     return substr($type, mb_strpos($type, ":") + 1);
 }));
 
+// Ugh: stopgap measure! camelCaseText to Title Case Text
+// Probably won't work with non-ASCII
+// Borrowed from: https://gist.github.com/justjkk/1402061
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("camel_to_title", function ($camelStr) {
+    $intermediate = preg_replace('/(?!^)([[:upper:]][[:lower:]]+)/', ' $0', $camelStr);
+    return ucwords(preg_replace('/(?!^)([[:lower:]])([[:upper:]])/', '$1 $2', $intermediate));
+}));
+
 $settings = parse_ini_file(__DIR__ . '/../settings.ini');
 $api = new \Pineapple\Api($settings);
 $triplestore = new \Pineapple\TripleStore($settings);
@@ -169,14 +177,11 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     $type = $app->request->get("type");
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
-    $limit_ontologies = $app->request->get("ontology", []);
-    $ontologies = array_values(array_filter($settings["ontologies"], function($k) use ($limit_ontologies) {
-       return empty($limit_ontologies) ? true : in_array($limit_ontologies, $k);
-    }));
+    $ont = $app->request->get("ontology");
 
     $data = [
-        "types" => $pineapple->getOntologyResourceTypes($ontologies, $q, $type),
-        "resources" => $pineapple->getOntologyResources($ontologies, $q, $type, $offset, $limit),
+        "types" => $pineapple->getOntologyResourceTypes($q, $type, $ont),
+        "resources" => $pineapple->getOntologyResources($q, $type, $ont, $offset, $limit),
         "offset" => $offset,
         "limit" => $limit,
         "query" => $q,
@@ -185,6 +190,12 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
 
     respond($app, "ontology_resources.html.twig", $data);
 })->name("ontologies");
+
+$app->get("/ontology-resource", function () use ($app, &$pineapple) {
+    $uri = $app->request->get("uri");
+    $data = $pineapple->getOntologyResource($uri);
+    respond($app, "ontology_resource.html.twig", $data);
+})->name("ontology-resource");
 
 $app->get("/people", function () use ($app, &$pineapple) {
     accessPointListPage($app, $pineapple, "schema:Person");

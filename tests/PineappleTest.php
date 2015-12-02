@@ -112,7 +112,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("ontology_resource_types"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $resources = $pineapple->getOntologyResourceTypes([], null, null);
+        $resources = $pineapple->getOntologyResourceTypes(null, null, null);
 
         $this->assertEquals("skos:Concept", $resources[0]["type"]);
         $this->assertEquals(2257, $resources[0]["count"]);
@@ -123,7 +123,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("ontology_resources"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $resources = $pineapple->getOntologyResources([], null, null,  0, 20);
+        $resources = $pineapple->getOntologyResources(null, null, null, 0, 20);
 
         $this->assertEquals("Italian", $resources[0]["prefLabel"]);
     }
