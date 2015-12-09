@@ -193,9 +193,16 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
 })->name("ontologies");
 
 $app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pineapple) {
-    $uri = $settings["namespaces"]["ontology"] . join("/", $uri_parts); // . "#this";
-    $data = $pineapple->getOntologyResource($uri);
-    respond($app, "ontology_resource.html.twig", $data);
+    $uri = $settings["namespaces"]["ontology"] . join("/", $uri_parts);
+    try {
+        $data = $pineapple->getOntologyResource($uri);
+        respond($app, "ontology_resource.html.twig", $data);
+    } catch(\Pineapple\ResourceNotFoundException $e) {
+        // MASSIVE HACK: If we fail to get the resource, try again
+        // with #this appended to the URI...
+        $data = $pineapple->getOntologyResource($uri . "#this");
+        respond($app, "ontology_resource.html.twig", $data);
+    }
 })->name("ontology-resource");
 
 $app->get("/people", function () use ($app, &$pineapple) {
