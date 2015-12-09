@@ -3,7 +3,7 @@
     <ul class="reference-list">
         {% for item in related %}
             <li>
-                <a title="{{ item.prefLabel }}" href="{{ urlFor("ontology-resource") }}?uri={{ item.uri|url_encode }}">
+                <a title="{{ item.prefLabel }}" href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">
                     {{ item.prefLabel }}
                 </a>
             </li>

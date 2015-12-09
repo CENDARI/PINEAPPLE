@@ -17,7 +17,7 @@
                                     <li>
                                         <div class="resource">
                                             <strong>
-                                                <a href="{{ urlFor("ontology-resource") }}?uri={{ item.uri|url_encode }}">{{ item.prefLabel }}</a>
+                                                <a href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">{{ item.prefLabel }}</a>
                                             </strong>
                                             <span class="type">{{ item.type|strip_rdf_prefix }}</span>
                                             <div class="note">

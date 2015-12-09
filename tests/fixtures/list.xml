@@ -1,5 +1,6 @@
 <sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <head>
+        <variable name="s"/>
         <variable name="title"/>
         <variable name="identifier"/>
         <variable name="lastModified"/>
@@ -7,6 +8,9 @@
     </head>
     <results distinct="false" ordered="true">
         <result>
+            <binding name="s">
+                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
+            </binding>
             <binding name="title">
                 <literal datatype="http://www.w3.org/2001/XMLSchema#string">Race in progress</literal>
             </binding>
@@ -22,6 +26,9 @@
             </binding>
         </result>
         <result>
+            <binding name="s">
+                <uri>http://resources.cendari.dariah.eu/resources/f22c70aa-c640-4773-884d-076ac2f536c4</uri>
+            </binding>
             <binding name="title">
                 <literal datatype="http://www.w3.org/2001/XMLSchema#string">Colonel of the regiment watching the greasy pole competition</literal>
             </binding>

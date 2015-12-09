@@ -3,7 +3,7 @@
     <ul class="reference-list">
         {% for item in related %}
             <li>
-                <a title="{{ item.title }}" href="{{ urlFor("resource", {"id": item.id }) }}">{{ item.title }}</a>
+                <a title="{{ item.title }}" href="{{ urlFor("resource", {"type": item.type, "id": item.id }) }}">{{ item.title }}</a>
             </li>
         {% endfor %}
     </ul>

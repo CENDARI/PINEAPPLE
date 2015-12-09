@@ -31,9 +31,9 @@ class Pineapple {
      * @return array an map of item data, including mentions
      * @throws ResourceNotFoundException
      */
-    function getResource($uddi) {
-        $graph = $this->getResourceGraph($uddi);
-        return $this->getResourceData($uddi, $graph);
+    function getResource($type, $uddi) {
+        $graph = $this->getResourceGraph($type, $uddi);
+        return $this->getResourceData($type, $uddi, $graph);
     }
 
     /**
@@ -44,9 +44,9 @@ class Pineapple {
      *               mentions keyed to the type (event, person, etc)
      * @throws ResourceNotFoundException
      */
-    function getResourceMentions($uddi) {
+    function getResourceMentions($type, $uddi) {
 
-        $full_uri = EasyRdf_Namespace::expand("resource:" . $uddi);
+        $full_uri = EasyRdf_Namespace::expand(sprintf("%s:%s", $type, $uddi));
         $query =
 
             "select distinct ?m ?type ?title " .
@@ -54,20 +54,20 @@ class Pineapple {
             "where {" .
             "  <$full_uri> schema:mentions ?m ." .
             "  ?m a ?type ; " .
-            "     schema:name ?title ." .
+            "     skos:prefLabel ?title ." .
             "}";
 
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
-            $type = EasyRdf_Namespace::shorten($row->type->getUri());
+            $m_type = EasyRdf_Namespace::shorten($row->type->getUri());
             $types = array_key_exists($type, $out) ? $out[$type] : [];
             array_push($types, [
                 "uri" => $row->m->getUri(),
-                "type" => $type,
+                "type" => $m_type,
                 "title" => $row->title->getValue()
             ]);
-            $out[$type] = $types;
+            $out[$m_type] = $types;
         }
 
         return $out;
@@ -80,10 +80,10 @@ class Pineapple {
      * @return EasyRdf_Graph
      * @throws ResourceNotFoundException
      */
-    function getResourceGraph($uddi) {
-        $graph_uri = sprintf("resource:%s", $uddi);
+    function getResourceGraph($type, $uddi) {
+        $graph_uri = sprintf("%s:%s", $type, $uddi);
         if (!$this->checkResourceExists($graph_uri)) {
-            throw new ResourceNotFoundException($uddi);
+            throw new ResourceNotFoundException($graph_uri);
         }
         $query =
             "select ?s ?p ?o " .
@@ -111,7 +111,7 @@ class Pineapple {
     function getResources($q = null, $from, $limit) {
         $query =
 
-            "select distinct ?title ?identifier ?lastModified count(?m) as ?count " .
+            "select distinct ?s ?title ?identifier ?lastModified count(?m) as ?count " .
             $this->getPermissionFilter() .
             "where {" .
             "  ?s dc11:title ?title ; " .
@@ -124,8 +124,10 @@ class Pineapple {
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
+            $ns_uri = EasyRdf_Namespace::shorten($row->s->getUri());
             array_push($out, [
                 "id" => $row->identifier->getValue(),
+                "type" => substr($ns_uri, 0, mb_strpos($ns_uri, ":")),
                 "title" => $row->title->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
                 "numMentions" => $row->count->getValue()
@@ -147,13 +149,13 @@ class Pineapple {
     function getMentionResources($type, $name, $from, $limit) {
         $query =
 
-            "select distinct ?identifier ?title " .
+            "select distinct ?r ?identifier ?title " .
             $this->getPermissionFilter() .
             "where {" .
-            "  [] schema:mentions [" .
+            "  ?r schema:mentions [" .
             "        a $type ; " .
             // FIXME: literal type? why is this needed?
-            "        schema:name \"$name\"^^xsd:string " .
+            "        skos:prefLabel \"$name\"^^xsd:string " .
             "     ] ; " .
             "     dc11:title ?title ; " .
             "     nao:identifier ?identifier . " .
@@ -162,8 +164,10 @@ class Pineapple {
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
+            $ns_uri = EasyRdf_Namespace::shorten($row->r->getUri());
             array_push($out, [
                 "id" => $row->identifier->getValue(),
+                "type" => substr($ns_uri, 0, mb_strpos($ns_uri, ":")),
                 "title" => $row->title->getValue()
             ]);
         }
@@ -180,26 +184,27 @@ class Pineapple {
      * @param int $limit the maximum returned items
      * @return array
      */
-    function getRelatedResources($uddi, $from, $limit) {
+    function getRelatedResources($type, $uddi, $from, $limit) {
+        $uri = EasyRdf_Namespace::expand(sprintf("%s:%s", $type, $uddi));
         $query =
 
-            "select distinct ?identifier ?title " .
+            "select distinct ?r ?identifier ?title " .
             $this->getPermissionFilter() .
             "where {" .
-            //"  <$graph_uri> schema:mentions ?m . " .
-            "  ?s nao:identifier \"$uddi\"^^xsd:string . " .
-            "  ?s schema:mentions ?m . " .
+            "  <$uri> schema:mentions ?m . " .
             "  ?r schema:mentions ?m . " .
             "  ?r dc11:title ?title ; " .
             "     nao:identifier ?identifier . " .
-            "  FILTER (?r != ?s ) " .
+            "  FILTER (?r != <$uri> ) " .
             "} " .
             "offset $from limit $limit";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
+            $ns_uri = EasyRdf_Namespace::shorten($row->r->getUri());
             array_push($out, [
                 "id" => $row->identifier->getValue(),
+                "type" => substr($ns_uri, 0, mb_strpos($ns_uri, ":")),
                 "title" => $row->title->getValue()
             ]);
         }
@@ -225,7 +230,7 @@ class Pineapple {
             $this->getPermissionFilter() .
             "where {" .
             "  ?s a <$typeUri> ; " .
-            "     schema:name ?title . " .
+            "     skos:prefLabel ?title . " .
             $this->getSearchFilter("?title", $q) .
             ($this->settings["limit_related_access_points"] ? (
                 "  FILTER EXISTS { " .
@@ -418,15 +423,16 @@ class Pineapple {
         return $this->triplestore->ask($query_string);
     }
 
-    private function getResourceData($uddi, EasyRdf_Graph $graph) {
-        $uri = $graph->getUri();
+    private function getResourceData($type, $uddi, EasyRdf_Graph $graph) {
+        $uri = EasyRdf_Namespace::expand($graph->getUri());
         return [
-            "id" => $graph->get($uri, 'nao:identifier')->getValue(),
+            "id" => $uddi,
+            "type" => $type,
             "title" => $graph->get($uri, 'dc11:title')->getValue(),
             "plainText" => $graph->get($uri, "nie:plainTextContent")->getValue(),
             "source" => $graph->get($uri, "dc11:source")->getValue(),
             "lastModified" => $graph->get($uri, "nao:lastModified")->getValue(),
-            "mentions" => $this->getResourceMentions($uddi)
+            "mentions" => $this->getResourceMentions($type, $uddi)
         ];
     }
 

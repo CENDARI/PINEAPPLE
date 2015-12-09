@@ -19,8 +19,8 @@
                         </pre>
                     </dd>
                 </dl>
-                {% include "_mentions.html.twig" %}
-                {% include "_related.html.twig" %}
+                {% include "_mentions.html.twig" with {"mentions": mentions} %}
+                {% include "_related.html.twig" with {"related": related} %}
             </div>
         </div>
     </div>

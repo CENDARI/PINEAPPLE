@@ -8,7 +8,9 @@ function type_to_name($type) {
         "schema:Event" => "Events",
         "schema:Place" => "Places",
         "schema:Person" => "People",
-        "schema:Organisation" => "Organisations"
+        "schema:Organisation" => "Organisations",
+        "edm:Place" => "Places",
+        "edm:Event" => "Events"
     ];
     return array_key_exists($type, $name) ? $name[$type] : $type;
 }
@@ -46,6 +48,9 @@ $app->error(function(\Exception $e) use ($app) {
     }
 });
 
+
+$settings = parse_ini_file(__DIR__ . '/../settings.ini');
+
 // Add a simple template function to format the millisecond date strings
 // we get back from the triplestore
 $view->getEnvironment()->addFilter(new Twig_SimpleFilter("pretty_date", function ($milliseconds) {
@@ -62,6 +67,16 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("strip_rdf_prefix", fun
     return substr($type, mb_strpos($type, ":") + 1);
 }));
 
+// Turn skos:Concept into Concept
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("strip_namespace", function ($uri) use (&$settings) {
+    foreach ($settings["namespaces"] as $ns => $nsuri) {
+        if (substr($uri, 0, mb_strlen($nsuri)) === $nsuri) {
+            return substr($uri, mb_strlen($nsuri));
+        }
+    }
+    return $uri;
+}));
+
 // Ugh: stopgap measure! camelCaseText to Title Case Text
 // Probably won't work with non-ASCII
 // Borrowed from: https://gist.github.com/justjkk/1402061
@@ -70,7 +85,6 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("camel_to_title", funct
     return ucwords(preg_replace('/(?!^)([[:lower:]])([[:upper:]])/', '$1 $2', $intermediate));
 }));
 
-$settings = parse_ini_file(__DIR__ . '/../settings.ini');
 $api = new \Pineapple\Api($settings);
 $triplestore = new \Pineapple\TripleStore($settings);
 
@@ -137,21 +151,8 @@ $app->get("/", function () use ($app, &$pineapple) {
     respond($app, "resources.html.twig", $data);
 })->name("home");
 
-$app->get("/resource/:id", function ($id) use ($app, &$pineapple) {
-    $data = $pineapple->getResource($id);
-
-    $offset = $app->request->get("offset", 0);
-    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
-    $more = [
-        "related" => $pineapple->getRelatedResources($id, $offset, $limit),
-        "offset" => $offset,
-        "limit" => $limit
-    ];
-    respond($app, "resource.html.twig", array_merge($data, $more));
-})->name("resource");
-
-
-$app->get("/mention/:type/:name", function ($type, $name) use ($app, &$pineapple) {
+$app->get("/mention/:type/:name+", function ($type, $name_parts) use ($app, &$pineapple) {
+    $name = join("/", $name_parts);
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
 
@@ -167,8 +168,8 @@ $app->get("/mention/:type/:name", function ($type, $name) use ($app, &$pineapple
 })->name("mention");
 
 
-$app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
-    $mentions = $pineapple->getResourceMentions($id);
+$app->get("/mentions/:type/:id", function ($type, $id) use ($app, &$pineapple) {
+    $mentions = $pineapple->getResourceMentions($type, $id);
     respond($app, "_mentions.html.twig", $mentions);
 })->name("mentions");
 
@@ -191,8 +192,8 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     respond($app, "ontology_resources.html.twig", $data);
 })->name("ontologies");
 
-$app->get("/ontology-resource", function () use ($app, &$pineapple) {
-    $uri = $app->request->get("uri");
+$app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pineapple) {
+    $uri = $settings["namespaces"]["ontology"] . join("/", $uri_parts); // . "#this";
     $data = $pineapple->getOntologyResource($uri);
     respond($app, "ontology_resource.html.twig", $data);
 })->name("ontology-resource");
@@ -206,9 +207,27 @@ $app->get("/organisations", function () use ($app, &$pineapple) {
 })->name("organisations");
 
 $app->get("/places", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "schema:Place");
+    accessPointListPage($app, $pineapple, "edm:Place");
 })->name("places");
 
 $app->get("/events", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "schema:Event");
+    accessPointListPage($app, $pineapple, "edm:Event");
 })->name("events");
+
+// Fallback, which handles URLs like:
+// BASEURL/resources/f22c70aa-c640-4773-884d-076ac2f536c4.
+// When Pineapple is mounted at http://resources.cendari.dariah.eu
+// this therefore handles URI resolution
+$app->get("/:type/:id+", function ($type, $id_parts) use ($app, &$settings, &$pineapple) {
+    $id = join("/", $id_parts);
+    $data = $pineapple->getResource($type, $id);
+
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+    $more = [
+        "related" => $pineapple->getRelatedResources($type, $id, $offset, $limit),
+        "offset" => $offset,
+        "limit" => $limit
+    ];
+    respond($app, "resource.html.twig", array_merge($data, $more));
+})->name("resource");
