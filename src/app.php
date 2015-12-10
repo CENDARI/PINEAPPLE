@@ -10,7 +10,9 @@ function type_to_name($type) {
         "schema:Person" => "People",
         "schema:Organisation" => "Organisations",
         "edm:Place" => "Places",
-        "edm:Event" => "Events"
+        "edm:Event" => "Events",
+        "foaf:Person" => "People",
+        "foaf:Organisation" => "Organisations"
     ];
     return array_key_exists($type, $name) ? $name[$type] : $type;
 }
@@ -178,15 +180,22 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     $type = $app->request->get("type");
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
-    $ont = $app->request->get("ontology");
+    $ont_facet = $app->request->get("ontology");
+
+    $meta = $pineapple->getOntologyGraphMeta($settings["ontology_meta"]);
+    $onts = $ont_facet ? [$ont_facet] : array_map(function ($v) {
+        return $v["uri"];
+    }, $meta);
 
     $data = [
-        "types" => $pineapple->getOntologyResourceTypes($q, $type, $ont),
-        "resources" => $pineapple->getOntologyResources($q, $type, $ont, $offset, $limit),
+        "types" => $pineapple->getOntologyResourceTypes($q, $type, $onts),
+        "resources" => $pineapple->getOntologyResources($q, $type, $onts, $offset, $limit),
         "offset" => $offset,
         "limit" => $limit,
         "query" => $q,
-        "type_facet" => $type
+        "type_facet" => $type,
+        "ont_facet" => $ont_facet,
+        "graph_meta" => $meta
     ];
 
     respond($app, "ontology_resources.html.twig", $data);
@@ -205,21 +214,6 @@ $app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pin
     }
 })->name("ontology-resource");
 
-$app->get("/people", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "schema:Person");
-})->name("people");
-
-$app->get("/organisations", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "schema:Organisation");
-})->name("organisations");
-
-$app->get("/places", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "edm:Place");
-})->name("places");
-
-$app->get("/events", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "edm:Event");
-})->name("events");
 
 // Fallback, which handles URLs like:
 // BASEURL/resources/f22c70aa-c640-4773-884d-076ac2f536c4.

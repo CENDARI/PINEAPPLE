@@ -6,11 +6,11 @@
                 <li class="list-group-item">
                     {% if facet_param == facet.type %}
                         <strong>{{ facet.type|strip_rdf_prefix }}</strong>
-                        <a href="?{{ {"offset": offset, "q": query}|url_encode }}">
+                        <a href="?{{ {"offset": offset, "q": query}|merge(extra|default({}))|url_encode }}">
                             <small>[remove filter]</small>
                         </a>
                     {% else %}
-                        <a href="?{{ {"offset": null, "q": query, "type": facet.type}|url_encode }}">
+                        <a href="?{{ {"offset": null, "q": query, "type": facet.type}|merge(extra|default({}))|url_encode }}">
                             {{ facet.type|strip_rdf_prefix }} ({{ facet.count }})
                         </a>
                     {% endif %}

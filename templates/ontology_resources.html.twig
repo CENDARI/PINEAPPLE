@@ -20,6 +20,7 @@
                                                 <a href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">{{ item.prefLabel }}</a>
                                             </strong>
                                             <span class="type">{{ item.type|strip_rdf_prefix }}</span>
+
                                             <div class="note">
                                                 {{ item.note }}
                                             </div>
@@ -29,11 +30,39 @@
                                     <li>{% trans "No results found" %}</li>
                                 {% endfor %}
                             </ul>
-                            {% include "_pagination.html.twig" with {"items": resources, "extra": {"type": type_facet}} %}
+                            {% include "_pagination.html.twig" with {"items": resources, "extra": {"type": type_facet, "ontology": ont_facet}} %}
                         </div>
                         <div class="col-md-3">
-                            {% include "_facet_set.html.twig" with {"facets": types, "facet_class": "Resource Type", "facet_param": type_facet} %}
-                            {% include "_facet_set.html.twig" with {"facets": ontologies} %}
+                            {% include "_facet_set.html.twig" with {"facets": types, "facet_class": "Resource Type", "facet_param": type_facet, "extra": {"ontology": ont_facet}} %}
+
+                            {% if graph_meta %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">Ontologies</div>
+                                    <ul class="list-group">
+                                        {% if ont_facet %}
+                                            {% for graph in graph_meta %}
+                                                {% if ont_facet == graph.uri %}
+                                                    <li class="list-group-item" title="{{ graph.description }}">
+                                                        <strong>{{ graph.name }}</strong>
+                                                        <a href="?{{ {"offset": offset, "q": query, "type": type_facet}|url_encode }}">
+                                                            <small>[remove filter]</small>
+                                                        </a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% for graph in graph_meta %}
+                                                <li class="list-group-item" title="{{ graph.description }}">
+                                                    <a href="?{{ {"offset": null, "q": query, "type": type_facet, "ontology": graph.uri}|url_encode }}">
+                                                        {{ graph.name }}
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
                         </div>
                     </form>
                 </div>

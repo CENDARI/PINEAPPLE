@@ -61,7 +61,8 @@ class Pineapple {
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
             $m_type = EasyRdf_Namespace::shorten($row->type->getUri());
-            $types = array_key_exists($type, $out) ? $out[$type] : [];
+            $m_type = $m_type ? $m_type : $row->type->getUri();
+            $types = array_key_exists($m_type, $out) ? $out[$m_type] : [];
             array_push($types, [
                 "uri" => $row->m->getUri(),
                 "type" => $m_type,
@@ -153,7 +154,7 @@ class Pineapple {
             $this->getPermissionFilter() .
             "where {" .
             "  ?r schema:mentions [" .
-            "        a $type ; " .
+            //"        a $type ; " .
             // FIXME: literal type? why is this needed?
             "        skos:prefLabel \"$name\"^^xsd:string " .
             "     ] ; " .
@@ -254,6 +255,27 @@ class Pineapple {
         return $out;
     }
 
+    public function getOntologyGraphMeta($meta_uri) {
+        $agg_pred = "http://www.openarchives.org/ore/terms/aggregates";
+        $query =
+
+            "select distinct ?uri ?name ?description where {".
+            "  <$meta_uri> <$agg_pred> ?uri . ".
+            "    ?uri dcterms:title ?name ;".
+            "       dcterms:abstract ?description .".
+            "}";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "uri" => $row->uri->getUri(),
+                "name" => $row->name->getValue(),
+                "description" => $row->description->getValue()
+            ]);
+        }
+        return $out;
+    }
+
     /**
      * Get distinct entity types contained within the specified ontology graphs.
      *
@@ -262,7 +284,7 @@ class Pineapple {
      * @param array $ont_ids a list of ontology IDs to constrain the search
      * @return array
      */
-    public function getOntologyResourceTypes($q = null, $t = null, $ont = null) {
+    public function getOntologyResourceTypes($q = null, $t = null, $ont = []) {
 
         $query =
 
@@ -299,7 +321,7 @@ class Pineapple {
      * @param int $limit
      * @return array
      */
-    public function getOntologyResources($q = null, $t = null, $ont = null, $from, $limit) {
+    public function getOntologyResources($q = null, $t = null, $ont = [], $from, $limit) {
 
         $query =
 
@@ -332,12 +354,12 @@ class Pineapple {
      * @param string $uri an ontology resource URI
      * @return array
      */
-    public function getOntologyResource($uri) {
+    public function getOntologyResource($uri, $ont = []) {
 
         $query =
 
             "select ?type ?prefLabel ?note ?lat ?long " .
-            $this->getOntologyFromClause() .
+            $this->getOntologyFromClause($ont) .
             "where {" .
             "  <$uri> a ?type ; " .
             "    skos:prefLabel ?prefLabel . " .
@@ -375,12 +397,12 @@ class Pineapple {
      * @param string $uri an ontology resource URI
      * @return array
      */
-    public function getOntologyResourceRelations($uri) {
+    public function getOntologyResourceRelations($uri, $ont = []) {
 
         $query =
 
-            "select ?r ?p ?type ?prefLabel ?note ?lat ?long " .
-            $this->getOntologyFromClause() .
+            "select distinct ?r ?p ?type ?prefLabel ?note ?lat ?long " .
+            $this->getOntologyFromClause($ont) .
             "where {" .
             "  <$uri> ?p ?r ." .
             "  ?r a ?type ; " .
@@ -509,12 +531,7 @@ class Pineapple {
         return $this->settings["AUTHORISATION_TYPE"];
     }
 
-    private function getOntologyFromClause($filter = null) {
-
-        $uris = array_filter(array_values($this->settings["ontologies"]), function ($v) use ($filter) {
-            return empty($filter) ? true : $filter == $v;
-        });
-
+    private function getOntologyFromClause($uris = []) {
         return join("\n", array_map(function ($v) {
             return "FROM <$v> ";
         }, $uris));
