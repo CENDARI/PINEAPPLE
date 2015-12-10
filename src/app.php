@@ -36,11 +36,11 @@ $view->parserExtensions = array(
     new Twig_Extensions_Extension_I18n
 );
 
-$app->notFound(function() use ($app) {
+$app->notFound(function () use ($app) {
     $app->render("404.html.twig", ["error" => ""]);
 });
 
-$app->error(function(\Exception $e) use ($app) {
+$app->error(function (\Exception $e) use ($app) {
     if ($e instanceof \Pineapple\ResourceNotFoundException) {
         $app->render("404.html.twig", ["error" => $e->getMessage()], 404);
     } else {
@@ -183,20 +183,27 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     $ont_facet = $app->request->get("ontology");
 
     $meta = $pineapple->getOntologyGraphMeta($settings["ontology_meta"]);
-    $onts = $ont_facet ? [$ont_facet] : array_map(function ($v) {
-        return $v["uri"];
-    }, $meta);
+    $ont_uris = array_map(function ($v) { return $v["uri"]; }, $meta);
+    $active_onts = $ont_uris;
 
-    $data = [
-        "types" => $pineapple->getOntologyResourceTypes($q, $type, $onts),
-        "resources" => $pineapple->getOntologyResources($q, $type, $onts, $offset, $limit),
+    if (in_array($ont_facet, $ont_uris, true)) {
+        $active_onts = [$ont_facet];
+    } else {
+        $ont_facet = null; // invalid
+    }
+
+    // We can't do anything useful without the graph metadata, so return
+    // early if that's missing.
+    $data = !empty($active_onts) ? [
+        "types" => $pineapple->getOntologyResourceTypes($q, $type, $active_onts),
+        "resources" => $pineapple->getOntologyResources($q, $type, $active_onts, $offset, $limit),
         "offset" => $offset,
         "limit" => $limit,
         "query" => $q,
         "type_facet" => $type,
         "ont_facet" => $ont_facet,
         "graph_meta" => $meta
-    ];
+    ] : [];
 
     respond($app, "ontology_resources.html.twig", $data);
 })->name("ontologies");
@@ -206,7 +213,7 @@ $app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pin
     try {
         $data = $pineapple->getOntologyResource($uri);
         respond($app, "ontology_resource.html.twig", $data);
-    } catch(\Pineapple\ResourceNotFoundException $e) {
+    } catch (\Pineapple\ResourceNotFoundException $e) {
         // MASSIVE HACK: If we fail to get the resource, try again
         // with #this appended to the URI...
         $data = $pineapple->getOntologyResource($uri . "#this");
