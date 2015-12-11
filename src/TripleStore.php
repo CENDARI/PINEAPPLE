@@ -23,7 +23,6 @@ class TripleStore {
             $endpointURLs =& $this->settings["endpoints"];
         if ($namespaces == null)
             $namespaces =& $this->settings["namespaces"];
-
         foreach ($endpointURLs as $url) {
             $sparql = new EasyRdf_Sparql_Client($url);
             array_push($this->endpoints, $sparql);

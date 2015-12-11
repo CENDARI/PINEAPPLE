@@ -1,0 +1,20 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <head>
+        <variable name="type"/>
+        <variable name="label"/>
+        <variable name="note"/>
+    </head>
+    <results distinct="false" ordered="true">
+        <result>
+            <binding name="type">
+                <uri>http://www.europeana.eu/schemas/edm/Event</uri>
+            </binding>
+            <binding name="label">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Holy Benedict Abbeys</literal>
+            </binding>
+            <binding name="note">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Test</literal>
+            </binding>
+        </result>
+    </results>
+</sparql>

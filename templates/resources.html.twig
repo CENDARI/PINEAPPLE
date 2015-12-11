@@ -13,7 +13,7 @@
                     <ul class="resource-list">
                         {% for item in resources %}
                             <li>
-                                <a class="title" href="{{ urlFor("resource", {"type": item.type, "id": item.id}) }}">{{ item.title }}</a>
+                                <a class="title" href="{{ urlFor("resource", {"id": item.id}) }}">{{ item.title }}</a>
                                 <ul class="details">
                                     <li>{% trans "Mentions" %}: {{ item.numMentions }}</li>
                                     <li>{% trans "Last modified" %}: {{ item.lastModified|pretty_date }}</li>

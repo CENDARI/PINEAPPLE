@@ -170,8 +170,8 @@ $app->get("/mention/:type/:name+", function ($type, $name_parts) use ($app, &$pi
 })->name("mention");
 
 
-$app->get("/mentions/:type/:id", function ($type, $id) use ($app, &$pineapple) {
-    $mentions = $pineapple->getResourceMentions($type, $id);
+$app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
+    $mentions = $pineapple->getResourceMentions($id);
     respond($app, "_mentions.html.twig", $mentions);
 })->name("mentions");
 
@@ -209,33 +209,38 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
 })->name("ontologies");
 
 $app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pineapple) {
-    $uri = $settings["namespaces"]["ontology"] . join("/", $uri_parts);
+    $id = join("/", array_map(function ($p) { return urlencode($p);}, $uri_parts));
     try {
-        $data = $pineapple->getOntologyResource($uri);
+        $data = $pineapple->getOntologyResource($id);
         respond($app, "ontology_resource.html.twig", $data);
     } catch (\Pineapple\ResourceNotFoundException $e) {
         // MASSIVE HACK: If we fail to get the resource, try again
         // with #this appended to the URI...
-        $data = $pineapple->getOntologyResource($uri . "#this");
+        $data = $pineapple->getOntologyResource($id . "#this");
         respond($app, "ontology_resource.html.twig", $data);
     }
 })->name("ontology-resource");
 
+$app->get("/resources/:id+", function ($id_parts) use ($app, &$settings, &$pineapple) {
+    $id = join("/", array_map(function ($p) { return urlencode($p);}, $id_parts));
+    $data = $pineapple->getResource($id);
+
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+    $more = [
+        "related" => $pineapple->getRelatedResources($id, $offset, $limit),
+        "offset" => $offset,
+        "limit" => $limit
+    ];
+    respond($app, "resource.html.twig", array_merge($data, $more));
+})->name("resource");
 
 // Fallback, which handles URLs like:
 // BASEURL/resources/f22c70aa-c640-4773-884d-076ac2f536c4.
 // When Pineapple is mounted at http://resources.cendari.dariah.eu
 // this therefore handles URI resolution
 $app->get("/:type/:id+", function ($type, $id_parts) use ($app, &$settings, &$pineapple) {
-    $id = join("/", $id_parts);
-    $data = $pineapple->getResource($type, $id);
-
-    $offset = $app->request->get("offset", 0);
-    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
-    $more = [
-        "related" => $pineapple->getRelatedResources($type, $id, $offset, $limit),
-        "offset" => $offset,
-        "limit" => $limit
-    ];
-    respond($app, "resource.html.twig", array_merge($data, $more));
-})->name("resource");
+    $id = join("/", array_map(function ($p) { return urlencode($p);}, $id_parts));
+    respond($app, "ontology_resource.html.twig",
+        $pineapple->getConcept($type, $id));
+})->name("concept");

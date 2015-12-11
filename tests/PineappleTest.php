@@ -37,9 +37,26 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
 
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
 
-        $resource = $pineapple->getResource("resources", "c87de1f4-8452-44e5-aea0-75edc3bc77d7");
+        $resource = $pineapple->getResource("c87de1f4-8452-44e5-aea0-75edc3bc77d7");
 
         $this->assertEquals("Race in progress", $resource["title"]);
+    }
+
+    public function testGetConcept() {
+        $this->store
+            ->method("ask")
+            ->willReturn(true);
+        $this->store
+            ->method("query")
+            ->will($this->onConsecutiveCalls(
+                $this->getMockResult("concept")));
+
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
+
+        $resource = $pineapple->getConcept("events", "Holy+Benedict+Abbeys");
+        $this->assertEquals("Holy Benedict Abbeys", $resource["prefLabel"]);
+        $this->assertEquals("edm:Event", $resource["type"]);
+        $this->assertEquals("Test", $resource["note"]);
     }
 
     /**
@@ -52,10 +69,10 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->willReturn(false);
         $this->store
             ->method("query")
-            ->willReturn($this->getMockResult("resource"));
+            ->willReturn($this->getMockResult("resource_not_found"));
 
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $pineapple->getResource("resources", "not-here");
+        $pineapple->getResource("not-here");
     }
 
     public function testGetResources() {
@@ -75,7 +92,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("mention_resources"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $resources = $pineapple->getMentionResources("schema:Event", "World War",  0, 20);
+        $resources = $pineapple->getMentionResources("edm:Event", "World War",  0, 20);
 
         $this->assertEquals("Race in progress", $resources[0]["title"]);
         $this->assertEquals("Colonel of the regiment watching the greasy pole competition",
@@ -89,7 +106,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("mention_resources"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $resources = $pineapple->getRelatedResources("resources", "test",  0, 20);
+        $resources = $pineapple->getRelatedResources("test",  0, 20);
 
         $this->assertEquals("Race in progress", $resources[0]["title"]);
         $this->assertEquals("Colonel of the regiment watching the greasy pole competition",

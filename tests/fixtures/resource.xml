@@ -1,89 +1,154 @@
-<sparql xmlns="http://www.w3.org/2005/sparql-results#">
-    <head>
-        <variable name="s"/>
-        <variable name="p"/>
-        <variable name="o"/>
-    </head>
-    <results distinct="false" ordered="true">
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/Event/World War</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</uri>
-            </binding>
-            <binding name="o">
-                <uri>http://schema.org/Event</uri>
-            </binding>
-        </result>
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/Event/World War</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://schema.org/name</uri>
-            </binding>
-            <binding name="o">
-                <literal datatype="http://www.w3.org/2001/XMLSchema#string">World War</literal>
-            </binding>
-        </result>
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://purl.org/dc/elements/1.1/source</uri>
-            </binding>
-            <binding name="o">
-                <literal datatype="http://www.w3.org/2001/XMLSchema#string">f4-8452-44e5-aea0-75edc3bc77d7</literal>
-            </binding>
-        </result>
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://www.semanticdesktop.org/ontologies/2007/01/19/nie#plainTextContent</uri>
-            </binding>
-            <binding name="o">
-                <literal datatype="http://www.w3.org/2001/XMLSchema#string">2005
-                    United Kingdom
-                </literal>
-            </binding>
-        </result>
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://purl.org/dc/elements/1.1/title</uri>
-            </binding>
-            <binding name="o">
-                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Race in progress</literal>
-            </binding>
-        </result>
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://www.semanticdesktop.org/ontologies/2007/08/15/nao#lastModified</uri>
-            </binding>
-            <binding name="o">
-                <literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000335000</literal>
-            </binding>
-        </result>
-        <result>
-            <binding name="s">
-                <uri>http://resources.cendari.dariah.eu/resources/c87de1f4-8452-44e5-aea0-75edc3bc77d7</uri>
-            </binding>
-            <binding name="p">
-                <uri>http://www.semanticdesktop.org/ontologies/2007/08/15/nao#identifier</uri>
-            </binding>
-            <binding name="o">
-                <literal datatype="http://www.w3.org/2001/XMLSchema#string">c87de1f4-8452-44e5-aea0-75edc3bc77d7
-                </literal>
-            </binding>
-        </result>
-    </results>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+ <head>
+  <variable name="title"/>
+  <variable name="identifier"/>
+  <variable name="lastModified"/>
+  <variable name="plainText"/>
+  <variable name="source"/>
+ </head>
+ <results distinct="false" ordered="true">
+  <result>
+   <binding name="title"><literal datatype="http://www.w3.org/2001/XMLSchema#string">Race in progress</literal></binding>
+   <binding name="identifier"><literal datatype="http://www.w3.org/2001/XMLSchema#string">c87de1f4-8452-44e5-aea0-75edc3bc77d7</literal></binding>
+   <binding name="lastModified"><literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000335000</literal></binding>
+   <binding name="plainText"><literal datatype="http://www.w3.org/2001/XMLSchema#string">2005
+Sat Jan 01 01:00:00 CET 2005
+Sat Dec 31 01:00:00 CET 2005
+Early 21th century
+ÐÐ°ÑÐ°Ð»Ð¾ 21-Ð³Ð¾ Ð²ÐµÐºÐ°
+Mon Jan 01 01:00:00 CET 2001
+Sat Dec 31 01:00:00 CET 2033
+21..
+21??
+21e
+21er siÃ¨cle
+21-st
+21st
+21st century
+21Ð¹ Ð²ÐµÐº
+21ste eeuw
+Mon Jan 01 01:00:00 CET 2001
+Fri Dec 31 01:00:00 CET 2100
+2e millÃ©naire aprÃ¨s J.-C.
+Second millenium AD
+Second millenium AD, years 1001-2000
+Chronological period
+Time
+fotografija
+fotografia
+fotografi
+fotografia; argazki
+fotograf
+fotografia (immagine)
+fotoÄraf
+ritratt
+fotografi (bilde)
+fÃ©nykÃ©p
+fotogrÄfs
+ØµÙØ±Ø© ÙÙØªÙØºØ±Ø§ÙÙØ©
+nuotrauka
+fotografie
+Photo
+ÏÏÏÎ¿Î³ÏÎ±ÏÎ¯Î±
+photograph
+ç§ç
+valokuva
+fotografia
+fotografia (imagem)
+Ð¤Ð¾ÑÐ¾Ð³ÑÐ°ÑÐ¸Ñ, ÑÐ¾ÑÐ¾Ð³ÑÐ°ÑÑÐºÐ¾ Ð¸Ð·Ð¾Ð±ÑÐ°Ð¶ÐµÐ½Ð¸Ðµ, ÑÐ½Ð¸Ð¼ÐºÐ°
+fotografi
+photo
+photograph
+ÑÐ¾ÑÐ¾Ð³ÑÐ°ÑÐ¸Ñ
+foto
+fotografÃ­a
+foto
+dokumentacija
+dokumentÃ¡cia
+dokumentatze; dokumentazio
+dokumentation
+documentaÅ£ie
+documentazione
+dokÃ¼mantasyon
+dokumentazzjoni
+dokumentasjon
+dokumentÃ¡lÃ¡s
+dokumentÄcija
+ØªÙØ«ÙÙ
+dokumentacija
+dokumentace
+Dokumentation
+ÏÎµÎºÎ¼Î·ÏÎ¯ÏÏÎ·
+documentation
+ææ¡£å
+dokumentointi, asiakirja-aineisto
+documentaÃ§Ã£o
+dokumentacja
+ÐÐ¾ÐºÑÐ¼ÐµÐ½ÑÐ¸ÑÐ°Ð½Ðµ
+documentation
+dokumentation
+documentation
+Ð´Ð¾ÐºÑÐ¼ÐµÐ½ÑÐ°ÑÐ¸Ñ
+dokumentatsioon
+documentaciÃ³n
+documentatie
+informacija, informacije, podatki
+informÃ¡cia
+informazio
+information
+informaÅ£ie
+informazione
+bilgi
+informazzjoni
+informasjon
+informÃ¡ciÃ³
+informÄcija
+Ø§ÙÙØ¹ÙÙÙØ§Øª
+informacija
+informace
+Information
+ÏÎ»Î·ÏÎ¿ÏÎ¿ÏÎ¯Î±(Î¯ÎµÏ)/ÏÎ»Î·ÏÎ¿ÏÏÏÎ·ÏÎ·/ÏÏÎ¿Î¹ÏÎµÎ¯Î±/ÎµÎ½Î·Î¼Î­ÏÏÏÎ·
+information
+ä¿¡æ¯
+tieto
+informaÃ§Ã£o
+informacja
+ÐÐ½ÑÐ¾ÑÐ¼Ð°ÑÐ¸Ñ
+information
+information
+information
+Ð¸Ð½ÑÐ¾ÑÐ¼Ð°ÑÐ¸Ñ
+teave, info[rmatsioon]
+informaciÃ³n
+informatie
+National Library of Scotland
+The European Library
+1914 - 1920
+2005
+A swimming race in progress, during World War I. Flags have been placed in the water as markers. There are soldiers the whole length of the left river bank watching. On the right bank there appears to be a small group of women and children. Often at events of this nature local people would also come along to watch. Soldiers at the Front were not on constant duty. There were periods allowed for recreation and relaxation. [Original reads: &#39;OFFICIAL PHOTOGRAPH TAKEN OF THE AQUATIC SPORTS OF CAVALRY BEHIND THE LINE - A race in progress.&#39;].
+Electronic reproduction of:; Race in progress.; 1 photograph : black and white ; 16.50 x 22.00 cm.
+74546282
+Available under Creative Commons license; Attribution, Non-commercial, ShareAlike
+Competitions
+Flags
+Rivers
+Spectators (event observers)
+Swimming
+Race in progress
+Photograph
+Monograph
+Still image
+Race in progress
+1 online resource
+false
+IMAGE
+true
+2005
+IMAGE
+9200316_Ag_EU_TEL_a11219_Scotland
+United Kingdom
+en</literal></binding>
+   <binding name="source"><literal datatype="http://www.w3.org/2001/XMLSchema#string">f4-8452-44e5-aea0-75edc3bc77d7</literal></binding>
+  </result>
+ </results>
 </sparql>

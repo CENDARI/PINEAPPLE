@@ -8,16 +8,22 @@
             <div class="col-md-12">
                 <h1>{{ title }}</h1>
                 <dl class="dl-horizontal">
-                    <dt>{% trans "Source" %}</dt>
-                    <dd>{{ source }}</dd>
-                    <dt>{% trans "Last modified" %}</dt>
-                    <dd>{{ lastModified|pretty_date }}</dd>
-                    <dt>{% trans "Plain Text" %}</dt>
-                    <dd class="raw-text">
+                    {% if source %}
+                        <dt>{% trans "Source" %}</dt>
+                        <dd>{{ source }}</dd>
+                    {% endif %}
+                    {% if lastModified %}
+                        <dt>{% trans "Last modified" %}</dt>
+                        <dd>{{ lastModified|pretty_date }}</dd>
+                    {% endif %}
+                    {% if plainText %}
+                        <dt>{% trans "Plain Text" %}</dt>
+                        <dd class="raw-text">
                         <pre>
                             {{ plainText }}
                         </pre>
-                    </dd>
+                        </dd>
+                    {% endif %}
                 </dl>
                 {% include "_mentions.html.twig" with {"mentions": mentions} %}
                 {% include "_related.html.twig" with {"related": related} %}
