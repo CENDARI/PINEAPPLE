@@ -4,6 +4,8 @@ namespace Pineapple;
 use EasyRdf_Namespace;
 use Exception;
 
+const DEFAULT_LANG = "en";
+
 
 class ResourceNotFoundException extends Exception {
 }
@@ -16,11 +18,18 @@ class Pineapple {
     private $triplestore;
     private $api;
     private $settings;
+    private $lang;
 
-    function __construct(Api $api, TripleStore $triplestore, $settings) {
+    function __construct(Api $api, TripleStore $triplestore, $settings, $preferredLang = DEFAULT_LANG) {
         $this->api = $api;
         $this->triplestore = $triplestore;
         $this->settings = $settings;
+        $this->lang = $preferredLang;
+    }
+
+    function withPreferredLang($lang) {
+        $code = substr($lang, 0, 2);
+        return new Pineapple($this->api, $this->triplestore, $this->settings, $code);
     }
 
     /**
@@ -269,13 +278,13 @@ class Pineapple {
      * @return array
      */
     public function getAccessPoints($type, $q = null, $from, $limit) {
-        $typeUri = EasyRdf_Namespace::expand($type);
+        $type_uri = EasyRdf_Namespace::expand($type);
         $query =
 
             "select distinct ?s ?title " .
             $this->getPermissionFilter() .
             "where {" .
-            "  ?s a <$typeUri> ; " .
+            "  ?s a <$type_uri> ; " .
             "     skos:prefLabel ?title . " .
             $this->getSearchFilter("?title", $q) .
             ($this->settings["limit_related_access_points"] ? (
@@ -339,7 +348,8 @@ class Pineapple {
             "  ?s a ?type . " .
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . " .
-                $this->getSearchFilter("?prefLabel", $q)) : "") .
+            $this->getLanguageFilter("?prefLabel") .
+            $this->getSearchFilter("?prefLabel", $q)) : "") .
             "}";
 
         $out = [];
@@ -369,13 +379,13 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?s ?type ?prefLabel ?note " .
+            "select distinct ?s ?type ?prefLabel " .
             $this->getOntologyFromClause($ont) .
             "where {" .
             "  ?s a ?type ; " .
             ($t ? " a $t ; " : "") .
             "     skos:prefLabel ?prefLabel . " .
-            " OPTIONAL { ?s skos:note ?note } ." .
+            $this->getLanguageFilter("?prefLabel") .
             $this->getSearchFilter("?prefLabel", $q) .
             "} offset $from limit $limit";
 
@@ -386,7 +396,6 @@ class Pineapple {
                 "uri" => $row->s->getUri(),
                 "type" => $short_type ? $short_type : $row->type->getUri(),
                 "prefLabel" => $row->prefLabel->getValue(),
-                "note" => property_exists($row, "note") ? $row->note->getValue() : ""
             ]);
         }
         return $out;
@@ -409,6 +418,8 @@ class Pineapple {
             "  <$uri> a ?type ; " .
             "    skos:prefLabel ?prefLabel . " .
             "    OPTIONAL { <$uri> skos:note ?note . }." .
+            $this->getLanguageFilter("?prefLabel") .
+            $this->getLanguageFilter("?note") .
             "    OPTIONAL {" .
             "      <$uri> geo:lat ?lat ;" .
             "             geo:lat ?long ." .
@@ -454,6 +465,8 @@ class Pineapple {
             "  ?r a ?type ; " .
             "    skos:prefLabel ?prefLabel . " .
             "    OPTIONAL { <$uri> skos:note ?note . }." .
+            $this->getLanguageFilter("?prefLabel") .
+            $this->getLanguageFilter("?note") .
             "    OPTIONAL {" .
             "      <$uri> geo:lat ?lat ;" .
             "            geo:lat ?long ." .
@@ -554,6 +567,11 @@ class Pineapple {
             return " FILTER isLiteral($pred) ." .
             " FILTER regex ($pred, \"$alts\", \"i\" ) .";
         }
+    }
+
+    private function getLanguageFilter($pred) {
+        return "FILTER(LANG($pred) = \"\" || LANGMATCHES(LANG($pred), \"" . $this->lang . "\")) ";
+
     }
 
     private function getAuthType() {

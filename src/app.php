@@ -5,10 +5,6 @@ const DEFAULT_PAGINATION_LIMIT = 20;
 
 function type_to_name($type) {
     $name = [
-        "schema:Event" => "Events",
-        "schema:Place" => "Places",
-        "schema:Person" => "People",
-        "schema:Organisation" => "Organisations",
         "edm:Place" => "Places",
         "edm:Event" => "Events",
         "foaf:Person" => "People",
@@ -175,6 +171,19 @@ $app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
     respond($app, "_mentions.html.twig", $mentions);
 })->name("mentions");
 
+$app->get("/people", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "foaf:Person");
+})->name("people");
+$app->get("/organisations", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "foaf:Organisation");
+})->name("organisations");
+$app->get("/places", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "edm:Place");
+})->name("places");
+$app->get("/events", function () use ($app, &$pineapple) {
+    accessPointListPage($app, $pineapple, "edm:Event");
+})->name("events");
+
 $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     $q = $app->request->get("q");
     $type = $app->request->get("type");
@@ -208,17 +217,28 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     respond($app, "ontology_resources.html.twig", $data);
 })->name("ontologies");
 
+
 $app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pineapple) {
     $id = join("/", array_map(function ($p) { return urlencode($p);}, $uri_parts));
-    try {
-        $data = $pineapple->getOntologyResource($id);
-        respond($app, "ontology_resource.html.twig", $data);
-    } catch (\Pineapple\ResourceNotFoundException $e) {
-        // MASSIVE HACK: If we fail to get the resource, try again
-        // with #this appended to the URI...
-        $data = $pineapple->getOntologyResource($id . "#this");
-        respond($app, "ontology_resource.html.twig", $data);
+
+    // Digging the hole ever deeper here. Due to inconsistency in resource URI
+    // encoding, resolving them requires some sadness, namely, trying to
+    // reconstruct the URI with and without encoding, and with or without
+    // a trailing #this.
+    // This should be removed when CENDARI URIs are more internally consistent.
+    $id_non_enc = join("/", $uri_parts);
+    $tries = [$id . "#this", $id_non_enc . "#this", $id, $id_non_enc];
+    foreach ($tries as $try_uri) {
+        try {
+            $data = $pineapple->getOntologyResource($try_uri);
+            respond($app, "ontology_resource.html.twig", $data);
+            return;
+        } catch (\Pineapple\ResourceNotFoundException $e) {
+            // Only throw when we've exhausted all attempts... :(
+            error_log("Resolution failed: " . $try_uri);
+        }
     }
+    throw new \Pineapple\ResourceNotFoundException($settings["namespaces"]["ontology"].$id);
 })->name("ontology-resource");
 
 $app->get("/resources/:id+", function ($id_parts) use ($app, &$settings, &$pineapple) {

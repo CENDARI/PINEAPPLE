@@ -17,7 +17,9 @@
                                     <li>
                                         <div class="resource">
                                             <strong>
-                                                <a href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">{{ item.prefLabel }}</a>
+                                                {# NB: Slim's urlFor strips out parentheses, which is a problem with our URIs #}
+                                                {# Therefore hacking it to create a partial URL onto which we append the rest of the URI#}
+                                                <a href="{{ urlFor("ontology-resource", {"name": ""}) }}{{ item.uri|strip_namespace }}">{{ item.prefLabel }}</a>
                                             </strong>
                                             <span class="type">{{ item.type|strip_rdf_prefix }}</span>
 
