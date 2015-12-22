@@ -44,9 +44,10 @@ class TripleStore {
      * @return Generator of return rows
      */
     public function query($sparqlQuery) {
-        error_log("Query: $sparqlQuery");
+        $queryWithPreamble = $this->preprocessQuery($sparqlQuery);
+        error_log("Query: $queryWithPreamble");
         foreach ($this->endpoints as $endpoint) {
-            $result = $endpoint->query($sparqlQuery);
+            $result = $endpoint->query($queryWithPreamble);
             //error_log($result->dump("application/sparql-results+xml"));
             foreach ($result as $row) {
                 yield $row;
@@ -63,10 +64,23 @@ class TripleStore {
      */
     public function ask($sparqlQuery) {
         foreach ($this->endpoints as $endpoint) {
-            if ($endpoint->query($sparqlQuery)->isTrue()) {
+            if ($endpoint->query($this->preprocessQuery($sparqlQuery))->isTrue()) {
                 return true;
             }
         }
         return false;
+    }
+
+    private function preprocessQuery($query) {
+        $prefixes = (array_key_exists("sparql_preamble", $this->settings)
+            ? $this->settings["sparql_preamble"] : ""). "\n";
+        foreach (EasyRdf_Namespace::namespaces() as $prefix => $uri) {
+            if (strpos($query, "{$prefix}:") !== false and
+                strpos($query, "PREFIX {$prefix}:") === false
+            ) {
+                $prefixes .= "PREFIX {$prefix}: <{$uri}>\n";
+            }
+        }
+        return $prefixes . $query;
     }
 }
