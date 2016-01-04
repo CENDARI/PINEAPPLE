@@ -21,7 +21,7 @@ $ontology_resource_relation_types = [
     "skos:broader" => false,
     "skos:narrower" => false,
     "skos:exactMatch" => true,
-    "skos:mappingRelation" => false,
+    //"skos:mappingRelation" => false, // Seems to be same as semantic relation?
     "skos:semanticRelation" => false,
     "skos:related" => false
 ];
