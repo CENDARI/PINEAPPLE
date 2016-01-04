@@ -74,10 +74,19 @@ class TripleStore {
     private function preprocessQuery($query) {
         $prefixes = (array_key_exists("sparql_preamble", $this->settings)
             ? $this->settings["sparql_preamble"] : ""). "\n";
+        // NB: This duplicates the (slightly broken) logic in EasyRDF which
+        // adds (known) prefixes if it finds them in the query. It duplicates
+        // it verbatim in order that we can add custom preamble to the query
+        // to allow for, e.g. Virtuoso pragmas.
+        // The reason the logic is slightly broken is that a query that
+        // contains, e.g. "?s schema:mentions ?m" will result in the "ma:"
+        // prefix being added (because it contains the substring "ma", albeit
+        // within another prefix.) We cannot "fix" the logic here because
+        // then EasyRdf will prepend our query with that erroneous prefix
+        // anyway, breaking it if it contains a preamble pragma.
         foreach (EasyRdf_Namespace::namespaces() as $prefix => $uri) {
             if (strpos($query, "{$prefix}:") !== false and
-                strpos($query, "PREFIX {$prefix}:") === false
-            ) {
+                    strpos($query, "PREFIX {$prefix}:") === false) {
                 $prefixes .= "PREFIX {$prefix}: <{$uri}>\n";
             }
         }

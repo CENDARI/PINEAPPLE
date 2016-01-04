@@ -42,19 +42,17 @@ class Pineapple {
     function getResource($uddi) {
         $full_uri = EasyRdf_Namespace::get("resources") . $uddi;
 
-        // NB: With all these optionals this is stupidly inefficient, but at
-        // least it's constrained to one URI.
         $query =
 
-            "select distinct ?title ?label ?identifier ?lastModified ?plainText ?source " .
+            "select distinct ?title ?label ?identifier ?lastModified ?plainText ?source \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  <$full_uri> dc11:title ?title ; " .
-            "     nao:identifier ?identifier ; " .
-            "     nao:lastModified ?lastModified ; " .
-            "     nie:plainTextContent ?plainText ; " .
-            "     dc11:source ?source . " .
-            "}";
+            "where {\n" .
+            "  <$full_uri> dc11:title ?title ; \n" .
+            "     nao:identifier ?identifier ; \n" .
+            "     nao:lastModified ?lastModified ; \n" .
+            "     nie:plainTextContent ?plainText ; \n" .
+            "     dc11:source ?source . \n" .
+            "} limit 1\n";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
@@ -89,17 +87,17 @@ class Pineapple {
     function getResources($q = null, $from, $limit) {
         $query =
 
-            "select distinct ?s ?title ?identifier ?lastModified count(?m) as ?count " .
+            "select distinct ?s ?title ?identifier ?lastModified count(?m) as ?count \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  ?s dc11:title ?title ; " .
-            "     nao:identifier ?identifier ; " .
-            "     nao:lastModified ?lastModified ; " .
-            "     nie:plainTextContent ?plainText ; " .
-            "     dc11:source ?source . " .
-            " OPTIONAL { ?s schema:mentions ?m } ." .
+            "where {\n" .
+            "  ?s dc11:title ?title ; \n" .
+            "     nao:identifier ?identifier ; \n" .
+            "     nao:lastModified ?lastModified ; \n" .
+            "     nie:plainTextContent ?plainText ; \n" .
+            "     dc11:source ?source . \n" .
+            " OPTIONAL { ?s schema:mentions ?m } .\n" .
             $this->getSearchFilter("?title", $q) .
-            "} order by ASC(?title) " .
+            "} order by ASC(?title) \n" .
             "offset $from limit $limit";
 
         $out = [];
@@ -107,7 +105,9 @@ class Pineapple {
             array_push($out, [
                 "id" => $row->identifier->getValue(),
                 "title" => $row->title->getValue(),
+                "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
+                "source" => $row->source->getValue(),
                 "numMentions" => $row->count->getValue()
             ]);
         }
