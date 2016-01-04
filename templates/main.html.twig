@@ -49,10 +49,11 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li {% if currentUrl() == baseUrl() ~ urlFor("resources")
-                        or currentUrl() starts with baseUrl() ~ "/resource" %}class="active"{% endif %}><a href="{{ urlFor("resources") }}">{% trans "Resources" %}</a></li>
-                    <li {% if currentUrl() == baseUrl() ~ urlFor("ontologies")
-                        or currentUrl() starts with baseUrl() ~ "/ontology" %}class="active"{% endif %}><a href="{{ urlFor("ontologies") }}">{% trans "WW1 Ontologies" %}</a></li>
+                    {{ path }}
+                    <li {% if path() == urlFor("resources")
+                        or currentUrl() starts with baseUrl() ~ "/resources/" %}class="active"{% endif %}><a href="{{ urlFor("resources") }}">{% trans "Resources" %}</a></li>
+                    <li {% if path() == urlFor("ontologies")
+                        or currentUrl() starts with baseUrl() ~ "/ontology/" %}class="active"{% endif %}><a href="{{ urlFor("ontologies") }}">{% trans "WW1 Ontologies" %}</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
 

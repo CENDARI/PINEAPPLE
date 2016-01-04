@@ -26,6 +26,22 @@ $ontology_resource_relation_types = [
     "skos:related" => false
 ];
 
+class PineappleTwigExtension extends \Twig_Extension {
+    public function getName() {
+        return 'pineapple';
+    }
+
+    public function getFunctions() {
+        return [
+            new \Twig_SimpleFunction('path', [$this, 'path'])
+        ];
+    }
+
+    public function path( $appName = 'default') {
+        return \Slim\Slim::getInstance($appName)->request->getPath();
+    }
+}
+
 function type_to_name($type) {
     $name = [
         "edm:Place" => "Places",
@@ -52,7 +68,8 @@ $view->setTemplatesDirectory(__DIR__ . '/../templates');
 
 $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
-    new Twig_Extensions_Extension_I18n
+    new Twig_Extensions_Extension_I18n,
+    new PineappleTwigExtension()
 );
 
 $app->notFound(function () use ($app) {

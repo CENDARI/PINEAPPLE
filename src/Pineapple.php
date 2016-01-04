@@ -87,14 +87,12 @@ class Pineapple {
     function getResources($q = null, $from, $limit) {
         $query =
 
-            "select distinct ?s ?title ?identifier ?lastModified count(?m) as ?count \n" .
+            "select distinct ?title ?identifier ?lastModified count(?m) as ?count \n" .
             $this->getPermissionFilter() .
             "where {\n" .
             "  ?s dc11:title ?title ; \n" .
             "     nao:identifier ?identifier ; \n" .
-            "     nao:lastModified ?lastModified ; \n" .
-            "     nie:plainTextContent ?plainText ; \n" .
-            "     dc11:source ?source . \n" .
+            "     nao:lastModified ?lastModified . \n" .
             " OPTIONAL { ?s schema:mentions ?m } .\n" .
             $this->getSearchFilter("?title", $q) .
             "} order by ASC(?title) \n" .
@@ -107,7 +105,6 @@ class Pineapple {
                 "title" => $row->title->getValue(),
                 "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
-                "source" => $row->source->getValue(),
                 "numMentions" => $row->count->getValue()
             ]);
         }
@@ -378,7 +375,7 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?s ?type ?prefLabel \n" .
+            "select distinct ?s ?type STR(?prefLabel) as ?label \n" .
             $this->getOntologyFromClause($ont) .
             "where {\n" .
             "  ?s a ?type ; \n" .
@@ -394,7 +391,7 @@ class Pineapple {
             array_push($out, [
                 "uri" => $row->s->getUri(),
                 "type" => $short_type ? $short_type : $row->type->getUri(),
-                "prefLabel" => $row->prefLabel->getValue(),
+                "prefLabel" => $row->label->getValue(),
             ]);
         }
         return $out;
