@@ -21,6 +21,12 @@
             <binding name="lastModified">
                 <literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000335000</literal>
             </binding>
+            <binding name="source">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">f4-8452-44e5-aea0-75edc3bc77d7</literal>
+            </binding>
+            <binding name="plainText">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Text</literal>
+            </binding>
             <binding name="count">
                 <literal datatype="http://www.w3.org/2001/XMLSchema#integer">10</literal>
             </binding>
@@ -38,6 +44,12 @@
             </binding>
             <binding name="lastModified">
                 <literal datatype="http://www.w3.org/2001/XMLSchema#long">1419000347000</literal>
+            </binding>
+            <binding name="source">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">f4-8452-44e5-aea0-75edc3bc77d7</literal>
+            </binding>
+            <binding name="plainText">
+                <literal datatype="http://www.w3.org/2001/XMLSchema#string">Text</literal>
             </binding>
             <binding name="count">
                 <literal datatype="http://www.w3.org/2001/XMLSchema#integer">9</literal>

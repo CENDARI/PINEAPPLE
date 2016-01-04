@@ -78,7 +78,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
     public function testGetResources() {
         $this->store
             ->method("query")
-            ->willReturn($this->getMockResult("list"));
+            ->willReturn($this->getMockResult("resources"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $resources = $pineapple->getResources("test", 0, 20);
 
