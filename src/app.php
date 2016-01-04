@@ -174,7 +174,7 @@ $app->get("/", function () use ($app, &$pineapple) {
         "query" => $q
     ];
     respond($app, "resources.html.twig", $data);
-})->name("home");
+})->name("resources");
 
 $app->get("/mention/:type/:name+", function ($type, $name_parts) use ($app, &$pineapple) {
     $name = join("/", $name_parts);

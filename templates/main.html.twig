@@ -46,11 +46,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{{ baseUrl() }}">{% trans "Resources" %}</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li {% if currentUrl() == baseUrl() ~ urlFor("ontologies") %}class="active"{% endif %}><a href="{{ urlFor("ontologies") }}">{% trans "Ontologies" %}</a></li>
+                    <li {% if currentUrl() == baseUrl() ~ urlFor("resources")
+                        or currentUrl() starts with baseUrl() ~ "/resource" %}class="active"{% endif %}><a href="{{ urlFor("resources") }}">{% trans "Resources" %}</a></li>
+                    <li {% if currentUrl() == baseUrl() ~ urlFor("ontologies")
+                        or currentUrl() starts with baseUrl() ~ "/ontology" %}class="active"{% endif %}><a href="{{ urlFor("ontologies") }}">{% trans "WW1 Ontologies" %}</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
 
