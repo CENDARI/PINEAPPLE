@@ -437,20 +437,58 @@ class Pineapple {
             throw new ResourceNotFoundException($uri);
         }
 
-        $out[0]["relations"] = $this->getOntologyResourceRelations($id, $reltypes);
+        $out[0]["relations"] = array_merge(
+            $this->getOntologyResourceRelations($id),
+            $this->getExplicitOntologyResourceRelations($id, $reltypes)
+        );
 
         return $out[0];
     }
 
     /**
-     * Get data for an ontology resource.
+     * Get all relation data for an ontology resource.
+     *
+     * @param string $uri an ontology resource URI
+     * @return array
+     */
+    public function getOntologyResourceRelations($id) {
+        $uri = EasyRdf_Namespace::get("ontology") . $id;
+        $query =
+            "select distinct ?r ?p ?type ?prefLabel " .
+            "where {" .
+            "  <$uri> ?p ?r ." .
+            "  ?r a ?type ; " .
+            "    skos:prefLabel ?prefLabel . " .
+            // FIXME: Hack: filter out SKOS relations since
+            // we use inference of inverseOf reasoning.
+            " FILTER (!REGEX( ?p, \"skos\")) ." .
+            $this->getLanguageFilter("?prefLabel") .
+            "}";
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            $short_pred = EasyRdf_Namespace::shorten($row->p->getUri());
+            $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
+            if (!array_key_exists($short_pred, $out)) {
+                $out[$short_pred] = [];
+            }
+            array_push($out[$short_pred], [
+                "uri" => $row->r->getUri(),
+                "type" => $short_type ? $short_type : $row->type->getUri(),
+                "prefLabel" => $row->prefLabel->getValue()
+            ]);
+        }
+        return $out;
+    }
+
+    /**
+     * Get specific relation types for an ontology resource.
      *
      * @param string $uri an ontology resource URI
      * @param ont array an array of ontologies
      * @param $reltypes array prefixed relationship types to search
      * @return array
      */
-    public function getOntologyResourceRelations($id, $reltypes) {
+    public function getExplicitOntologyResourceRelations($id, $reltypes) {
         $uri = EasyRdf_Namespace::get("ontology") . $id;
 
         $out = [];

@@ -8,7 +8,7 @@
   <result>
    <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/wet_Italian#this</uri></binding>
    <binding name="type"><uri>http://www.w3.org/2004/02/skos/core#Concept</uri></binding>
-   <binding name="prefLabel"><literal xml:lang="en">Italian</literal></binding>
+   <binding name="label"><literal>Italian</literal></binding>
   </result>
  </results>
 </sparql>

@@ -11,18 +11,9 @@ const DEFAULT_PAGINATION_LIMIT = 20;
 // The sad state of affairs is that we now ask every ontology resource
 // if it's got relationships of these types in X separate queries...
 $ontology_resource_relation_types = [
-    "edm:Event" => false,
-    "edm:happenedAt" => false,
-    "edm:isRelatedTo" => false,
-    "edm:occurredAt" => false,
-    "crm:P15_was_influenced_by" => false,
-    "dc:isPartOf" => false,
-    "dc:hasPart" => false,
     "skos:broader" => false,
     "skos:narrower" => false,
     "skos:exactMatch" => true,
-    //"skos:mappingRelation" => false, // Seems to be same as semantic relation?
-    "skos:semanticRelation" => false,
     "skos:related" => false
 ];
 
