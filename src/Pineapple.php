@@ -128,12 +128,12 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?type ?label ?note " .
+            "select distinct ?type ?label ?note \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  <$full_uri> a ?type ;
-                  skos:prefLabel ?label . " .
-            "  OPTIONAL { <$full_uri>  skos:note ?note .} " .
+            "where {\n" .
+            "  <$full_uri> a ?type ; \n".
+            "      skos:prefLabel ?label . \n" .
+            "  OPTIONAL { <$full_uri>  skos:note ?note .} \n" .
             "}";
 
         $out = [];
@@ -167,12 +167,12 @@ class Pineapple {
         $full_uri = EasyRdf_Namespace::get("resources") . $uddi;
         $query =
 
-            "select distinct ?m ?type ?title " .
+            "select distinct ?m ?type ?title \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  <$full_uri> schema:mentions ?m ." .
-            "  ?m a ?type ; " .
-            "     skos:prefLabel ?title ." .
+            "where {\n" .
+            "  <$full_uri> schema:mentions ?m .\n" .
+            "  ?m a ?type ; \n" .
+            "     skos:prefLabel ?title .\n" .
             "}";
 
 
@@ -204,18 +204,17 @@ class Pineapple {
     function getMentionResources($type, $name, $from, $limit) {
         $query =
 
-            "select distinct ?r ?identifier ?title " .
+            "select distinct ?r ?identifier ?title \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  ?r schema:mentions [" .
+            "where {\n" .
+            "  ?r schema:mentions [\n" .
             //"        a $type ; " .
             // FIXME: literal type? why is this needed?
-            "        skos:prefLabel \"$name\"^^xsd:string " .
-            "     ] ; " .
-            "     dc11:title ?title ; " .
-            "     nao:identifier ?identifier . " .
-            "} " .
-            "offset $from limit $limit";
+            "        skos:prefLabel \"$name\"^^xsd:string \n" .
+            "     ] ; \n" .
+            "     dc11:title ?title ; \n" .
+            "     nao:identifier ?identifier . \n" .
+            "} offset $from limit $limit";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
@@ -243,16 +242,15 @@ class Pineapple {
         $uri = EasyRdf_Namespace::get("resources") . $uddi;
         $query =
 
-            "select distinct ?r ?identifier ?title " .
+            "select distinct ?r ?identifier ?title \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  <$uri> schema:mentions ?m . " .
-            "  ?r schema:mentions ?m . " .
-            "  ?r dc11:title ?title ; " .
-            "     nao:identifier ?identifier . " .
-            "  FILTER (?r != <$uri> ) " .
-            "} " .
-            "offset $from limit $limit";
+            "where {\n" .
+            "  <$uri> schema:mentions ?m . \n" .
+            "  ?r schema:mentions ?m . \n" .
+            "  ?r dc11:title ?title ; \n" .
+            "     nao:identifier ?identifier . \n" .
+            "  FILTER (?r != <$uri> ) \n" .
+            "} offset $from limit $limit";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
@@ -281,20 +279,20 @@ class Pineapple {
         $type_uri = EasyRdf_Namespace::expand($type);
         $query =
 
-            "select distinct ?s ?title " .
+            "select distinct ?s ?title \n" .
             $this->getPermissionFilter() .
-            "where {" .
-            "  ?s a <$type_uri> ; " .
-            "     skos:prefLabel ?title . " .
+            "where {\n" .
+            "  ?s a <$type_uri> ; \n" .
+            "     skos:prefLabel ?title . \n" .
             $this->getSearchFilter("?title", $q) .
             ($this->settings["limit_related_access_points"] ? (
-                "  FILTER EXISTS { " .
-                "    ?m schema:mentions ?s ;" .
-                "       nao:identifier [] ; " .
-                "       dc11:title []. " .
-                "  } "
+                "  FILTER EXISTS { \n" .
+                "    ?m schema:mentions ?s ;\n" .
+                "       nao:identifier [] ; \n" .
+                "       dc11:title []. \n" .
+                "  } \n"
             ) : "") .
-            "} " .
+            "} \n" .
             "offset $from limit $limit";
 
         $out = [];
@@ -313,10 +311,11 @@ class Pineapple {
         $agg_pred = "http://www.openarchives.org/ore/terms/aggregates";
         $query =
 
-            "select distinct ?uri ?name ?description where {" .
-            "  <$meta_uri> <$agg_pred> ?uri . " .
-            "    ?uri dcterms:title ?name ;" .
-            "       dcterms:abstract ?description ." .
+            "select distinct ?uri ?name ?description \n".
+            "where {\n" .
+            "  <$meta_uri> <$agg_pred> ?uri . \n" .
+            "    ?uri dcterms:title ?name ;\n" .
+            "       dcterms:abstract ?description .\n" .
             "}";
 
         $out = [];
@@ -342,12 +341,12 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?type (count (?s) as ?count) " .
+            "select distinct ?type (count (?s) as ?count) \n" .
             $this->getOntologyFromClause($ont) .
-            "where {" .
-            "  ?s a ?type . " .
+            "where {\n" .
+            "  ?s a ?type . \n" .
             ($t ? " ?s a $t . " : "") .
-            ($q ? ("?s skos:prefLabel ?prefLabel . " .
+            ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
             $this->getLanguageFilter("?prefLabel") .
             $this->getSearchFilter("?prefLabel", $q)) : "") .
             "}";
@@ -379,12 +378,12 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?s ?type ?prefLabel " .
+            "select distinct ?s ?type ?prefLabel \n" .
             $this->getOntologyFromClause($ont) .
-            "where {" .
-            "  ?s a ?type ; " .
+            "where {\n" .
+            "  ?s a ?type ; \n" .
             ($t ? " a $t ; " : "") .
-            "     skos:prefLabel ?prefLabel . " .
+            "     skos:prefLabel ?prefLabel . \n" .
             $this->getLanguageFilter("?prefLabel") .
             $this->getSearchFilter("?prefLabel", $q) .
             "} offset $from limit $limit";
@@ -407,23 +406,22 @@ class Pineapple {
      * @param string $uri an ontology resource URI
      * @return array
      */
-    public function getOntologyResource($id, $ont = []) {
+    public function getOntologyResource($id, $reltypes) {
         $uri = EasyRdf_Namespace::get("ontology") . $id;
 
         $query =
 
-            "select ?type ?prefLabel ?note ?lat ?long " .
-            $this->getOntologyFromClause($ont) .
-            "where {" .
-            "  <$uri> a ?type ; " .
-            "    skos:prefLabel ?prefLabel . " .
-            "    OPTIONAL { <$uri> skos:note ?note . }." .
+            "select ?type ?prefLabel ?note ?lat ?long \n" .
+            "where {\n" .
+            "  <$uri> a ?type ; \n" .
+            "    skos:prefLabel ?prefLabel . \n" .
+            "    OPTIONAL { <$uri> skos:note ?note . }.\n" .
             $this->getLanguageFilter("?prefLabel") .
             $this->getLanguageFilter("?note") .
-            "    OPTIONAL {" .
-            "      <$uri> geo:lat ?lat ;" .
-            "             geo:lat ?long ." .
-            "    }." .
+            "    OPTIONAL {\n" .
+            "      <$uri> geo:lat ?lat ;\n" .
+            "             geo:lat ?long .\n" .
+            "    }.\n" .
             "}";
 
         $out = [];
@@ -442,7 +440,7 @@ class Pineapple {
             throw new ResourceNotFoundException($uri);
         }
 
-        $out[0]["relations"] = $this->getOntologyResourceRelations($id);
+        $out[0]["relations"] = $this->getOntologyResourceRelations($id, $reltypes);
 
         return $out[0];
     }
@@ -451,44 +449,39 @@ class Pineapple {
      * Get data for an ontology resource.
      *
      * @param string $uri an ontology resource URI
+     * @param ont array an array of ontologies
+     * @param $reltypes array prefixed relationship types to search
      * @return array
      */
-    public function getOntologyResourceRelations($id, $ont = []) {
+    public function getOntologyResourceRelations($id, $reltypes) {
         $uri = EasyRdf_Namespace::get("ontology") . $id;
 
-        $query =
-
-            "select distinct ?r ?p ?type ?prefLabel ?note ?lat ?long " .
-            $this->getOntologyFromClause($ont) .
-            "where {" .
-            "  <$uri> ?p ?r ." .
-            "  ?r a ?type ; " .
-            "    skos:prefLabel ?prefLabel . " .
-            "    OPTIONAL { <$uri> skos:note ?note . }." .
-            $this->getLanguageFilter("?prefLabel") .
-            $this->getLanguageFilter("?note") .
-            "    OPTIONAL {" .
-            "      <$uri> geo:lat ?lat ;" .
-            "            geo:lat ?long ." .
-            "    }." .
-            "}";
-
         $out = [];
-        foreach ($this->triplestore->query($query) as $row) {
-            $short_pred = EasyRdf_Namespace::shorten($row->p->getUri());
-            $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
-            if (!array_key_exists($short_pred, $out)) {
-                $out[$short_pred] = [];
+
+        foreach ($reltypes as $reltype => $is_distinct) {
+            $query =
+
+                "select distinct ?r ?type ?prefLabel \n" .
+                "where {\n" .
+                "  <$uri> $reltype ?r " . ($is_distinct ? "OPTION (T_DISTINCT)" : "") ." .\n" .
+                "  ?r a ?type ; \n" .
+                "    skos:prefLabel ?prefLabel . \n" .
+                $this->getLanguageFilter("?prefLabel") .
+                "}";
+
+            foreach ($this->triplestore->query($query) as $row) {
+                $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
+                if (!array_key_exists($reltype, $out)) {
+                    $out[$reltype] = [];
+                }
+                array_push($out[$reltype], [
+                    "uri" => $row->r->getUri(),
+                    "type" => $short_type ? $short_type : $row->type->getUri(),
+                    "prefLabel" => $row->prefLabel->getValue(),
+                ]);
             }
-            array_push($out[$short_pred], [
-                "uri" => $row->r->getUri(),
-                "type" => $short_type ? $short_type : $row->type->getUri(),
-                "prefLabel" => $row->prefLabel->getValue(),
-                "note" => property_exists($row, "note") ? $row->note->getValue() : "",
-                "lat" => property_exists($row, "lat") ? $row->lat->getValue() : "",
-                "long" => property_exists($row, "long") ? $row->long->getValue() : ""
-            ]);
         }
+
         return $out;
     }
 
@@ -565,12 +558,12 @@ class Pineapple {
             return "";
         } else {
             return " FILTER isLiteral($pred) ." .
-            " FILTER regex ($pred, \"$alts\", \"i\" ) .";
+            " FILTER regex ($pred, \"$alts\", \"i\" ) .\n";
         }
     }
 
     private function getLanguageFilter($pred) {
-        return "FILTER(LANG($pred) = \"\" || LANGMATCHES(LANG($pred), \"" . $this->lang . "\")) ";
+        return "FILTER(LANG($pred) = \"\" || LANGMATCHES(LANG($pred), \"" . $this->lang . "\")) \n";
 
     }
 

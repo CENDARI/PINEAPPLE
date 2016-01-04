@@ -135,3 +135,11 @@ footer p {
   max-height: 300px;
   overflow-y: scroll;
 }
+
+.ontology-relation {
+  margin-bottom: 10px;
+  .ontology-relation-name {
+    font-size: 1.1em;
+    font-style: italic;
+  }
+}

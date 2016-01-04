@@ -2,9 +2,10 @@
     <h2>{{ relation_name|strip_rdf_prefix|camel_to_title }}</h2>
     <ul class="reference-list">
         {% for item in related %}
-            <li>
+            <li class="ontology-relation">
+                <div class="ontology-relation-name">{{ item.prefLabel }}</div>
                 <a title="{{ item.prefLabel }}" href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">
-                    {{ item.prefLabel }}
+                    {{ item.uri }}
                 </a>
             </li>
         {% endfor %}

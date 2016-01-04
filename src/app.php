@@ -3,6 +3,29 @@ require __DIR__ . '/../vendor/autoload.php';
 
 const DEFAULT_PAGINATION_LIMIT = 20;
 
+// Relations to try and fetch, mapped to whether they require the
+// Virtuoso-specific T_DISTINCT option (very sad face :( ... )
+// It's about a billion times more efficient to query for relations
+// in one go, but that prevents inference from determining inverse
+// relations, which we need to do.
+// The sad state of affairs is that we now ask every ontology resource
+// if it's got relationships of these types in X separate queries...
+$ontology_resource_relation_types = [
+    "edm:Event" => false,
+    "edm:happenedAt" => false,
+    "edm:isRelatedTo" => false,
+    "edm:occurredAt" => false,
+    "crm:P15_was_influenced_by" => false,
+    "dc:isPartOf" => false,
+    "dc:hasPart" => false,
+    "skos:broader" => false,
+    "skos:narrower" => false,
+    "skos:exactMatch" => true,
+    "skos:mappingRelation" => false,
+    "skos:semanticRelation" => false,
+    "skos:related" => false
+];
+
 function type_to_name($type) {
     $name = [
         "edm:Place" => "Places",
@@ -218,7 +241,7 @@ $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
 })->name("ontologies");
 
 
-$app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pineapple) {
+$app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pineapple, &$ontology_resource_relation_types) {
     $id = join("/", array_map(function ($p) { return urlencode($p);}, $uri_parts));
 
     // Digging the hole ever deeper here. Due to inconsistency in resource URI
@@ -230,7 +253,7 @@ $app->get("/ontology/:name+", function ($uri_parts) use ($app, &$settings, &$pin
     $tries = [$id . "#this", $id_non_enc . "#this", $id, $id_non_enc];
     foreach ($tries as $try_uri) {
         try {
-            $data = $pineapple->getOntologyResource($try_uri);
+            $data = $pineapple->getOntologyResource($try_uri, $ontology_resource_relation_types);
             respond($app, "ontology_resource.html.twig", $data);
             return;
         } catch (\Pineapple\ResourceNotFoundException $e) {
