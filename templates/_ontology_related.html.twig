@@ -1,5 +1,5 @@
 {% if not related is empty %}
-    <h2>{{ relation_name|strip_rdf_prefix|camel_to_title }}</h2>
+    <h2>{{ relation_name|strip_rdf_prefix|camel_to_title|snake_to_title }}</h2>
     <ul class="reference-list">
         {% for item in related %}
             <li class="ontology-relation">

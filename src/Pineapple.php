@@ -461,7 +461,7 @@ class Pineapple {
         foreach ($reltypes as $reltype => $is_distinct) {
             $query =
 
-                "select distinct ?r ?type ?prefLabel \n" .
+                "select distinct ?r ?type STR(?prefLabel) as ?label \n" .
                 "where {\n" .
                 "  <$uri> $reltype ?r " . ($is_distinct ? "OPTION (T_DISTINCT)" : "") ." .\n" .
                 "  ?r a ?type ; \n" .
@@ -477,7 +477,7 @@ class Pineapple {
                 array_push($out[$reltype], [
                     "uri" => $row->r->getUri(),
                     "type" => $short_type ? $short_type : $row->type->getUri(),
-                    "prefLabel" => $row->prefLabel->getValue(),
+                    "prefLabel" => $row->label->getValue(),
                 ]);
             }
         }
@@ -564,7 +564,6 @@ class Pineapple {
 
     private function getLanguageFilter($pred) {
         return "FILTER(LANG($pred) = \"\" || LANGMATCHES(LANG($pred), \"" . $this->lang . "\")) \n";
-
     }
 
     private function getAuthType() {

@@ -106,6 +106,10 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("camel_to_title", funct
     return ucwords(preg_replace('/(?!^)([[:lower:]])([[:upper:]])/', '$1 $2', $intermediate));
 }));
 
+$view->getEnvironment()->addFilter(new Twig_SimpleFilter("snake_to_title", function ($snakeStr) {
+    return ucwords(str_replace('_', ' ', $snakeStr));
+}));
+
 $api = new \Pineapple\Api($settings);
 $triplestore = new \Pineapple\TripleStore($settings);
 
