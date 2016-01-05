@@ -338,23 +338,21 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?type (count (?s) as ?count) \n" .
+            "select distinct ?name (count (?s) as ?count) \n" .
             $this->getOntologyFromClause($ont) .
             "where {\n" .
-            "  ?s a ?type . \n" .
+            "  ?s a ?name . \n" .
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
             $this->getLanguageFilter("?prefLabel") .
             $this->getSearchFilter("?prefLabel", $q)) : "") .
-            "}";
+            "} order by DESC(?count)";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
-            $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
-            $type = $short_type ? $short_type : $row->type->getUri();
+            $short_type = EasyRdf_Namespace::shorten($row->name->getUri());
             array_push($out, [
-                "type" => $type,
-                "name" => $type,
+                "name" => $short_type ? $short_type : $row->name->getUri(),
                 "count" => $row->count->getValue()
             ]);
         }
@@ -441,8 +439,47 @@ class Pineapple {
             $this->getOntologyResourceRelations($id),
             $this->getExplicitOntologyResourceRelations($id, $reltypes)
         );
+        $out[0]["context"] = $this->getOntologyResourceContext($id);
 
         return $out[0];
+    }
+
+    /**
+     * Fetch (optional) data about the graph context of an ontology
+     * resource.
+     *
+     * @param string $id the ID of an ontology resource
+     * @return array|null
+     */
+    public function getOntologyResourceContext($id) {
+        $uri = EasyRdf_Namespace::get("ontology") . $id;
+
+        $query =
+
+            "select distinct ?g ?name ?description ?rights ?rightsRef ?references \n".
+            "where {\n" .
+            "  graph ?g { <$uri> skos:prefLabel [] }.\n".
+            "  ?g dcterms:title ?name ;\n" .
+            "     dcterms:abstract ?description .\n" .
+            "  OPTIONAL {\n".
+            "     ?g dc11:rights ?rights ;\n".
+            "        dcterms:rights ?rightsRef ;\n".
+            "        dcterms:references ?references .".
+            "  } .\n".
+            "} limit 1";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "uri" => $row->g->getUri(),
+                "name" => $row->name->getValue(),
+                "description" => $row->description->getValue(),
+                "rights" => property_exists($row, "rights") ? $row->rights->getValue() : "",
+                "rightsRef" => property_exists($row, "rightsRef") ? $row->rightsRef->getUri() : "",
+                "references" => property_exists($row, "references") ? $row->references->getUri() : ""
+            ]);
+        }
+        return empty($out) ? null : $out[0];
     }
 
     /**

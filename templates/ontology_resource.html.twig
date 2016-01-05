@@ -5,7 +5,7 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-9">
                 <h1>{{ prefLabel }}</h1>
                 <dl class="dl-horizontal">
                     <dt>{% trans "type" %}</dt>
@@ -19,6 +19,36 @@
                 {% for name, set in relations %}
                     {% include "_ontology_related.html.twig" with {"relation_name" : name, "related": set} %}
                 {% endfor %}
+            </div>
+            <div class="col-md-3">
+                {% if context %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">{% trans "Context" %}</div>
+                        <div class="panel-body ontology-resource-context">
+                            <div class="ontology-resource-context-name">
+                                <a href="{{ urlFor("ontologies") }}?ontology={{ context.uri }}">{{ context.name }}</a>
+                            </div>
+                            <div class="ontology-resource-context-description">
+                                {{ context.description }}
+                                {% if context.references %}
+                                    <hr/>
+                                    <a class="references" href="{{ context.references }}">{{ context.references }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if context.rights %}
+                            <div class="panel-footer">
+                                <div class="ontology-resource-context-rights">
+                                    {{ context.rights }}
+
+                                    {% if context.rightsRef %}
+                                        [<a href="{{ context.rightsRef }}">Link</a>]
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

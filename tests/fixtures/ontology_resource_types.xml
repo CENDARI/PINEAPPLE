@@ -1,39 +1,39 @@
 <sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
  <head>
-  <variable name="type"/>
+  <variable name="name"/>
   <variable name="count"/>
  </head>
  <results distinct="false" ordered="true">
   <result>
-   <binding name="type"><uri>http://www.w3.org/2004/02/skos/core#Concept</uri></binding>
+   <binding name="name"><uri>http://www.w3.org/2004/02/skos/core#Concept</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">2257</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://www.w3.org/2004/02/skos/core#ConceptShemes</uri></binding>
+   <binding name="name"><uri>http://www.w3.org/2004/02/skos/core#ConceptShemes</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">1</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://xmlns.com/foaf/0.1/Person</uri></binding>
+   <binding name="name"><uri>http://xmlns.com/foaf/0.1/Person</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">553</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="name"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">4866</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Timespan</uri></binding>
+   <binding name="name"><uri>http://www.europeana.eu/schemas/edm/Timespan</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">2142</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://xmlns.com/foaf/0.1/Organization</uri></binding>
+   <binding name="name"><uri>http://xmlns.com/foaf/0.1/Organization</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">777</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://xmlns.com/foaf/0.1/Group</uri></binding>
+   <binding name="name"><uri>http://xmlns.com/foaf/0.1/Group</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">8</literal></binding>
   </result>
   <result>
-   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Place</uri></binding>
+   <binding name="name"><uri>http://www.europeana.eu/schemas/edm/Place</uri></binding>
    <binding name="count"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">1351</literal></binding>
   </result>
  </results>

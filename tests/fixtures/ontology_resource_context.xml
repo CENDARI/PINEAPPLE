@@ -1,0 +1,20 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+ <head>
+  <variable name="g"/>
+  <variable name="name"/>
+  <variable name="description"/>
+  <variable name="rights"/>
+  <variable name="rightsRef"/>
+  <variable name="references"/>
+ </head>
+ <results distinct="false" ordered="true">
+  <result>
+   <binding name="g"><uri>http://resources.cendari.dariah.eu/ontology/1914_1918/concept/</uri></binding>
+   <binding name="name"><literal>1914-1918 Online (Concepts)</literal></binding>
+   <binding name="description"><literal>The 1914-1918 Online taxonomies provide concepts and events related to the First World War that have been transformed to the CEDM element set</literal></binding>
+   <binding name="rights"><literal>This vocabulary is based on taxonomies from 1914-1918 Online: International Encyclopedia of the First World War, which was made available under a Creative Commons Zero license</literal></binding>
+   <binding name="rightsRef"><uri>http://creativecommons.org/publicdomain/zero/1.0/</uri></binding>
+   <binding name="references"><uri>http://encyclopedia.1914-1918-online.net/home/</uri></binding>
+  </result>
+ </results>
+</sparql>

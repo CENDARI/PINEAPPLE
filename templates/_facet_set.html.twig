@@ -4,14 +4,14 @@
         <ul class="list-group">
             {% for facet in facets %}
                 <li class="list-group-item">
-                    {% if facet_param == facet.type %}
-                        <strong>{{ facet.type|strip_rdf_prefix }}</strong>
+                    {% if facet_param == facet.name %}
+                        <strong>{{ facet.name|strip_rdf_prefix }}</strong>
                         <a href="?{{ {"offset": offset, "q": query}|merge(extra|default({}))|url_encode }}">
                             <small>[remove filter]</small>
                         </a>
                     {% else %}
-                        <a href="?{{ {"offset": null, "q": query, "type": facet.type}|merge(extra|default({}))|url_encode }}">
-                            {{ facet.type|strip_rdf_prefix }} ({{ facet.count }})
+                        <a href="?{{ {"offset": null, "q": query, "type": facet.name}|merge(extra|default({}))|url_encode }}">
+                            {{ facet.name|strip_rdf_prefix }} ({{ facet.count }})
                         </a>
                     {% endif %}
                 </li>

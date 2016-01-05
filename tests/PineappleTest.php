@@ -131,8 +131,18 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
         $resources = $pineapple->getOntologyResourceTypes(null, null, []);
 
-        $this->assertEquals("skos:Concept", $resources[0]["type"]);
+        $this->assertEquals("skos:Concept", $resources[0]["name"]);
         $this->assertEquals(2257, $resources[0]["count"]);
+    }
+
+    public function testOntologyResourceContext() {
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("ontology_resource_context"));
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
+        $resources = $pineapple->getOntologyResourceContext("test");
+
+        $this->assertEquals("1914-1918 Online (Concepts)", $resources["name"]);
     }
 
     public function testGetOntologyResources() {

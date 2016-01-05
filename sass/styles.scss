@@ -143,3 +143,22 @@ footer p {
     font-style: italic;
   }
 }
+
+.ontology-resource-context-name {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.ontology-resource-context-description {
+  @extend .text-muted, .small;
+  .references {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+}
+
+.ontology-resource-context-rights {
+  @extend .text-muted;
+  font-size: 0.8em;
+}

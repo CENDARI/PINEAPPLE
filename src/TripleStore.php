@@ -45,7 +45,7 @@ class TripleStore {
      */
     public function query($sparqlQuery) {
         $queryWithPreamble = $this->preprocessQuery($sparqlQuery);
-        error_log("Query: $queryWithPreamble");
+        error_log("Sparql Query:\n$queryWithPreamble");
         foreach ($this->endpoints as $endpoint) {
             $result = $endpoint->query($queryWithPreamble);
             //error_log($result->dump("application/sparql-results+xml"));
