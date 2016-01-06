@@ -93,7 +93,7 @@ $view->getEnvironment()->addFilter(new Twig_SimpleFilter("type_to_name", functio
 
 // Turn skos:Concept into Concept
 $view->getEnvironment()->addFilter(new Twig_SimpleFilter("strip_rdf_prefix", function ($type) {
-    return substr($type, mb_strpos($type, ":") + 1);
+    return mb_strpos($type, ":") !== FALSE ? substr($type, mb_strpos($type, ":") + 1) : $type;
 }));
 
 // Turn skos:Concept into Concept

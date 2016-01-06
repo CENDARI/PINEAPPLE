@@ -15,6 +15,7 @@ class TripleStore {
 
     private $endpoints = array();
     private $settings = array();
+    private $preamble;
 
     /**
      * Constructor
@@ -24,9 +25,14 @@ class TripleStore {
      * @param null $endpointURLs an optional set of endpoint URLs
      * @param null $namespaces an optional set of namespaces
      */
-    function __construct($settings, $endpointURLs = null, $namespaces = null) {
+    function __construct($settings, $endpointURLs = null, $namespaces = null, $preamble = null) {
         $this->settings = $settings;
         #print_r($this->pineapple_settings);
+
+        $this->preamble = $preamble !== null
+            ? $preamble
+            : (array_key_exists("sparql_preamble", $this->settings)
+                ? $this->settings["sparql_preamble"] : "");
 
         if ($endpointURLs == null)
             $endpointURLs =& $this->settings["endpoints"];
@@ -56,6 +62,7 @@ class TripleStore {
         $queryWithPreamble = $this->preprocessQuery($sparqlQuery);
         error_log("Sparql Query:\n$queryWithPreamble");
         foreach ($this->endpoints as $endpoint) {
+            error_log("Asking: " . $endpoint->getQueryUri());
             $result = $endpoint->query($queryWithPreamble);
             //error_log($result->dump("application/sparql-results+xml"));
             foreach ($result as $row) {
@@ -81,8 +88,7 @@ class TripleStore {
     }
 
     private function preprocessQuery($query) {
-        $prefixes = (array_key_exists("sparql_preamble", $this->settings)
-                ? $this->settings["sparql_preamble"] : "") . "\n";
+        $prefixes = $this->preamble . "\n";
         // NB: This duplicates the (slightly broken) logic in EasyRDF which
         // adds (known) prefixes if it finds them in the query. It duplicates
         // it verbatim in order that we can add custom preamble to the query

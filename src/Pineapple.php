@@ -128,7 +128,7 @@ class Pineapple {
             "select distinct ?type ?label ?note \n" .
             $this->getPermissionFilter() .
             "where {\n" .
-            "  <$full_uri> a ?type ; \n".
+            "  <$full_uri> a ?type ; \n" .
             "      skos:prefLabel ?label . \n" .
             "  OPTIONAL { <$full_uri>  skos:note ?note .} \n" .
             "}";
@@ -308,7 +308,7 @@ class Pineapple {
         $agg_pred = "http://www.openarchives.org/ore/terms/aggregates";
         $query =
 
-            "select distinct ?uri ?name ?description \n".
+            "select distinct ?uri ?name ?description \n" .
             "where {\n" .
             "  <$meta_uri> <$agg_pred> ?uri . \n" .
             "    ?uri dcterms:title ?name ;\n" .
@@ -344,8 +344,8 @@ class Pineapple {
             "  ?s a ?name . \n" .
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
-            $this->getLanguageFilter("?prefLabel") .
-            $this->getSearchFilter("?prefLabel", $q)) : "") .
+                $this->getLanguageFilter("?prefLabel") .
+                $this->getSearchFilter("?prefLabel", $q)) : "") .
             "} order by DESC(?count)";
 
         $out = [];
@@ -456,16 +456,16 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?g ?name ?description ?rights ?rightsRef ?references \n".
+            "select distinct ?g ?name ?description ?rights ?rightsRef ?references \n" .
             "where {\n" .
-            "  graph ?g { <$uri> skos:prefLabel [] }.\n".
+            "  graph ?g { <$uri> skos:prefLabel [] }.\n" .
             "  ?g dcterms:title ?name ;\n" .
             "     dcterms:abstract ?description .\n" .
-            "  OPTIONAL {\n".
-            "     ?g dc11:rights ?rights ;\n".
-            "        dcterms:rights ?rightsRef ;\n".
-            "        dcterms:references ?references .".
-            "  } .\n".
+            "  OPTIONAL {\n" .
+            "     ?g dc11:rights ?rights ;\n" .
+            "        dcterms:rights ?rightsRef ;\n" .
+            "        dcterms:references ?references ." .
+            "  } .\n" .
             "} limit 1";
 
         $out = [];
@@ -535,7 +535,7 @@ class Pineapple {
 
                 "select distinct ?r ?type STR(?prefLabel) as ?label \n" .
                 "where {\n" .
-                "  <$uri> $reltype ?r " . ($is_distinct ? "OPTION (T_DISTINCT)" : "") ." .\n" .
+                "  <$uri> $reltype ?r " . ($is_distinct ? "OPTION (T_DISTINCT)" : "") . " .\n" .
                 "  ?r a ?type ; \n" .
                 "    skos:prefLabel ?prefLabel . \n" .
                 $this->getLanguageFilter("?prefLabel") .
@@ -650,4 +650,5 @@ class Pineapple {
             return "FROM <$v> ";
         }, $uris));
     }
+
 }

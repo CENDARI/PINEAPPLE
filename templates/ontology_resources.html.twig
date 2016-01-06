@@ -35,7 +35,8 @@
                             {% include "_pagination.html.twig" with {"items": resources, "extra": {"type": type_facet, "ontology": ont_facet}} %}
                         </div>
                         <div class="col-md-3">
-                            {% include "_facet_set.html.twig" with {"facets": types, "facet_class": "Resource Type", "facet_param": type_facet, "extra": {"ontology": ont_facet}} %}
+                            {% include "_facet_set.html.twig" with {"facets": types, "facet_class": "Resource Type", "facet_key": "type",
+                                "facet_param": type_facet, "extra": {"ontology": ont_facet}} %}
 
                             {% if graph_meta %}
                                 <div class="panel panel-default">
@@ -64,7 +65,6 @@
                                     </ul>
                                 </div>
                             {% endif %}
-
                         </div>
                     </form>
                 </div>
