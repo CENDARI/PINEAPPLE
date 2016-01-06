@@ -209,12 +209,15 @@ $app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
 $app->get("/people", function () use ($app, &$pineapple) {
     accessPointListPage($app, $pineapple, "foaf:Person");
 })->name("people");
+
 $app->get("/organisations", function () use ($app, &$pineapple) {
     accessPointListPage($app, $pineapple, "foaf:Organisation");
 })->name("organisations");
+
 $app->get("/places", function () use ($app, &$pineapple) {
     accessPointListPage($app, $pineapple, "edm:Place");
 })->name("places");
+
 $app->get("/events", function () use ($app, &$pineapple) {
     accessPointListPage($app, $pineapple, "edm:Event");
 })->name("events");

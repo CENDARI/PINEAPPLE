@@ -1,7 +1,8 @@
 <?php
 namespace Pineapple;
 
-use EasyRdf_Sparql_Client, EasyRdf_Namespace;
+use EasyRdf_Namespace;
+use EasyRdf_Sparql_Client;
 use Generator;
 
 
@@ -15,6 +16,14 @@ class TripleStore {
     private $endpoints = array();
     private $settings = array();
 
+    /**
+     * Constructor
+     *
+     * @param array $settings a map of settings containing a list
+     * of endpoints and namespaces
+     * @param null $endpointURLs an optional set of endpoint URLs
+     * @param null $namespaces an optional set of namespaces
+     */
     function __construct($settings, $endpointURLs = null, $namespaces = null) {
         $this->settings = $settings;
         #print_r($this->pineapple_settings);
@@ -73,7 +82,7 @@ class TripleStore {
 
     private function preprocessQuery($query) {
         $prefixes = (array_key_exists("sparql_preamble", $this->settings)
-            ? $this->settings["sparql_preamble"] : ""). "\n";
+                ? $this->settings["sparql_preamble"] : "") . "\n";
         // NB: This duplicates the (slightly broken) logic in EasyRDF which
         // adds (known) prefixes if it finds them in the query. It duplicates
         // it verbatim in order that we can add custom preamble to the query
@@ -86,7 +95,8 @@ class TripleStore {
         // anyway, breaking it if it contains a preamble pragma.
         foreach (EasyRdf_Namespace::namespaces() as $prefix => $uri) {
             if (strpos($query, "{$prefix}:") !== false and
-                    strpos($query, "PREFIX {$prefix}:") === false) {
+                strpos($query, "PREFIX {$prefix}:") === false
+            ) {
                 $prefixes .= "PREFIX {$prefix}: <{$uri}>\n";
             }
         }
