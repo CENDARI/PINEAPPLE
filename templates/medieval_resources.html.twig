@@ -25,7 +25,7 @@
                             <li>{% trans "No results found" %}</li>
                         {% endfor %}
                     </ul>
-                    {% include "_pagination.html.twig" with {'items': resources} %}
+                    {% include "_pagination.html.twig" with {items: resources, extra: {author: author_facet}} %}
                 </form>
             </div>
             <div class="col-md-3">
