@@ -54,6 +54,7 @@
                         or currentUrl() starts with baseUrl() ~ "/resources/" %}class="active"{% endif %}><a href="{{ urlFor("resources") }}">{% trans "Resources" %}</a></li>
                     <li {% if path() == urlFor("ontologies")
                         or currentUrl() starts with baseUrl() ~ "/ontology/" %}class="active"{% endif %}><a href="{{ urlFor("ontologies") }}">{% trans "WW1 Ontologies" %}</a></li>
+                    <li {% if path() == urlFor("medieval") %}class="active"{% endif %}><a href="{{ urlFor("medieval") }}">{% trans "Medieval Resources" %}</a></li>
                 </ul>
             </div><!--/.nav-collapse -->
 

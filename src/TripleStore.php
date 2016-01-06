@@ -64,7 +64,7 @@ class TripleStore {
         foreach ($this->endpoints as $endpoint) {
             error_log("Asking: " . $endpoint->getQueryUri());
             $result = $endpoint->query($queryWithPreamble);
-            //error_log($result->dump("application/sparql-results+xml"));
+            //error_log($result->dump("application/json"));
             foreach ($result as $row) {
                 yield $row;
             }

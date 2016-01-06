@@ -164,6 +164,16 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($pineapple->checkResourceExists("mock-item-uri"));
     }
 
+    public function testGetMedievalResources() {
+        $this->store
+            ->method("query")
+            ->willReturn($this->getMockResult("medieval_resources"));
+        $pineapple = new Pineapple($this->api, $this->store, $this->settings);
+        $resources = $pineapple->getMedievalResources(null, null, 0, 20);
+
+        $this->assertEquals("http://sismel/mdv/manoscritti/100173", $resources[0]["mss"]);
+    }
+
     public function testGetPermissionFilter() {
         // This assumes a lot of knowledge about the getPermissionFilter
         // function, but it's difficult to test otherwise. Here we mock

@@ -557,6 +557,97 @@ class Pineapple {
         return $out;
     }
 
+    private function getMedievalDataPatterns() {
+        // The basic patterns for selecting medieval data
+        return <<<EOL
+
+    ?id_opera <http://sismel.it/onto#hasAuthorID> ?id_autore ;
+              <http://sismel.it/onto#hasTitle> ?nome_opera .
+    ?id_autore <http://sismel.it/onto#hasName> ?nome_autore ;
+               <http://sismel.it/onto#belongsToReligiousOrderID> ?id_relig_autore .
+    ?id_relig_autore <http://sismel.it/onto#isReligiousOrder> ?nome_ordine_autore .
+    ?mss <http://sismel.it/onto#hasName> ?mss_segnatura ;
+         <http://sismel.it/onto#hasManuscriptSectionID> ?mss_section .
+    ?mss_section <http://sismel.it/onto#hasOperaID> ?id_opera ;
+                 <http://sismel.it/onto#hasHoldingID> ?id_ente ;
+                 <http://sismel.it/onto#hasStartDate> ?data_mss .
+    ?id_ente <http://sismel.it/onto#hasName> ?nome_ente ;
+             <http://sismel.it/onto#belongsToReligiousOrderID> ?id_relig_ente ;
+             <http://sismel.it/onto#hasInfo> ?info_ente .
+    ?id_relig_ente <http://sismel.it/onto#isReligiousOrder> ?nome_ordine_ente .
+EOL;
+    }
+
+    /**
+     * Medieval data queries. No, this does not belong here.
+     *
+     * @param string|null $q an optional query
+     * @param int $from the search offset
+     * @param int $limit the search limit
+     */
+    public function getMedievalResources($q = null, $author_name = null, $from, $limit) {
+
+        $query =
+            "select  distinct ?mss ?mss_segnatura ?nome_opera ?nome_autore ?nome_ordine_autore ?nome_ente ?nome_ordine_ente ?info_ente ?data_mss\n" .
+            "where  {\n" .
+            "  GRAPH <http://sismel/mdv> {\n" .
+            $this->getMedievalDataPatterns() .
+            ($author_name !== null ? "FILTER (?nome_autore = \"$author_name\")" : "") .
+            $this->getSearchFilter("?nome_opera", $q) .
+            "  }" .
+            "} offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "mss" => $row->mss->getUri(),
+                "nome_opera" => $row->nome_opera->getValue(),
+                "mss_segnatura" => $row->mss_segnatura->getValue(),
+                "nome_autore" => $row->nome_autore->getValue(),
+                "nome_ordine_autore" => $row->nome_ordine_autore->getValue(),
+                "nome_ente" => $row->nome_ente->getValue(),
+                "nome_ordine_ente" => $row->nome_ordine_ente->getValue(),
+                "info_ente" => $row->info_ente->getValue(),
+                "data_mss" => $row->data_mss->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Can a list of top authors, ordered by manuscript count
+     *
+     * @param null $q a query for the manuscript name
+     * @param int $from search offset
+     * @param int $limit search limit
+     * @return array
+     */
+    public function getMedievalAuthors($q = null, $author_name = null, $from, $limit) {
+
+        $query =
+
+            "select  distinct ?nome_autore count(?id_opera) as ?count\n" .
+            "where  {\n" .
+            "  GRAPH <http://sismel/mdv> {\n" .
+            $this->getMedievalDataPatterns() .
+            ($author_name !== null ? "FILTER (?nome_autore = \"$author_name\")" : "") .
+            $this->getSearchFilter("?nome_opera", $q) .
+            "  }\n" .
+            "} order by desc(?count) offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "name" => $row->nome_autore->getValue(),
+                "count" => $row->count->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+
+
     /**
      * Check if a resource exists.
      *

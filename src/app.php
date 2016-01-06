@@ -293,6 +293,31 @@ $app->get("/resources/:id+", function ($id_parts) use ($app, &$settings, &$pinea
     respond($app, "resource.html.twig", array_merge($data, $more));
 })->name("resource");
 
+$app->get("/medieval", function () use ($app, &$settings, &$api) {
+    // NB: Since we're using a different endpoint for the medieval data, create
+    // a new Triplestore and Pineapple instance containing just that data.
+    $ts = new \Pineapple\TripleStore($settings, ["http://git-trame.fefonlus.it/sparql/"], [], "");
+    $pineapple = new \Pineapple\Pineapple($api, $ts, $settings);
+
+    $q = $app->request->get("q");
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+    $author_facet = $app->request->get("author");
+
+    $data = [
+        "offset" => $offset,
+        "limit" => $limit,
+        "query" => $q,
+        "author_facet" => $author_facet,
+        // just fetch top 20 authors, because there are too many to
+        // list a facets - this could be improved.
+        "authors" => $pineapple->getMedievalAuthors($q, $author_facet, 0, 20),
+        "resources" => $pineapple->getMedievalResources($q, $author_facet, $offset, $limit)
+    ];
+
+    respond($app, "medieval_resources.html.twig", $data);
+})->name("medieval");
+
 // Fallback, which handles URLs like:
 // BASEURL/resources/f22c70aa-c640-4773-884d-076ac2f536c4.
 // When Pineapple is mounted at http://resources.cendari.dariah.eu

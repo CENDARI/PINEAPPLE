@@ -1,0 +1,37 @@
+{% extends "main.html.twig" %}
+
+{% block title %} - {% trans "Medieval Resources" %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <form action="{{ currentUrl() }}" method="get" class="form-inline">
+                    <h1>{% trans "Medieval Resources" %}</h1>
+                    {% include "_search_form.html.twig" %}
+
+                    <ul class="resource-list">
+                        {% for item in resources %}
+                            <li>
+                                <a class="title" href="{{ item.mss }}">{{ item.nome_opera }}</a>
+                                <ul class="details">
+                                    <li>{% trans "Author" %}: <a href="{{ urlFor("medieval") }}?author={{ item.nome_autore|url_encode }}">{{ item.nome_autore }}</a> </li>
+                                    <li>{% trans "Shelfmark Info" %}: {{ item.mss_segnatura }}</li>
+                                    <li>{% trans "Date" %}: {{ item.data_mss }}</li>
+                                </ul>
+
+                            </li>
+                        {% else %}
+                            <li>{% trans "No results found" %}</li>
+                        {% endfor %}
+                    </ul>
+                    {% include "_pagination.html.twig" with {'items': resources} %}
+                </form>
+            </div>
+            <div class="col-md-3">
+                {% include "_facet_set.html.twig" with {facets: authors, facet_class: "Prolific Authors", facet_key: "author",
+                facet_param: author_facet} %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
