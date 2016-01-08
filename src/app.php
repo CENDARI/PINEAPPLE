@@ -303,6 +303,9 @@ $app->get("/medieval", function () use ($app, &$settings, &$api) {
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
     $author_facet = $app->request->get("author");
+    $organisation_facet = $app->request->get("organisation");
+    $organisation_order_facet = $app->request->get("organisation_order");
+    $author_order_facet = $app->request->get("author_order");
 
     $data = [
         "offset" => $offset,
@@ -312,7 +315,16 @@ $app->get("/medieval", function () use ($app, &$settings, &$api) {
         // just fetch top 20 authors, because there are too many to
         // list a facets - this could be improved.
         "authors" => $pineapple->getMedievalAuthors($q, $author_facet, 0, 20),
-        "resources" => $pineapple->getMedievalResources($q, $author_facet, $offset, $limit)
+        "resources" => $pineapple->getMedievalResources($q, $author_facet, $organisation_facet, $organisation_order_facet, $author_order_facet, $offset, $limit),
+        
+        "organisation_facet" => $organisation_facet, 
+        "organisations" => $pineapple->getMedievalOrganisations($q, $organisation_facet, $offset, $limit), 
+        
+        "organisation_order_facet" => $organisation_order_facet,
+        "organisation_orders" => $pineapple->getMedievalOrganisationOrders($q, $organisation_order_facet, $offset, $limit),
+        
+        "author_order_facet" => $author_order_facet,
+        "author_orders" => $pineapple->getMedievalAuthorOrders($q, $author_order_facet, $offset, $limit)
     ];
 
     respond($app, "medieval_resources.html.twig", $data);

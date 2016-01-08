@@ -585,7 +585,7 @@ EOL;
      * @param int $from the search offset
      * @param int $limit the search limit
      */
-    public function getMedievalResources($q = null, $author_name = null, $from, $limit) {
+    public function getMedievalResources($q = null, $author_name = null, $organisation_name = null, $organisation_order = null, $author_order = null, $from, $limit) {
 
         $query =
             "select  distinct ?mss ?mss_segnatura ?nome_opera ?nome_autore ?nome_ordine_autore ?nome_ente ?nome_ordine_ente ?info_ente ?data_mss\n" .
@@ -593,6 +593,9 @@ EOL;
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
             ($author_name !== null ? "FILTER (?nome_autore = \"$author_name\")" : "") .
+            ($organisation_name !== null ? "FILTER (?info_ente = \"$organisation_name\")" : "") .
+            ($organisation_order !== null ? "FILTER (?nome_ordine_ente = \"$organisation_order\")" : "") .
+            ($author_order !== null ? "FILTER (?nome_ordine_autore = \"$author_order\")" : "") .
             $this->getSearchFilter("?nome_opera", $q) .
             "  }" .
             "} offset $from limit $limit";
@@ -609,6 +612,102 @@ EOL;
                 "nome_ordine_ente" => $row->nome_ordine_ente->getValue(),
                 "info_ente" => $row->info_ente->getValue(),
                 "data_mss" => $row->data_mss->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+    
+    /**
+     * List of organisations, ordered by manuscript count
+     *
+     * @param null $q a query for the manuscript name
+     * @param int $from search offset
+     * @param int $limit search limit
+     * @return array
+     */
+    public function getMedievalOrganisations($q = null, $organisation_name = null, $from, $limit)
+    {
+        $query =
+
+            "select  distinct ?info_ente count(?id_opera) as ?count\n" .
+            "where  {\n" .
+            "  GRAPH <http://sismel/mdv> {\n" .
+            $this->getMedievalDataPatterns() .
+            ($organisation_name !== null ? "FILTER (?info_ente = \"$organisation_name\")" : "") .
+            $this->getSearchFilter("?nome_opera", $q) .
+            "  }\n" .
+            "}  order by desc(?count) offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "name" => $row->info_ente->getValue(),
+                "count" => $row->count->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+    
+    /**
+     * List of organisation's orders, ordered by manuscript count
+     *
+     * @param null $q a query for the manuscript name
+     * @param int $from search offset
+     * @param int $limit search limit
+     * @return array
+     */
+    public function getMedievalOrganisationOrders($q, $organisation_order = null, $from, $limit)
+    {
+        $query =
+
+            "select  distinct ?nome_ordine_ente count(?id_opera) as ?count\n" .
+            "where  {\n" .
+            "  GRAPH <http://sismel/mdv> {\n" .
+            $this->getMedievalDataPatterns() .
+            ($organisation_order !== null ? "FILTER (?nome_ordine_ente = \"$organisation_order\")" : "") .
+            $this->getSearchFilter("?nome_opera", $q) .
+            "  }\n" .
+            "}  order by desc(?count) offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "name" => $row->nome_ordine_ente->getValue(),
+                "count" => $row->count->getValue()
+            ]);
+        }
+
+        return $out;
+    }
+    
+    /**
+     * List of author's orders, ordered by manuscript count
+     *
+     * @param null $q a query for the manuscript name
+     * @param int $from search offset
+     * @param int $limit search limit
+     * @return array
+     */
+    public function getMedievalAuthorOrders($q, $author_order = null, $from, $limit)
+    {
+        $query =
+
+            "select  distinct ?nome_ordine_autore count(?id_opera) as ?count\n" .
+            "where  {\n" .
+            "  GRAPH <http://sismel/mdv> {\n" .
+            $this->getMedievalDataPatterns() .
+            ($author_order !== null ? "FILTER (?nome_ordine_autore = \"$author_order\")" : "") .
+            $this->getSearchFilter("?nome_opera", $q) .
+            "  }\n" .
+            "}  order by desc(?count) offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            array_push($out, [
+                "name" => $row->nome_ordine_autore->getValue(),
+                "count" => $row->count->getValue()
             ]);
         }
 

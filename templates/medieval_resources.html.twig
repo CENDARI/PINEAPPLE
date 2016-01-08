@@ -29,8 +29,17 @@
                 </form>
             </div>
             <div class="col-md-3">
+                {% include "_facet_set.html.twig" with {facets: organisation_orders, facet_class: "Organisation's religious order", facet_key: "organisation_order", 
+                facet_param: organisation_order_facet, "extra": {"organisation": organisation_facet, "author_order": author_order_facet, "author": author_facet}} %}
+                
+                {% include "_facet_set.html.twig" with {facets: organisations, facet_class: "Organisations", facet_key: "organisation",
+                facet_param: organisation_facet, "extra": {"organisation_order": organisation_order_facet, "author_order": author_order_facet, "author": author_facet}} %}
+                
+                {% include "_facet_set.html.twig" with {facets: author_orders, facet_class: "Author's religious order", facet_key: "author_order",
+                facet_param: author_order_facet, "extra": {"organisation": organisation_facet, "organisation_order": organisation_order_facet, "author": author_facet}} %}
+            
                 {% include "_facet_set.html.twig" with {facets: authors, facet_class: "Prolific Authors", facet_key: "author",
-                facet_param: author_facet} %}
+                facet_param: author_facet, "extra": {"organisation": organisation_facet, "organisation_order": organisation_order_facet, "author_order": author_order_facet}} %}
             </div>
         </div>
     </div>
