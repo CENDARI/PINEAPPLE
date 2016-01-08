@@ -575,6 +575,7 @@ class Pineapple {
              <http://sismel.it/onto#belongsToReligiousOrderID> ?id_relig_ente ;
              <http://sismel.it/onto#hasInfo> ?info_ente .
     ?id_relig_ente <http://sismel.it/onto#isReligiousOrder> ?nome_ordine_ente .
+
 EOL;
     }
 
@@ -585,17 +586,23 @@ EOL;
      * @param int $from the search offset
      * @param int $limit the search limit
      */
-    public function getMedievalResources($q = null, $author_name = null, $organisation_name = null, $organisation_order = null, $author_order = null, $from, $limit) {
+    public function getMedievalResources($q = null,
+                                         $author_name = null,
+                                         $organisation_name = null,
+                                         $organisation_order = null,
+                                         $author_order = null,
+                                         $from,
+                                         $limit) {
 
         $query =
             "select  distinct ?mss ?mss_segnatura ?nome_opera ?nome_autore ?nome_ordine_autore ?nome_ente ?nome_ordine_ente ?info_ente ?data_mss\n" .
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
-            ($author_name !== null ? "FILTER (?nome_autore = \"$author_name\")" : "") .
-            ($organisation_name !== null ? "FILTER (?info_ente = \"$organisation_name\")" : "") .
-            ($organisation_order !== null ? "FILTER (?nome_ordine_ente = \"$organisation_order\")" : "") .
-            ($author_order !== null ? "FILTER (?nome_ordine_autore = \"$author_order\")" : "") .
+            $this->getExactFilter("?nome_autore", $author_name) .
+            $this->getExactFilter("?info_ente", $organisation_name) .
+            $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
+            $this->getExactFilter("?nome_ordine_autore", $author_order) .
             $this->getSearchFilter("?nome_opera", $q) .
             "  }" .
             "} offset $from limit $limit";
@@ -626,7 +633,13 @@ EOL;
      * @param int $limit search limit
      * @return array
      */
-    public function getMedievalOrganisations($q = null, $organisation_name = null, $from, $limit)
+    public function getMedievalOrganisations($q = null,
+                                             $author_name = null,
+                                             $organisation_name = null,
+                                             $organisation_order = null,
+                                             $author_order = null,
+                                             $from,
+                                             $limit)
     {
         $query =
 
@@ -634,7 +647,10 @@ EOL;
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
-            ($organisation_name !== null ? "FILTER (?info_ente = \"$organisation_name\")" : "") .
+            $this->getExactFilter("?nome_autore", $author_name) .
+            $this->getExactFilter("?info_ente", $organisation_name) .
+            $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
+            $this->getExactFilter("?nome_ordine_autore", $author_order) .
             $this->getSearchFilter("?nome_opera", $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
@@ -658,7 +674,13 @@ EOL;
      * @param int $limit search limit
      * @return array
      */
-    public function getMedievalOrganisationOrders($q, $organisation_order = null, $from, $limit)
+    public function getMedievalOrganisationOrders($q,
+                                                  $author_name = null,
+                                                  $organisation_name = null,
+                                                  $organisation_order = null,
+                                                  $author_order = null,
+                                                  $from,
+                                                  $limit)
     {
         $query =
 
@@ -666,7 +688,10 @@ EOL;
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
-            ($organisation_order !== null ? "FILTER (?nome_ordine_ente = \"$organisation_order\")" : "") .
+            $this->getExactFilter("?nome_autore", $author_name) .
+            $this->getExactFilter("?info_ente", $organisation_name) .
+            $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
+            $this->getExactFilter("?nome_ordine_autore", $author_order) .
             $this->getSearchFilter("?nome_opera", $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
@@ -690,7 +715,13 @@ EOL;
      * @param int $limit search limit
      * @return array
      */
-    public function getMedievalAuthorOrders($q, $author_order = null, $from, $limit)
+    public function getMedievalAuthorOrders($q,
+                                            $author_name = null,
+                                            $organisation_name = null,
+                                            $organisation_order = null,
+                                            $author_order = null,
+                                            $from,
+                                            $limit)
     {
         $query =
 
@@ -698,7 +729,10 @@ EOL;
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
-            ($author_order !== null ? "FILTER (?nome_ordine_autore = \"$author_order\")" : "") .
+            $this->getExactFilter("?nome_autore", $author_name) .
+            $this->getExactFilter("?info_ente", $organisation_name) .
+            $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
+            $this->getExactFilter("?nome_ordine_autore", $author_order) .
             $this->getSearchFilter("?nome_opera", $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
@@ -722,7 +756,13 @@ EOL;
      * @param int $limit search limit
      * @return array
      */
-    public function getMedievalAuthors($q = null, $author_name = null, $from, $limit) {
+    public function getMedievalAuthors($q = null,
+                                       $author_name = null,
+                                       $organisation_name = null,
+                                       $organisation_order = null,
+                                       $author_order = null,
+                                       $from,
+                                       $limit) {
 
         $query =
 
@@ -730,7 +770,10 @@ EOL;
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
-            ($author_name !== null ? "FILTER (?nome_autore = \"$author_name\")" : "") .
+            $this->getExactFilter("?nome_autore", $author_name) .
+            $this->getExactFilter("?info_ente", $organisation_name) .
+            $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
+            $this->getExactFilter("?nome_ordine_autore", $author_order) .
             $this->getSearchFilter("?nome_opera", $q) .
             "  }\n" .
             "} order by desc(?count) offset $from limit $limit";
@@ -822,6 +865,14 @@ EOL;
             return " FILTER isLiteral($pred) ." .
             " FILTER regex ($pred, \"$alts\", \"i\" ) .\n";
         }
+    }
+
+    private function getExactFilter($pred, $q, $op = "=") {
+        if ($q == null || trim($q) === "") {
+            return "";
+        }
+
+        return "FILTER ($pred $op \"$q\") .\n";
     }
 
     private function getLanguageFilter($pred) {

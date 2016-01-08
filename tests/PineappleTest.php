@@ -169,7 +169,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("medieval_resources"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $resources = $pineapple->getMedievalResources(null, null, 0, 20);
+        $resources = $pineapple->getMedievalResources(null, null, null, null, null, 0, 20);
 
         $this->assertEquals("http://sismel/mdv/manoscritti/100173", $resources[0]["mss"]);
     }

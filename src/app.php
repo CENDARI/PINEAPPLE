@@ -306,25 +306,31 @@ $app->get("/medieval", function () use ($app, &$settings, &$api) {
     $organisation_facet = $app->request->get("organisation");
     $organisation_order_facet = $app->request->get("organisation_order");
     $author_order_facet = $app->request->get("author_order");
+    $num_facets = $app->request->get("num_facets", 10);
 
     $data = [
         "offset" => $offset,
         "limit" => $limit,
         "query" => $q,
+
+        "resources" => $pineapple->getMedievalResources($q, $author_facet, $organisation_facet,
+            $organisation_order_facet, $author_order_facet, $offset, $limit),
+
         "author_facet" => $author_facet,
-        // just fetch top 20 authors, because there are too many to
-        // list a facets - this could be improved.
-        "authors" => $pineapple->getMedievalAuthors($q, $author_facet, 0, 20),
-        "resources" => $pineapple->getMedievalResources($q, $author_facet, $organisation_facet, $organisation_order_facet, $author_order_facet, $offset, $limit),
-        
-        "organisation_facet" => $organisation_facet, 
-        "organisations" => $pineapple->getMedievalOrganisations($q, $organisation_facet, $offset, $limit), 
+        "authors" => $pineapple->getMedievalAuthors($q, $author_facet, $organisation_facet,
+            $organisation_order_facet, $author_order_facet, 0, $num_facets),
+
+        "organisation_facet" => $organisation_facet,
+        "organisations" => $pineapple->getMedievalOrganisations($q, $author_facet, $organisation_facet,
+            $organisation_order_facet, $author_order_facet, 0, $num_facets),
         
         "organisation_order_facet" => $organisation_order_facet,
-        "organisation_orders" => $pineapple->getMedievalOrganisationOrders($q, $organisation_order_facet, $offset, $limit),
+        "organisation_orders" => $pineapple->getMedievalOrganisationOrders($q, $author_facet, $organisation_facet,
+            $organisation_order_facet, $author_order_facet, 0, $num_facets),
         
         "author_order_facet" => $author_order_facet,
-        "author_orders" => $pineapple->getMedievalAuthorOrders($q, $author_order_facet, $offset, $limit)
+        "author_orders" => $pineapple->getMedievalAuthorOrders($q, $author_facet, $organisation_facet,
+            $organisation_order_facet, $author_order_facet, 0, $num_facets)
     ];
 
     respond($app, "medieval_resources.html.twig", $data);
