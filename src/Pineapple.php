@@ -63,9 +63,7 @@ class Pineapple {
                 "lastModified" => $row->lastModified->getValue(),
                 "plainText" => $row->plainText->getValue(),
                 "source" => $row->source->getValue(),
-                "title" => property_exists($row, "title")
-                    ? $row->title->getValue()
-                    : $row->identifier->getValue(),
+                "title" => property_exists($row, "title") ? $row->title->getValue() : $full_uri,
             ]);
         }
 
@@ -90,25 +88,26 @@ class Pineapple {
     function getResources($q = null, $from, $limit) {
         $query =
 
-            "select distinct ?title ?identifier ?lastModified count(?m) as ?count \n" .
+            "select distinct ?s ?title ?identifier ?lastModified \n" .
             $this->getPermissionFilter() .
             "where {\n" .
-            "  ?s dc11:title ?title ; \n" .
-            "     nao:identifier ?identifier ; \n" .
+            "  ?s nao:identifier ?identifier ; \n" .
             "     nao:lastModified ?lastModified . \n" .
-            " OPTIONAL { ?s schema:mentions ?m } .\n" .
+            " OPTIONAL { ?s dc11:title ?title . } \n" .
             $this->getSearchFilter("?title", $q) .
-            "} order by ASC(?title) \n" .
+            "}\n".
             "offset $from limit $limit";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
             array_push($out, [
+                "uri" => $row->s->getUri(),
                 "id" => $row->identifier->getValue(),
                 "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
-                "title" => $row->title->getValue(),
-                "numMentions" => $row->count->getValue()
+                "title" => property_exists($row, "title")
+                    ? $row->title->getValue()
+                    : $row->s->getUri()
             ]);
         }
 
@@ -627,7 +626,7 @@ EOL;
 
         return $out;
     }
-    
+
     /**
      * List of organisations, ordered by manuscript count
      *
@@ -642,8 +641,7 @@ EOL;
                                              $organisation_order = null,
                                              $author_order = null,
                                              $from,
-                                             $limit)
-    {
+                                             $limit) {
         $query =
 
             "select  distinct ?info_ente count(?id_opera) as ?count\n" .
@@ -668,7 +666,7 @@ EOL;
 
         return $out;
     }
-    
+
     /**
      * List of organisation's orders, ordered by manuscript count
      *
@@ -683,8 +681,7 @@ EOL;
                                                   $organisation_order = null,
                                                   $author_order = null,
                                                   $from,
-                                                  $limit)
-    {
+                                                  $limit) {
         $query =
 
             "select  distinct ?nome_ordine_ente count(?id_opera) as ?count\n" .
@@ -709,7 +706,7 @@ EOL;
 
         return $out;
     }
-    
+
     /**
      * List of author's orders, ordered by manuscript count
      *
@@ -724,8 +721,7 @@ EOL;
                                             $organisation_order = null,
                                             $author_order = null,
                                             $from,
-                                            $limit)
-    {
+                                            $limit) {
         $query =
 
             "select  distinct ?nome_ordine_autore count(?id_opera) as ?count\n" .
