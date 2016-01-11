@@ -44,25 +44,28 @@ class Pineapple {
 
         $query =
 
-            "select distinct ?title ?label ?identifier ?lastModified ?plainText ?source \n" .
+            "select distinct ?title ?identifier ?lastModified ?plainText ?source \n" .
             $this->getPermissionFilter() .
             "where {\n" .
-            "  <$full_uri> dc11:title ?title ; \n" .
+            "  <$full_uri>\n" .
             "     nao:identifier ?identifier ; \n" .
             "     nao:lastModified ?lastModified ; \n" .
             "     nie:plainTextContent ?plainText ; \n" .
             "     dc11:source ?source . \n" .
+            "  OPTIONAL { <$full_uri> dc11:title ?title . } \n" .
             "} limit 1\n";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
             array_push($out, [
                 "id" => $uddi,
-                "title" => $row->title->getValue(),
-                "identifier" => $row->title->getValue(),
+                "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
                 "plainText" => $row->plainText->getValue(),
                 "source" => $row->source->getValue(),
+                "title" => property_exists($row, "title")
+                    ? $row->title->getValue()
+                    : $row->identifier->getValue(),
             ]);
         }
 
@@ -102,9 +105,9 @@ class Pineapple {
         foreach ($this->triplestore->query($query) as $row) {
             array_push($out, [
                 "id" => $row->identifier->getValue(),
-                "title" => $row->title->getValue(),
                 "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
+                "title" => $row->title->getValue(),
                 "numMentions" => $row->count->getValue()
             ]);
         }
