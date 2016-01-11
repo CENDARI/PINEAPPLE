@@ -606,7 +606,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilter("?nome_opera", $q) .
+            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
             "  }" .
             "} offset $from limit $limit";
 
@@ -653,7 +653,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilter("?nome_opera", $q) .
+            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
 
@@ -693,7 +693,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilter("?nome_opera", $q) .
+            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
 
@@ -733,7 +733,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilter("?nome_opera", $q) .
+            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
 
@@ -774,7 +774,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilter("?nome_opera", $q) .
+            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
             "  }\n" .
             "} order by desc(?count) offset $from limit $limit";
 
@@ -870,12 +870,12 @@ EOL;
     }
 
     private function getRegexFilterPredicate($pred, $q) {
-        $chars = preg_replace("/[^\w\s-_]/", '.', trim($q));
+        $chars = trim(preg_replace("/[\[\]\{\}\*\+\?\(\)]/", '', trim($q)));
         if (strlen($chars) === 0) {
             return "";
         } else {
             error_log("Raw query: $q");
-            $rq = preg_replace("/\s+/", "\\\\\\s*", $chars);
+            $rq = preg_replace("/\s+/", "\\\\\\s+", $chars);
             return "regex ($pred, '$rq', \"i\" )";
         }
     }
