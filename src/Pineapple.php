@@ -94,7 +94,8 @@ class Pineapple {
             "  ?s nao:identifier ?identifier ; \n" .
             "     nao:lastModified ?lastModified . \n" .
             " OPTIONAL { ?s dc11:title ?title . } \n" .
-            $this->getSearchFilter("?title", $q) .
+            " OPTIONAL { ?s nie:plainTextContent ?plainText }\n" .
+            $this->getSearchFilters(["?title", "?plainText"], $q) .
             "}\n".
             "offset $from limit $limit";
 
@@ -847,6 +848,15 @@ EOL;
         return $output;
     }
 
+    private function getSearchFilters($predList, $q) {
+        $filters = array_filter(array_map(function($p) use ($q) {
+            return $this->getRegexFilterPredicate($p, $q);
+        }, $predList), function($f) {
+            return !empty($f);
+        });
+        return empty($filters) ? "" : "FILTER(" . join(" || ", $filters) . ")";
+    }
+
     private function getSearchFilter($pred, $q) {
         if ($q == null || trim($q) === "") {
             return "";
@@ -855,14 +865,18 @@ EOL;
         // Sadness. Apparently there's no way to parameterize
         // queries with Easy_RDF, so this rubbish thing will have
         // to do.
-        error_log("Raw query: $q");
-        $chars = preg_replace("/[^\+\s\w]/", ' ', trim($q));
-        $alts = implode("|", explode(" ", $chars));
+        $regexPred = $this->getRegexFilterPredicate($pred, $q);
+        return empty($regexPred) ? "" : "FILTER (" . $regexPred . ")\n";
+    }
+
+    private function getRegexFilterPredicate($pred, $q) {
+        $chars = preg_replace("/[^\w\s-_]/", '.', trim($q));
         if (strlen($chars) === 0) {
             return "";
         } else {
-            return " FILTER isLiteral($pred) ." .
-            " FILTER regex ($pred, \"$alts\", \"i\" ) .\n";
+            error_log("Raw query: $q");
+            $rq = preg_replace("/\s+/", "\\\\\\s*", $chars);
+            return "regex ($pred, '$rq', \"i\" )";
         }
     }
 
