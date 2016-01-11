@@ -8,7 +8,7 @@
             <div class="col-md-9">
                 <form action="{{ currentUrl() }}" method="get" class="form-inline">
                     <h1>{% trans "Medieval Resources" %}</h1>
-                    <!-- {% include "_search_form.html.twig" %} -->
+                    {% include "_search_form.html.twig" %}
 
                     <ul class="resource-list">
                         {% for item in resources %}
