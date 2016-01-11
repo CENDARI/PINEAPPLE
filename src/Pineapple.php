@@ -49,10 +49,11 @@ class Pineapple {
             "where {\n" .
             "  <$full_uri>\n" .
             "     nao:identifier ?identifier ; \n" .
-            "     nao:lastModified ?lastModified ; \n" .
-            "     nie:plainTextContent ?plainText ; \n" .
-            "     dc11:source ?source . \n" .
-            "  OPTIONAL { <$full_uri> dc11:title ?title . } \n" .
+            "     nao:lastModified ?lastModified . \n" .
+            "  OPTIONAL { <$full_uri> dc11:title ?title ; \n" .
+            "                         nie:plainTextContent ?plainText ;\n" .
+            "                         dc11:source ?source . \n" .
+            "  }\n" .
             "} limit 1\n";
 
         $out = [];
@@ -61,8 +62,8 @@ class Pineapple {
                 "id" => $uddi,
                 "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
-                "plainText" => $row->plainText->getValue(),
-                "source" => $row->source->getValue(),
+                "plainText" => property_exists($row, "plainText") ? $row->plainText->getValue() : "",
+                "source" => property_exists($row, "source") ? $row->source->getValue() : "",
                 "title" => property_exists($row, "title") ? $row->title->getValue() : $full_uri,
             ]);
         }
