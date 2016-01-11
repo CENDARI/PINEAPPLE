@@ -50,10 +50,9 @@ class Pineapple {
             "  <$full_uri>\n" .
             "     nao:identifier ?identifier ; \n" .
             "     nao:lastModified ?lastModified . \n" .
-            "  OPTIONAL { <$full_uri> dc11:title ?title ; \n" .
-            "                         nie:plainTextContent ?plainText ;\n" .
-            "                         dc11:source ?source . \n" .
-            "  }\n" .
+            "  OPTIONAL { <$full_uri> dc11:title ?title }\n" .
+            "  OPTIONAL { <$full_uri> nie:plainTextContent ?plainText }\n" .
+            "  OPTIONAL { <$full_uri> dc11:source ?source } \n" .
             "} limit 1\n";
 
         $out = [];
