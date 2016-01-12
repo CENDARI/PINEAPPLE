@@ -96,7 +96,7 @@ class Pineapple {
             " OPTIONAL { ?s dc11:title ?title . } \n" .
             " OPTIONAL { ?s nie:plainTextContent ?plainText }\n" .
             $this->getSearchFilters(["?title", "?plainText"], $q) .
-            "}\n".
+            "}\n" .
             "offset $from limit $limit";
 
         $out = [];
@@ -212,8 +212,8 @@ class Pineapple {
             // FIXME: literal type? why is this needed?
             "        skos:prefLabel \"$name\"^^xsd:string \n" .
             "     ] ; \n" .
-            "     dc11:title ?title ; \n" .
             "     nao:identifier ?identifier . \n" .
+            "     OPTIONAL { ?r dc11:title ?title } \n" .
             "} offset $from limit $limit";
 
         $out = [];
@@ -222,7 +222,9 @@ class Pineapple {
             array_push($out, [
                 "id" => $row->identifier->getValue(),
                 "type" => substr($ns_uri, 0, mb_strpos($ns_uri, ":")),
-                "title" => $row->title->getValue()
+                "title" => property_exists($row, "title")
+                    ? $row->title->getValue()
+                    : $row->r->getUri()
             ]);
         }
 
@@ -875,9 +877,9 @@ EOL;
     }
 
     private function getSearchFilters($predList, $q) {
-        $filters = array_filter(array_map(function($p) use ($q) {
+        $filters = array_filter(array_map(function ($p) use ($q) {
             return $this->getRegexFilterPredicate($p, $q);
-        }, $predList), function($f) {
+        }, $predList), function ($f) {
             return !empty($f);
         });
         return empty($filters) ? "" : "FILTER(" . join(" || ", $filters) . ")";
