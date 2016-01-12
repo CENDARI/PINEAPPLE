@@ -62,8 +62,10 @@ class TripleStore {
         $queryWithPreamble = $this->preprocessQuery($sparqlQuery);
         error_log("Sparql Query:\n$queryWithPreamble");
         foreach ($this->endpoints as $endpoint) {
-            error_log("Asking: " . $endpoint->getQueryUri());
+            $time = microtime(TRUE);
             $result = $endpoint->query($queryWithPreamble);
+            error_log(sprintf("Asked: %s; result in %0.3f seconds",
+                $endpoint->getQueryUri(), microtime(TRUE) - $time));
             //error_log($result->dump("application/json"));
             foreach ($result as $row) {
                 yield $row;

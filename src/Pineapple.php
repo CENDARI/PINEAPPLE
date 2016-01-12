@@ -598,7 +598,7 @@ EOL;
                                          $limit) {
 
         $query =
-            "select  distinct ?mss ?mss_segnatura ?nome_opera ?nome_autore ?nome_ordine_autore ?nome_ente ?nome_ordine_ente ?info_ente ?data_mss\n" .
+            "select  distinct ?mss ?nome_opera ?mss_segnatura ?nome_autore ?data_mss\n" .
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
@@ -606,7 +606,13 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
+            $this->getSearchFilters([
+                "?nome_opera",
+                "?nome_autore",
+                "?info_ente",
+                "?nome_ordine_ente",
+                "?nome_ordine_autore"
+            ], $q) .
             "  }" .
             "} offset $from limit $limit";
 
@@ -617,10 +623,6 @@ EOL;
                 "nome_opera" => $row->nome_opera->getValue(),
                 "mss_segnatura" => $row->mss_segnatura->getValue(),
                 "nome_autore" => $row->nome_autore->getValue(),
-                "nome_ordine_autore" => $row->nome_ordine_autore->getValue(),
-                "nome_ente" => $row->nome_ente->getValue(),
-                "nome_ordine_ente" => $row->nome_ordine_ente->getValue(),
-                "info_ente" => $row->info_ente->getValue(),
                 "data_mss" => $row->data_mss->getValue()
             ]);
         }
@@ -653,7 +655,13 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
+            $this->getSearchFilters([
+                "?nome_opera",
+                "?nome_autore",
+                "?info_ente",
+                "?nome_ordine_ente",
+                "?nome_ordine_autore"
+            ], $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
 
@@ -693,7 +701,13 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
+            $this->getSearchFilters([
+                "?nome_opera",
+                "?nome_autore",
+                "?info_ente",
+                "?nome_ordine_ente",
+                "?nome_ordine_autore"
+            ], $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
 
@@ -733,7 +747,13 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
+            $this->getSearchFilters([
+                "?nome_opera",
+                "?nome_autore",
+                "?info_ente",
+                "?nome_ordine_ente",
+                "?nome_ordine_autore"
+            ], $q) .
             "  }\n" .
             "}  order by desc(?count) offset $from limit $limit";
 
@@ -774,7 +794,13 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters(["?nome_opera", "?nome_autore", "?info_ente", "?nome_ordine_ente", "?nome_ordine_autore"], $q) .
+            $this->getSearchFilters([
+                "?nome_opera",
+                "?nome_autore",
+                "?info_ente",
+                "?nome_ordine_ente",
+                "?nome_ordine_autore"
+            ], $q) .
             "  }\n" .
             "} order by desc(?count) offset $from limit $limit";
 
