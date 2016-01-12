@@ -13,7 +13,8 @@
                     <ul class="resource-list">
                         {% for item in resources %}
                             <li>
-                                {{ item.nome_opera }} <a class="title" target="_blank" href="http://lodlive-mirabile.netseven.it/?{{ item.mss }}"><small>[visualise]</small></a>
+                                {{ item.nome_opera }} <a class="title" target="_blank" href="http://lodlive-mirabile.netseven.it/?{{ item.mss }}"><small>[visualise manuscript shelfmark]</small></a> 
+                                <a class="title" target="_blank" href="http://lodlive-mirabile.netseven.it/?{{ item.id_opera }}"><small>[visualise text]</small></a>
                                 <ul class="details">
                                     <li>{% trans "Author" %}: <a href="{{ urlFor("medieval") }}?author={{ item.nome_autore|url_encode }}">{{ item.nome_autore }}</a> </li>
                                     <li>{% trans "Shelfmark Info" %}: {{ item.mss_segnatura }}</li>
