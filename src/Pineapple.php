@@ -602,7 +602,7 @@ EOL;
                                          $limit) {
 
         $query =
-            "select  distinct ?mss ?nome_opera ?mss_segnatura ?nome_autore ?data_mss\n" .
+            "select  distinct ?id_opera ?mss ?nome_opera ?mss_segnatura ?nome_autore ?data_mss\n" .
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
@@ -623,6 +623,7 @@ EOL;
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
             array_push($out, [
+                "id_opera" => $row->id_opera->getUri(),
                 "mss" => $row->mss->getUri(),
                 "nome_opera" => $row->nome_opera->getValue(),
                 "mss_segnatura" => $row->mss_segnatura->getValue(),

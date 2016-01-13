@@ -1,36 +1,27 @@
 <sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
  <head>
+  <variable name="id_opera"/>
   <variable name="mss"/>
   <variable name="mss_segnatura"/>
   <variable name="nome_opera"/>
   <variable name="nome_autore"/>
-  <variable name="nome_ordine_autore"/>
-  <variable name="nome_ente"/>
-  <variable name="nome_ordine_ente"/>
-  <variable name="info_ente"/>
   <variable name="data_mss"/>
  </head>
  <results distinct="false" ordered="true">
   <result>
+   <binding name="id_opera"><uri>http://sismel/mdv/opere/10207</uri></binding>
    <binding name="mss"><uri>http://sismel/mdv/manoscritti/100173</uri></binding>
    <binding name="mss_segnatura"><literal>Grenoble, Bibliothèque Municipale,  268 (231)</literal></binding>
    <binding name="nome_opera"><literal>Commentarium in Exodum</literal></binding>
    <binding name="nome_autore"><literal>Hrabanus Maurus n. 780 ca., m. 4-2-856</literal></binding>
-   <binding name="nome_ordine_autore"><literal>OSB</literal></binding>
-   <binding name="nome_ente"><literal>Portes, monastero OCart</literal></binding>
-   <binding name="nome_ordine_ente"><literal>OCart</literal></binding>
-   <binding name="info_ente"><literal>Francia Rhône-Alpes Portes (Ain) Portes, monastero OCart </literal></binding>
    <binding name="data_mss"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">1101</literal></binding>
   </result>
   <result>
+   <binding name="id_opera"><uri>http://sismel/mdv/opere/10207</uri></binding>
    <binding name="mss"><uri>http://sismel/mdv/manoscritti/128554</uri></binding>
    <binding name="mss_segnatura"><literal>Douai, Bibliothèque Marceline Desbordes-Valmore (olim Bibliothèque Municipale),  339</literal></binding>
    <binding name="nome_opera"><literal>Commentarium in Exodum</literal></binding>
    <binding name="nome_autore"><literal>Hrabanus Maurus n. 780 ca., m. 4-2-856</literal></binding>
-   <binding name="nome_ordine_autore"><literal>OSB</literal></binding>
-   <binding name="nome_ente"><literal>St. Sauveur et St. André, abbazia OSB</literal></binding>
-   <binding name="nome_ordine_ente"><literal>OSB</literal></binding>
-   <binding name="info_ente"><literal>Francia Nord-Pas-de-Calais Anchin (Nord) St. Sauveur et St. André, abbazia </literal></binding>
    <binding name="data_mss"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">1101</literal></binding>
   </result>
  </results>
