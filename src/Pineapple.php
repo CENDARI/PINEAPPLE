@@ -575,7 +575,8 @@ class Pineapple {
          <http://sismel.it/onto#hasManuscriptSectionID> ?mss_section .
     ?mss_section <http://sismel.it/onto#hasOperaID> ?id_opera ;
                  <http://sismel.it/onto#hasHoldingID> ?id_ente ;
-                 <http://sismel.it/onto#hasStartDate> ?data_mss .
+                 <http://sismel.it/onto#hasStartDate> ?data_mss ;
+                 <http://sismel.it/onto#hasEndDate> ?data_end_mss .
     ?id_ente <http://sismel.it/onto#hasName> ?nome_ente ;
              <http://sismel.it/onto#belongsToReligiousOrderID> ?id_relig_ente ;
              <http://sismel.it/onto#hasInfo> ?info_ente .
@@ -600,7 +601,7 @@ EOL;
                                          $limit) {
 
         $query =
-            "select  distinct ?id_opera ?mss ?nome_opera ?mss_segnatura ?nome_autore ?data_mss\n" .
+            "select  distinct ?id_opera ?mss ?nome_opera ?mss_segnatura ?nome_autore ?data_mss ?data_end_mss\n" .
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
@@ -626,7 +627,8 @@ EOL;
                 "nome_opera" => $row->nome_opera->getValue(),
                 "mss_segnatura" => $row->mss_segnatura->getValue(),
                 "nome_autore" => $row->nome_autore->getValue(),
-                "data_mss" => $row->data_mss->getValue()
+                "data_mss" => $row->data_mss->getValue(),
+                "data_end_mss" => $row->data_end_mss->getValue()
             ]);
         }
 
