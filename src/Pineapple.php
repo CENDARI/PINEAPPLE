@@ -49,9 +49,9 @@ class Pineapple {
             "where {\n" .
             "  <$full_uri>\n" .
             "     nao:identifier ?identifier ; \n" .
+            "     nie:plainTextContent ?plainText ;\n" .
             "     nao:lastModified ?lastModified . \n" .
             "  OPTIONAL { <$full_uri> dc11:title ?title }\n" .
-            "  OPTIONAL { <$full_uri> nie:plainTextContent ?plainText }\n" .
             "  OPTIONAL { <$full_uri> dc11:source ?source } \n" .
             "} limit 1\n";
 
@@ -61,7 +61,7 @@ class Pineapple {
                 "id" => $uddi,
                 "identifier" => $row->identifier->getValue(),
                 "lastModified" => $row->lastModified->getValue(),
-                "plainText" => property_exists($row, "plainText") ? $row->plainText->getValue() : "",
+                "plainText" => $row->plainText->getValue(),
                 "source" => property_exists($row, "source") ? $row->source->getValue() : "",
                 "title" => property_exists($row, "title") ? $row->title->getValue() : $full_uri,
             ]);
@@ -92,10 +92,10 @@ class Pineapple {
             $this->getPermissionFilter() .
             "where {\n" .
             "  ?s nao:identifier ?identifier ; \n" .
-            "     nao:lastModified ?lastModified . \n" .
+            "     nao:lastModified ?lastModified ; \n" .
+            "     nie:plainTextContent ?plainText . \n" .
             " OPTIONAL { ?s dc11:title ?title . } \n" .
-            " OPTIONAL { ?s nie:plainTextContent ?plainText }\n" .
-            $this->getSearchFilters(["?title", "?plainText"], $q) .
+            $this->getSearchFilters(["?plainText"], $q) .
             "}\n" .
             "offset $from limit $limit";
 
@@ -249,8 +249,8 @@ class Pineapple {
             "where {\n" .
             "  <$uri> schema:mentions ?m . \n" .
             "  ?r schema:mentions ?m . \n" .
-            "  ?r dc11:title ?title ; \n" .
-            "     nao:identifier ?identifier . \n" .
+            "  ?r nao:identifier ?identifier . \n" .
+            "  OPTIONAL { ?r dc11:title ?title } \n" .
             "  FILTER (?r != <$uri> ) \n" .
             "} offset $from limit $limit";
 
@@ -260,7 +260,9 @@ class Pineapple {
             array_push($out, [
                 "id" => $row->identifier->getValue(),
                 "type" => substr($ns_uri, 0, mb_strpos($ns_uri, ":")),
-                "title" => $row->title->getValue()
+                "title" => property_exists($row, "title")
+                    ? $row->title->getValue()
+                    : $row->r->getUri()
             ]);
         }
 
@@ -898,14 +900,12 @@ EOL;
     }
 
     private function getRegexFilterPredicate($pred, $q) {
-        $chars = trim(preg_replace("/[\[\]\{\}\*\+\?\(\)]/", '', trim($q)));
-        if (strlen($chars) === 0) {
-            return "";
-        } else {
-            error_log("Raw query: $q");
-            $rq = preg_replace("/\s+/", "\\\\\\s+", $chars);
-            return "regex ($pred, '$rq', \"i\" )";
-        }
+        $words = explode(" ", trim($q));
+        $res = array_map(function ($word) use ($pred) {
+            $chars = preg_replace("/\\\\/", '\\\\\\', preg_quote(trim($word)));
+            return "regex($pred, '$chars', 'i' )";
+        }, $words);
+        return "(" . join(" && ", $res) . ")";
     }
 
     private function getExactFilter($pred, $q, $op = "=") {
