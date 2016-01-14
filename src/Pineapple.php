@@ -178,8 +178,8 @@ class Pineapple {
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
-            $m_type = EasyRdf_Namespace::shorten($row->type->getUri());
-            $m_type = $m_type ? $m_type : $row->type->getUri();
+            $m_type = EasyRdf_Namespace::splitUri($row->m->getUri(), TRUE);
+            $m_type = $m_type[0];
             $types = array_key_exists($m_type, $out) ? $out[$m_type] : [];
             array_push($types, [
                 "uri" => $row->m->getUri(),
@@ -202,16 +202,15 @@ class Pineapple {
      * @return array
      */
     function getMentionResources($type, $name, $from, $limit) {
+        $uri = EasyRdf_Namespace::get($type) . $name;
+        error_log("URI: " . $uri);
+
         $query =
 
             "select distinct ?r ?identifier ?title \n" .
             $this->getPermissionFilter() .
             "where {\n" .
-            "  ?r schema:mentions [\n" .
-            //"        a $type ; " .
-            // FIXME: literal type? why is this needed?
-            "        skos:prefLabel \"$name\"^^xsd:string \n" .
-            "     ] ; \n" .
+            "  ?r schema:mentions <$uri> ; \n" .
             "     nao:identifier ?identifier . \n" .
             "     OPTIONAL { ?r dc11:title ?title } \n" .
             "} offset $from limit $limit";

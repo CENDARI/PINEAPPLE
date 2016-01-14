@@ -19,6 +19,18 @@
                 {% for name, set in relations %}
                     {% include "_ontology_related.html.twig" with {"relation_name" : name, "related": set} %}
                 {% endfor %}
+
+                {% if not mentions is empty %}
+                    <h2>{% trans "Referencing resources" %}</h2>
+                    <ul class="reference-list">
+                        {% for item in mentions %}
+                            <li>
+                                <a class="title" href="{{ urlFor("resource", {"type": item.type, "id": item.id}) }}">{{ item.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% include "_pagination.html.twig" with {'items': mentions} %}
+                {% endif %}
             </div>
             <div class="col-md-3">
                 {% if context %}

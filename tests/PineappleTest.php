@@ -92,7 +92,7 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
             ->method("query")
             ->willReturn($this->getMockResult("mention_resources"));
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
-        $resources = $pineapple->getMentionResources("edm:Event", "World War",  0, 20);
+        $resources = $pineapple->getMentionResources("events", "World War",  0, 20);
 
         $this->assertEquals("Race in progress", $resources[0]["title"]);
         $this->assertEquals("Colonel of the regiment watching the greasy pole competition",

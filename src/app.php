@@ -184,14 +184,14 @@ $app->get("/", function () use ($app, &$pineapple) {
     respond($app, "resources.html.twig", $data);
 })->name("resources");
 
-$app->get("/mention/:type/:name+", function ($type, $name_parts) use ($app, &$pineapple) {
-    $name = join("/", $name_parts);
+$app->get("/mention/:type/:name+", function ($type, $id_parts) use ($app, &$pineapple) {
+    $id = join("/", array_map("urlencode", $id_parts));
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
 
-    $mentions = $pineapple->getMentionResources($type, $name, $offset, $limit);
+    $mentions = $pineapple->getMentionResources($type, $id, $offset, $limit);
     $data = [
-        "name" => $name,
+        "name" => $id,
         "type" => $type,
         "mentions" => $mentions,
         "offset" => $offset,
@@ -341,7 +341,17 @@ $app->get("/medieval", function () use ($app, &$settings, &$api) {
 // When Pineapple is mounted at http://resources.cendari.dariah.eu
 // this therefore handles URI resolution
 $app->get("/:type/:id+", function ($type, $id_parts) use ($app, &$settings, &$pineapple) {
-    $id = join("/", array_map(function ($p) { return urlencode($p);}, $id_parts));
+    $id = join("/", array_map("urlencode", $id_parts));
+    $offset = $app->request->get("offset", 0);
+    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
+
+    $data = $pineapple->getConcept($type, $id);
+    $mentions = $pineapple->getMentionResources($type, $id, $offset, $limit);
     respond($app, "ontology_resource.html.twig",
-        $pineapple->getConcept($type, $id));
+        array_merge($data, [
+            "mentions" => $mentions,
+            "offset" => $offset,
+            "limit" => $limit
+        ])
+    );
 })->name("concept");

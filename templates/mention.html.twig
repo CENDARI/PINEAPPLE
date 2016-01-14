@@ -7,6 +7,14 @@
         <div class="row">
             <div class="col-md-12">
                 <h1>{{ name }}</h1>
+                <dl class="dl-horizontal">
+                    <dt>{% trans "type" %}</dt>
+                    <dd>{{ type|strip_rdf_prefix }}</dd>
+                    {% if note %}
+                        <dt>{% trans "note" %}</dt>
+                        <dd>{{ note }}</dd>
+                    {% endif %}
+                </dl>
 
                 {% if not mentions is empty %}
                 <h2>{% trans "Referencing resources" %}</h2>
