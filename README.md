@@ -78,9 +78,17 @@ http localhost:8000/resource/bcc950c1-6984-4f9a-802d-3571d04d0adf Accept:applica
     "source": "c1-6984-4f9a-802d-3571d04d0adf",
     "mentions": [
         {
-            "title": "France",
-            "type": "schema:Place",
-            "uri": "cendari://resources/Place/France"
+            "prefLabel": "France",
+            "type": "edm:Place",
+            "uri": "http://resources.cendari.dariah.eu/locations/France"
+        },
+        ...
+    ],
+    "related": [
+        {
+            "id": "71a62833-7c4d-41a5-90aa-6f047eafd4c6",
+            "title": "One of our big guns with which we annoy the enemy",
+            "type": "resources"          
         },
         ...
     ]
@@ -88,7 +96,7 @@ http localhost:8000/resource/bcc950c1-6984-4f9a-802d-3571d04d0adf Accept:applica
 ```
 
 ```bash
-http localhost:8000/mention/schema:Place/France Accept:application/json
+http localhost:8000/locations/France Accept:application/json
 ```
 
 ```json
@@ -97,12 +105,14 @@ http localhost:8000/mention/schema:Place/France Accept:application/json
     "mentions": [
         {
             "id": "71a62833-7c4d-41a5-90aa-6f047eafd4c6",
-            "title": "One of our big guns with which we annoy the enemy"
+            "title": "One of our big guns with which we annoy the enemy",
+            "type": "resources"
         },
         ...
     ],
-    "name": "France",
-    "type": "schema:Place"
+    "prefLabel": "France",
+    "type": "edm:Place",
+    "uri": "http://resources.cendari.dariah.eu/locations/France"
 }
 ```
 

@@ -203,7 +203,6 @@ class Pineapple {
      */
     function getMentionResources($type, $name, $from, $limit) {
         $uri = EasyRdf_Namespace::get($type) . $name;
-        error_log("URI: " . $uri);
 
         $query =
 

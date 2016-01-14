@@ -33,16 +33,6 @@ class PineappleTwigExtension extends \Twig_Extension {
     }
 }
 
-function type_to_name($type) {
-    $name = [
-        "edm:Place" => "Places",
-        "edm:Event" => "Events",
-        "foaf:Person" => "People",
-        "foaf:Organisation" => "Organisations"
-    ];
-    return array_key_exists($type, $name) ? $name[$type] : $type;
-}
-
 $app = new \Slim\Slim(array(
     "view" => new \Slim\Views\Twig(),
     "debug" => getenv("APP_DEBUG")
@@ -84,11 +74,6 @@ $settings = parse_ini_file(__DIR__ . '/../settings.ini');
 // we get back from the triplestore
 $view->getEnvironment()->addFilter(new Twig_SimpleFilter("pretty_date", function ($milliseconds) {
     return date("d-m-Y H:i", intval($milliseconds) / 1000);
-}));
-
-// Access type-to-name via templates
-$view->getEnvironment()->addFilter(new Twig_SimpleFilter("type_to_name", function ($type) {
-    return type_to_name($type);
 }));
 
 // Turn skos:Concept into Concept
@@ -154,21 +139,6 @@ function respond(\Slim\Slim $app, $template, $data) {
     }
 }
 
-function accessPointListPage(\Slim\Slim $app, \Pineapple\Pineapple $pineapple, $type) {
-    $q = $app->request->get("q");
-    $offset = $app->request->get("offset", 0);
-    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
-    $items = $pineapple->getAccessPoints($type, $q, $offset, $limit);
-    $data = [
-        "type" => type_to_name($type),
-        "offset" => $offset,
-        "limit" => $limit,
-        "query" => $q,
-        "accessPoints" => $items,
-    ];
-    respond($app, "access_points.html.twig", $data);
-}
-
 $app->get("/", function () use ($app, &$pineapple) {
     $q = $app->request->get("q");
     $offset = $app->request->get("offset", 0);
@@ -184,43 +154,6 @@ $app->get("/", function () use ($app, &$pineapple) {
     respond($app, "resources.html.twig", $data);
 })->name("resources");
 
-$app->get("/mention/:type/:name+", function ($type, $id_parts) use ($app, &$pineapple) {
-    $id = join("/", array_map("urlencode", $id_parts));
-    $offset = $app->request->get("offset", 0);
-    $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
-
-    $mentions = $pineapple->getMentionResources($type, $id, $offset, $limit);
-    $data = [
-        "name" => $id,
-        "type" => $type,
-        "mentions" => $mentions,
-        "offset" => $offset,
-        "limit" => $limit
-    ];
-    respond($app, "mention.html.twig", $data);
-})->name("mention");
-
-
-$app->get("/mentions/:id", function ($id) use ($app, &$pineapple) {
-    $mentions = $pineapple->getResourceMentions($id);
-    respond($app, "_mentions.html.twig", $mentions);
-})->name("mentions");
-
-$app->get("/people", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "foaf:Person");
-})->name("people");
-
-$app->get("/organisations", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "foaf:Organisation");
-})->name("organisations");
-
-$app->get("/places", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "edm:Place");
-})->name("places");
-
-$app->get("/events", function () use ($app, &$pineapple) {
-    accessPointListPage($app, $pineapple, "edm:Event");
-})->name("events");
 
 $app->get("/ontologies", function () use ($app, &$settings, &$pineapple) {
     $q = $app->request->get("q");
