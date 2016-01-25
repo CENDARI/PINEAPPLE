@@ -95,7 +95,7 @@ class Pineapple {
             "     nao:lastModified ?lastModified ; \n" .
             "     nie:plainTextContent ?plainText . \n" .
             " OPTIONAL { ?s dc11:title ?title . } \n" .
-            $this->getContainsFilters(["?plainText"], $q) .
+            $this->getContainsFilter("?plainText", $q) .
             "}\n" .
             "offset $from limit $limit";
 
@@ -286,7 +286,7 @@ class Pineapple {
             "where {\n" .
             "  ?s a <$type_uri> ; \n" .
             "     skos:prefLabel ?title . \n" .
-            $this->getContainsFilters(["?title"], $q) .
+            $this->getContainsFilter("?title", $q) .
             ($this->settings["limit_related_access_points"] ? (
                 "  FILTER EXISTS { \n" .
                 "    ?m schema:mentions ?s ;\n" .
@@ -350,7 +350,7 @@ class Pineapple {
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
                 $this->getLanguageFilter("?prefLabel") .
-                $this->getContainsFilters(["?prefLabel"], $q)) : "") .
+                $this->getRegexFilters(["?prefLabel"], $q)) : "") .
             "} order by DESC(?count)";
 
         $out = [];
@@ -385,7 +385,7 @@ class Pineapple {
             ($t ? " a $t ; " : "") .
             "     skos:prefLabel ?prefLabel . \n" .
             $this->getLanguageFilter("?prefLabel") .
-            $this->getContainsFilters(["?prefLabel"], $q) .
+            $this->getRegexFilters(["?prefLabel"], $q) .
             "} offset $from limit $limit";
 
         $out = [];
@@ -609,7 +609,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters([
+            $this->getRegexFilters([
                 "?nome_opera",
                 "?nome_autore",
                 "?info_ente",
@@ -660,7 +660,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters([
+            $this->getRegexFilters([
                 "?nome_opera",
                 "?nome_autore",
                 "?info_ente",
@@ -706,7 +706,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters([
+            $this->getRegexFilters([
                 "?nome_opera",
                 "?nome_autore",
                 "?info_ente",
@@ -752,7 +752,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters([
+            $this->getRegexFilters([
                 "?nome_opera",
                 "?nome_autore",
                 "?info_ente",
@@ -799,7 +799,7 @@ EOL;
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
             $this->getExactFilter("?nome_ordine_autore", $author_order) .
-            $this->getSearchFilters([
+            $this->getRegexFilters([
                 "?nome_opera",
                 "?nome_autore",
                 "?info_ente",
@@ -879,30 +879,7 @@ EOL;
         return $output;
     }
 
-    private function getContainsFilters($predList, $q) {
-        if ($q == null || trim($q) === "") {
-            return "";
-        }
-
-        $filters = array_filter(array_map(function ($p) use ($q) {
-            return $this->getContainsFilterPredicate($p, $q);
-        }, $predList), function ($f) {
-            return !empty($f);
-        });
-        return empty($filters) ? "" : "FILTER(" . join(" || ", $filters) . ")";
-    }
-
-    private function getContainsFilterPredicate($pred, $q) {
-        $cleaned = $this->stripPunctuation(trim($q));
-        $words = explode(" ", $cleaned);
-        $remove_keywords = array_filter($words, function ($t) {
-            return !in_array($t, ["or", "and"]);
-        });
-        $query = join(" AND ", $remove_keywords);
-        return "bif:contains($pred, '$query')";
-    }
-
-    private function getSearchFilters($predList, $q) {
+    private function getRegexFilters($predList, $q) {
         if ($q == null || trim($q) === "") {
             return "";
         }
@@ -915,18 +892,6 @@ EOL;
         return empty($filters) ? "" : "FILTER(" . join(" || ", $filters) . ")";
     }
 
-    private function getSearchFilter($pred, $q) {
-        if ($q == null || trim($q) === "") {
-            return "";
-        }
-
-        // Sadness. Apparently there's no way to parameterize
-        // queries with Easy_RDF, so this rubbish thing will have
-        // to do.
-        $regexPred = $this->getRegexFilterPredicate($pred, $q);
-        return empty($regexPred) ? "" : "FILTER (" . $regexPred . ")\n";
-    }
-
     private function getRegexFilterPredicate($pred, $q) {
         $words = explode(" ", trim($q));
         $res = array_map(function ($word) use ($pred) {
@@ -934,6 +899,20 @@ EOL;
             return "regex($pred, '$chars', 'i' )";
         }, $words);
         return "(" . join(" && ", $res) . ")";
+    }
+
+    private function getContainsFilter($pred, $q) {
+        if ($q == null || trim($q) === "") {
+            return "";
+        }
+
+        $cleaned = $this->stripPunctuation(trim($q));
+        $words = explode(" ", $cleaned);
+        $remove_keywords = array_filter($words, function ($t) {
+            return !in_array($t, ["or", "and"]);
+        });
+        $query = join(" AND ", $remove_keywords);
+        return "FILTER(bif:contains($pred, '$query'))\n";
     }
 
     private function getExactFilter($pred, $q, $op = "=") {
