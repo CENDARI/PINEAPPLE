@@ -95,7 +95,7 @@ class Pineapple {
             "     nao:lastModified ?lastModified ; \n" .
             "     nie:plainTextContent ?plainText . \n" .
             " OPTIONAL { ?s dc11:title ?title . } \n" .
-            $this->getSearchFilters(["?plainText"], $q) .
+            $this->getContainsFilters(["?plainText"], $q) .
             "}\n" .
             "offset $from limit $limit";
 
@@ -879,7 +879,34 @@ EOL;
         return $output;
     }
 
+    private function getContainsFilters($predList, $q) {
+        if ($q == null || trim($q) === "") {
+            return "";
+        }
+
+        $filters = array_filter(array_map(function ($p) use ($q) {
+            return $this->getContainsFilterPredicate($p, $q);
+        }, $predList), function ($f) {
+            return !empty($f);
+        });
+        return empty($filters) ? "" : "FILTER(" . join(" || ", $filters) . ")";
+    }
+
+    private function getContainsFilterPredicate($pred, $q) {
+        $cleaned = $this->stripPunctuation(trim($q));
+        $words = explode(" ", $cleaned);
+        $remove_keywords = array_filter($words, function ($t) {
+            return !in_array($t, ["or", "and"]);
+        });
+        $query = join(" AND ", $remove_keywords);
+        return "bif:contains($pred, '$query')";
+    }
+
     private function getSearchFilters($predList, $q) {
+        if ($q == null || trim($q) === "") {
+            return "";
+        }
+
         $filters = array_filter(array_map(function ($p) use ($q) {
             return $this->getRegexFilterPredicate($p, $q);
         }, $predList), function ($f) {
@@ -934,4 +961,10 @@ EOL;
         }, $uris));
     }
 
+    private function stripPunctuation($string) {
+        $string = mb_strtolower($string);
+        $string = preg_replace("/[[:punct:]]+/", " ", $string);
+        $string = preg_replace("/\\s+/", " ", $string);
+        return $string;
+    }
 }
