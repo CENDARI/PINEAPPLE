@@ -286,7 +286,7 @@ class Pineapple {
             "where {\n" .
             "  ?s a <$type_uri> ; \n" .
             "     skos:prefLabel ?title . \n" .
-            $this->getSearchFilter("?title", $q) .
+            $this->getContainsFilters(["?title"], $q) .
             ($this->settings["limit_related_access_points"] ? (
                 "  FILTER EXISTS { \n" .
                 "    ?m schema:mentions ?s ;\n" .
@@ -350,7 +350,7 @@ class Pineapple {
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
                 $this->getLanguageFilter("?prefLabel") .
-                $this->getSearchFilter("?prefLabel", $q)) : "") .
+                $this->getContainsFilters(["?prefLabel"], $q)) : "") .
             "} order by DESC(?count)";
 
         $out = [];
@@ -385,7 +385,7 @@ class Pineapple {
             ($t ? " a $t ; " : "") .
             "     skos:prefLabel ?prefLabel . \n" .
             $this->getLanguageFilter("?prefLabel") .
-            $this->getSearchFilter("?prefLabel", $q) .
+            $this->getContainsFilters(["?prefLabel"], $q) .
             "} offset $from limit $limit";
 
         $out = [];
