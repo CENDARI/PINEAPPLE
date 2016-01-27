@@ -350,7 +350,7 @@ class Pineapple {
             ($t ? " ?s a $t . " : "") .
             ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
                 $this->getLanguageFilter("?prefLabel") .
-                $this->getRegexFilters(["?prefLabel"], $q)) : "") .
+                $this->getContainsFilter("?prefLabel", $q)) : "") .
             "} order by DESC(?count)";
 
         $out = [];
@@ -385,7 +385,7 @@ class Pineapple {
             ($t ? " a $t ; " : "") .
             "     skos:prefLabel ?prefLabel . \n" .
             $this->getLanguageFilter("?prefLabel") .
-            $this->getRegexFilters(["?prefLabel"], $q) .
+            $this->getContainsFilter("?prefLabel", $q) .
             "} offset $from limit $limit";
 
         $out = [];
