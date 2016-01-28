@@ -9,6 +9,12 @@
                 <div class="row">
                     <form action="{{ currentUrl() }}" method="get" class="form-inline" accept-charset="UTF-8">
                         <h1>{% trans "Ontology Browser" %}</h1>
+                        {% if type_facet %}
+                            <input type="hidden" name="type" value="{{ type_facet }}">
+                        {% endif %}
+                        {% if ont_facet %}
+                            <input type="hidden" name="ontology" value="{{ ont_facet }}">
+                        {% endif %}
 
                         <div class="col-md-9">
                             {% include "_search_form.html.twig" %}

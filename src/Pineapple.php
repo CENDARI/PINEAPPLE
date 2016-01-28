@@ -384,16 +384,23 @@ class Pineapple {
      */
     public function getOntologyResourceTypes($q = null, $t = null, $ont = []) {
 
+        // NB: Hardcoding the types here is an optimisation, and for
+        // some reason it makes a massive difference to query speed.
+        $type_uris = $this->settings["ontology_item_types"];
+
         $query =
 
             "select distinct ?name (count (?s) as ?count) \n" .
             $this->getOntologyFromClause($ont) .
             "where {\n" .
-            "  ?s a ?name . \n" .
-            ($t ? " ?s a $t . " : "") .
-            ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
-                $this->getContainsFilter("?prefLabel", $q) .
-                $this->getLanguageFilter("?prefLabel")) : "") .
+                join( " UNION", array_map(function($uri) use ($q, $t) {
+                    return "{ ?s a <$uri> . ?s a ?name . " .
+                    ($t ? " ?s a $t . " : "") .
+                    ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
+                        $this->getContainsFilter("?prefLabel", $q) .
+                        $this->getLanguageFilter("?prefLabel")) : "") .
+                    "}\n";
+                }, $type_uris)) .
             "} order by DESC(?count)";
 
         $out = [];
