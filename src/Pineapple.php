@@ -134,7 +134,7 @@ class Pineapple {
             "  <$full_uri> a ?type ; \n" .
             "      skos:prefLabel ?label . \n" .
             "  OPTIONAL { <$full_uri>  skos:note ?note .} \n" .
-            "}";
+            "} limit 1";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
@@ -150,6 +150,9 @@ class Pineapple {
         if (empty($out)) {
             throw new ResourceNotFoundException($full_uri);
         }
+
+        $out[0]["ontology_resources"] =
+            $this->getCloseMatchOntologyResources($out[0]["prefLabel"], 0, 10);
 
         return $out[0];
     }
@@ -427,6 +430,43 @@ class Pineapple {
             $this->getContainsFilter("?prefLabel", $q) .
             $this->getLanguageFilter("?prefLabel") .
             "} offset $from limit $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            $short_type = EasyRdf_Namespace::shorten($row->type->getUri());
+            array_push($out, [
+                "uri" => $row->s->getUri(),
+                "type" => $short_type ? $short_type : $row->type->getUri(),
+                "prefLabel" => $row->label->getValue(),
+            ]);
+        }
+        return $out;
+    }
+
+    /**
+     * Fetch ontology resources that match a given string.
+     *
+     * @param string $text the search query
+     * @param int $from the start offset
+     * @param int $limit the maximum returned items
+     * @return array
+     */
+    function getCloseMatchOntologyResources($text, $from, $limit) {
+        $onts = array_map(function ($v) {
+            return $v["uri"];
+        }, $this->getOntologyGraphMeta($this->settings["ontology_meta"]));
+
+        $query =
+
+            "select distinct ?s ?type STR(?prefLabel) as ?label ?sc\n" .
+            $this->getOntologyFromClause($onts) .
+            "where {\n" .
+            "  ?s a ?type ; \n" .
+            "     skos:prefLabel ?prefLabel . \n" .
+            "  ?prefLabel bif:contains \"" . $this->getMatchQuery($text) . "\"\n" .
+            "  OPTION (score ?sc)\n" .
+            "} ORDER BY DESC (?sc)\n" .
+            " OFFSET $from LIMIT $limit";
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {

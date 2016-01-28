@@ -1,13 +1,4 @@
 {% if not related is empty %}
     <h2 title="{{ relation_name }}">{{ relation_name|strip_rdf_prefix|camel_to_title|snake_to_title }}</h2>
-    <ul class="reference-list">
-        {% for item in related %}
-            <li class="ontology-relation">
-                <div class="ontology-relation-name">{{ item.prefLabel }}</div>
-                <a title="{{ item.prefLabel }}" href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">
-                    {{ item.uri }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    {% include "_ontology_resource_list.html.twig" with {resources: related} %}
 {% endif %}

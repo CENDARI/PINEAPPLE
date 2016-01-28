@@ -17,17 +17,16 @@
                 </dl>
 
                 {% if not mentions is empty %}
-                <h2>{% trans "Referencing resources" %}</h2>
-                <ul class="reference-list">
-                    {% for item in mentions %}
-                        <li>
-                            <a class="title" href="{{ urlFor("resource", {"type": item.type, "id": item.id}) }}">{{ item.title }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-                {% include "_pagination.html.twig" with {'items': mentions} %}
+                    <h2>{% trans "Referencing resources" %}</h2>
+                    {% include "_resource_list.html.twig" with {resources: mentions} %}
+                    {% include "_pagination.html.twig" with {'items': mentions} %}
                 {% else %}
                     <p>{% trans "No referencing resources found" %}</p>
+                {% endif %}
+
+                {% if not ontology_resources is empty %}
+                    <h2>{% trans "Potentially associated ontology items" %}</h2>
+                    {% include "_ontology_resource_list.html.twig" with {resources: ontology_resources} %}
                 {% endif %}
             </div>
         </div>

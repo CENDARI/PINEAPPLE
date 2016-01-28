@@ -30,6 +30,12 @@
                     <h2>{% trans "Potentially associated resources" %}</h2>
                     {% include "_resource_list.html.twig" with {resources: resources} %}
                 {% endif %}
+
+
+                {% if not ontology_resources is empty %}
+                    <h2>{% trans "Potentially associated ontology items" %}</h2>
+                    {% include "_ontology_resource_list.html.twig" with {resources: ontology_resources} %}
+                {% endif %}
             </div>
             <div class="col-md-3">
                 {% if context %}

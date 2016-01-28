@@ -1,0 +1,49 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+ <head>
+  <variable name="uri"/>
+  <variable name="name"/>
+  <variable name="description"/>
+ </head>
+ <results distinct="false" ordered="true">
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/DBpediaBattles/</uri></binding>
+   <binding name="name"><literal>DBpedia Battles</literal></binding>
+   <binding name="description"><literal>DBpedia Battles is a subset of DBpedia that has been transformed to the CEDM element set</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/</uri></binding>
+   <binding name="name"><literal>WW1 as Linked Open Data</literal></binding>
+   <binding name="description"><literal>WW1 as Linked Open Data contains events, actors and places related to the first world transformed to the CEDM element</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/1914_1918/event/</uri></binding>
+   <binding name="name"><literal>1914-1918 Online (Events)</literal></binding>
+   <binding name="description"><literal>The 1914-1918 Online taxonomies provide concepts and events related to the First World War that have been transformed to the CEDM element set</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/1914_1918/concept/</uri></binding>
+   <binding name="name"><literal>1914-1918 Online (Concepts)</literal></binding>
+   <binding name="description"><literal>The 1914-1918 Online taxonomies provide concepts and events related to the First World War that have been transformed to the CEDM element set</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/T23/concept/</uri></binding>
+   <binding name="name"><literal>Trenches to Triples (Concepts)</literal></binding>
+   <binding name="description"><literal>The original Trenches to Triples vocabularies were designed to enhance metadata records in the King&#39;s College London archives relating to the First World War. These consist of concepts, places, people, and organizations, each of which have been transformed to the CEDM element set</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/T23/person/</uri></binding>
+   <binding name="name"><literal>Trenches to Triples (People)</literal></binding>
+   <binding name="description"><literal>The original Trenches to Triples vocabularies were designed to enhance metadata records in the King&#39;s College London archives relating to the First World War. These consist of concepts, places, people, and organizations, each of which have been transformed to the CEDM element set</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/T23/organization/</uri></binding>
+   <binding name="name"><literal>Trenches to Triples (Organizations)</literal></binding>
+   <binding name="description"><literal>The original Trenches to Triples vocabularies were designed to enhance metadata records in the King&#39;s College London archives relating to the First World War. These consist of concepts, places, people, and organizations, each of which have been transformed to the CEDM element set</literal></binding>
+  </result>
+  <result>
+   <binding name="uri"><uri>http://resources.cendari.dariah.eu/ontology/T23/place/</uri></binding>
+   <binding name="name"><literal>Trenches to Triples (Places)</literal></binding>
+   <binding name="description"><literal>The original Trenches to Triples vocabularies were designed to enhance metadata records in the King&#39;s College London archives relating to the First World War. These consist of concepts, places, people, and organizations, each of which have been transformed to the CEDM element set</literal></binding>
+  </result>
+ </results>
+</sparql>

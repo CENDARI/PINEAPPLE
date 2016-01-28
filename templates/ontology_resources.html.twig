@@ -12,27 +12,29 @@
 
                         <div class="col-md-9">
                             {% include "_search_form.html.twig" %}
-                            <ul class="resource-list">
-                                {% for item in resources %}
-                                    <li>
-                                        <div class="resource">
-                                            <strong>
-                                                {# NB: Slim's urlFor strips out parentheses, which is a problem with our URIs #}
-                                                {# Therefore hacking it to create a partial URL onto which we append the rest of the URI#}
-                                                <a href="{{ urlFor("ontology-resource", {"name": ""}) }}{{ item.uri|strip_namespace }}">{{ item.prefLabel }}</a>
-                                            </strong>
-                                            <span class="type">{{ item.type|strip_rdf_prefix }}</span>
+                            {% if not resources is empty %}
+                                <ul class="resource-list">
+                                    {% for item in resources %}
+                                        <li>
+                                            <div class="resource">
+                                                <strong>
+                                                    {# NB: Slim's urlFor strips out parentheses, which is a problem with our URIs #}
+                                                    {# Therefore hacking it to create a partial URL onto which we append the rest of the URI#}
+                                                    <a href="{{ urlFor("ontology-resource", {"name": ""}) }}{{ item.uri|strip_namespace }}">{{ item.prefLabel }}</a>
+                                                </strong>
+                                                <span class="type">{{ item.type|strip_rdf_prefix }}</span>
 
-                                            <div class="note">
-                                                {{ item.note }}
+                                                <div class="note">
+                                                    {{ item.note }}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </li>
-                                {% else %}
-                                    <li>{% trans "No results found" %}</li>
-                                {% endfor %}
-                            </ul>
-                            {% include "_pagination.html.twig" with {"items": resources, "extra": {"type": type_facet, "ontology": ont_facet}} %}
+                                        </li>
+                                    {% else %}
+                                        <li>{% trans "No results found" %}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% include "_pagination.html.twig" with {"items": resources, "extra": {"type": type_facet, "ontology": ont_facet}} %}
+                            {% endif %}
                         </div>
                         <div class="col-md-3">
                             {% include "_facet_set.html.twig" with {"facets": types, "facet_class": "Resource Type", "facet_key": "type",

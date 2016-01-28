@@ -49,7 +49,9 @@ class PineappleTest extends PHPUnit_Framework_TestCase {
         $this->store
             ->method("query")
             ->will($this->onConsecutiveCalls(
-                $this->getMockResult("concept")));
+                $this->getMockResult("concept"),
+                $this->getMockResult("ontology_resource_meta"),
+                $this->getMockResult("ontology_resource_match")));
 
         $pineapple = new Pineapple($this->api, $this->store, $this->settings);
 

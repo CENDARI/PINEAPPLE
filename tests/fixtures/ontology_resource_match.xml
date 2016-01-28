@@ -1,0 +1,70 @@
+<sparql xmlns="http://www.w3.org/2005/sparql-results#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/sw/DataAccess/rf1/result2.xsd">
+ <head>
+  <variable name="s"/>
+  <variable name="type"/>
+  <variable name="label"/>
+  <variable name="sc"/>
+ </head>
+ <results distinct="false" ordered="true">
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe205#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>British army retreats from Mons (see 23rd, and September 5th)</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">28</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe414#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>British army begins to leave the Aisne and to move northwards (see 19th)</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">28</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/T23/organization/britishsalonikaarmy#this</uri></binding>
+   <binding name="type"><uri>http://xmlns.com/foaf/0.1/Organization</uri></binding>
+   <binding name="label"><literal>British Salonika Army</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">26</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe496#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>Transfer of British army from the Aisne to Flanders completed (see 3rd)</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">24</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe3579#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>Demobilisation of the British Army begins</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">24</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe388#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>British force joins Japanese army before Tsinigtau (see 2iid, and November 7th)</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">24</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe2496#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>Tank Corps formed in British Army (see September 15th, 1916)</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">22</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/pe350#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>British Government issue orders raising third New Army of six</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">20</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/8137fdb9#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>An Indian Army force leaves Bombay to secure British interests in the Persian Gulf by landing in Mesopotamia, part of the Ottoman Empire (Turkey)</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">20</literal></binding>
+  </result>
+  <result>
+   <binding name="s"><uri>http://resources.cendari.dariah.eu/ontology/ww1lod/d85bc7ad#this</uri></binding>
+   <binding name="type"><uri>http://www.europeana.eu/schemas/edm/Event</uri></binding>
+   <binding name="label"><literal>Indian Army troops land in Mesopotamia to protect British oil interests in neighbouring Persia, and encourage an Arab revolt against Turkish rule</literal></binding>
+   <binding name="sc"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">20</literal></binding>
+  </result>
+ </results>
+</sparql>

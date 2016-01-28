@@ -1,0 +1,10 @@
+<ul class="reference-list">
+    {% for item in resources %}
+        <li class="ontology-relation">
+            <div class="ontology-relation-name">{{ item.prefLabel }}</div>
+            <a title="{{ item.prefLabel }}" href="{{ urlFor("ontology-resource", {"name": item.uri|strip_namespace}) }}">
+                {{ item.uri }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
