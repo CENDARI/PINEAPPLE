@@ -268,6 +268,46 @@ class Pineapple {
     }
 
     /**
+     * Fetch resources related to the current one via
+     * mentions.
+     *
+     * @param string $uddi the resource identifier
+     * @param int $from the start offset
+     * @param int $limit the maximum returned items
+     * @return array
+     */
+    function getCloseMatchResources($text, $from, $limit) {
+        $query =
+
+            "select distinct ?r ?identifier ?title ?sc\n" .
+            $this->getPermissionFilter() .
+            "where {\n" .
+            "  ?r nie:plainTextContent ?plainText ; \n" .
+            "     nao:identifier ?identifier . \n" .
+            "  OPTIONAL { ?r dc11:title ?title } \n" .
+            "  ?plainText bif:contains \"" . $this->getMatchQuery($text) . "\"\n" .
+            "  OPTION (score ?sc)\n" .
+            "} ORDER BY DESC (?sc)\n" .
+            " OFFSET $from LIMIT $limit";
+
+        $out = [];
+        foreach ($this->triplestore->query($query) as $row) {
+            $ns_uri = EasyRdf_Namespace::shorten($row->r->getUri());
+            array_push($out, [
+                "id" => $row->identifier->getValue(),
+                "type" => substr($ns_uri, 0, mb_strpos($ns_uri, ":")),
+                "title" => property_exists($row, "title")
+                    ? $row->title->getValue()
+                    : $row->r->getUri(),
+                "score" => property_exists($row, "sc")
+                    ? $row->sc->getValue() : 0
+            ]);
+        }
+
+        return $out;
+    }
+
+    /**
      * Fetch a list of access points of a given type which relate to
      * at least one other resource.
      *
@@ -445,6 +485,7 @@ class Pineapple {
             $this->getExplicitOntologyResourceRelations($id, $reltypes)
         );
         $out[0]["context"] = $this->getOntologyResourceContext($id);
+        $out[0]["resources"] = $this->getCloseMatchResources($out[0]["prefLabel"], 0, 10);
 
         return $out[0];
     }
@@ -906,13 +947,20 @@ EOL;
             return "";
         }
 
+        $query = $this->getMatchQuery($q);
+        return "FILTER(bif:contains($pred, \"$query\"))\n";
+    }
+
+    private function getMatchQuery($q) {
         $cleaned = $this->stripPunctuation(trim($q));
-        $words = explode(" ", $cleaned);
+        $words = mb_split(" ", $cleaned);
         $remove_keywords = array_filter($words, function ($t) {
             return !in_array($t, ["or", "and"]);
         });
-        $query = join(" AND ", $remove_keywords);
-        return "FILTER(bif:contains($pred, '$query'))\n";
+        $quoted = array_map(function($w) {
+            return "'" . trim($w) . "'";
+        }, $remove_keywords);
+        return join(" AND ", $quoted);
     }
 
     private function getExactFilter($pred, $q, $op = "=") {
@@ -941,9 +989,10 @@ EOL;
     }
 
     private function stripPunctuation($string) {
+        $string = preg_replace("/'/", "", $string);
         $string = mb_strtolower($string);
         $string = preg_replace("/[[:punct:]]+/", " ", $string);
         $string = preg_replace("/\\s+/", " ", $string);
-        return $string;
+        return trim($string);
     }
 }

@@ -17,19 +17,18 @@
                 </dl>
 
                 {% for name, set in relations %}
-                    {% include "_ontology_related.html.twig" with {"relation_name" : name, "related": set} %}
+                    {% include "_ontology_related.html.twig" with {relation_name: name, related: set} %}
                 {% endfor %}
 
                 {% if not mentions is empty %}
                     <h2>{% trans "Referencing resources" %}</h2>
-                    <ul class="reference-list">
-                        {% for item in mentions %}
-                            <li>
-                                <a class="title" href="{{ urlFor("resource", {"type": item.type, "id": item.id}) }}">{{ item.title }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                    {% include "_pagination.html.twig" with {'items': mentions} %}
+                    {% include "_resource_list.html.twig" with {resources: mentions} %}
+                    {% include "_pagination.html.twig" with {items: mentions} %}
+                {% endif %}
+
+                {% if not resources is empty %}
+                    <h2>{% trans "Potentially associated resources" %}</h2>
+                    {% include "_resource_list.html.twig" with {resources: resources} %}
                 {% endif %}
             </div>
             <div class="col-md-3">

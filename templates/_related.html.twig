@@ -1,12 +1,7 @@
 {% if not mentions is empty %}
     <h2>{% trans "Related resources" %}</h2>
-    <ul class="reference-list">
-        {% for item in related %}
-            <li>
-                <a title="{{ item.title }}" href="{{ urlFor("resource", {"type": item.type, "id": item.id }) }}">{{ item.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
+
+    {% include "_resource_list.html.twig" with {resources:related} %}
     {% include "_pagination.html.twig" with {'items': related } %}
 {% else %}
     <p>{% trans "No related resources found" %}</p>

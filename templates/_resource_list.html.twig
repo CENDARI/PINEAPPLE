@@ -1,0 +1,7 @@
+<ul class="reference-list">
+    {% for item in resources %}
+        <li>
+            <a title="{{ item.title }}" href="{{ urlFor("resource", {"type": item.type, "id": item.id }) }}">{{ item.title }}</a>
+        </li>
+    {% endfor %}
+</ul>
