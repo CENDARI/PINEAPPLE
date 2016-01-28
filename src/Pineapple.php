@@ -394,14 +394,25 @@ class Pineapple {
             $this->getOntologyFromClause($ont) .
             "where {\n" .
                 join( " UNION", array_map(function($uri) use ($q, $t) {
-                    return "{ ?s a <$uri> . ?s a ?name . " .
-                    ($t ? " ?s a $t . " : "") .
-                    ($q ? ("?s skos:prefLabel ?prefLabel . \n" .
-                        $this->getContainsFilter("?prefLabel", $q) .
-                        $this->getLanguageFilter("?prefLabel")) : "") .
-                    "}\n";
+                    return "{ ?s a <$uri> . ?s a ?name . " .($t ? " ?s a $t . " : "") . "}\n";
                 }, $type_uris)) .
             "} order by DESC(?count)";
+
+        if ($q) {
+            // If we have a text filter we can do a considerable simpler and
+            // faster query...
+            $query =
+
+                "select distinct ?name (count (?s) as ?count) \n" .
+                $this->getOntologyFromClause($ont) .
+                "where {\n" .
+                ($t ? " ?s a $t . " : "") .
+                "  ?s skos:prefLabel ?prefLabel . \n" .
+                $this->getContainsFilter("?prefLabel", $q) .
+                $this->getLanguageFilter("?prefLabel") .
+                "  ?s a ?name .\n" .
+                "} order by DESC(?count)";
+        }
 
         $out = [];
         foreach ($this->triplestore->query($query) as $row) {
