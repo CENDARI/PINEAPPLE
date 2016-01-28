@@ -1,6 +1,9 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
 
+// Ensure we're using UTF-8
+mb_internal_encoding("UTF-8");
+
 const DEFAULT_PAGINATION_LIMIT = 20;
 
 // Relations to try and fetch, mapped to whether they require the
