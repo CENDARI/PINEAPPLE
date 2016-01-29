@@ -18,7 +18,7 @@
                                 <ul class="details">
                                     <li>{% trans "Author" %}: <a href="{{ urlFor("medieval") }}?author={{ item.nome_autore|url_encode }}">{{ item.nome_autore }}</a> </li>
                                     <li>{% trans "Shelfmark Info" %}: {{ item.mss_segnatura }}</li>
-                                    <li>{% trans "Date" %}: {{ item.data_mss }} - {{ item.data_end_mss }}</li>
+                                    <li>{% trans "Date" %}: from: {{ item.data_mss }} to: {{ item.data_end_mss }}</li>
                                 </ul>
 
                             </li>
