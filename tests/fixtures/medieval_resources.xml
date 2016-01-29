@@ -24,8 +24,6 @@
    <binding name="mss_segnatura"><literal>Douai, Bibliothèque Marceline Desbordes-Valmore (olim Bibliothèque Municipale),  339</literal></binding>
    <binding name="nome_opera"><literal>Commentarium in Exodum</literal></binding>
    <binding name="nome_autore"><literal>Hrabanus Maurus n. 780 ca., m. 4-2-856</literal></binding>
-   <binding name="data_mss"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">1101</literal></binding>
-   <binding name="data_end_mss"><literal datatype="http://www.w3.org/2001/XMLSchema#integer">1200</literal></binding>
   </result>
  </results>
 </sparql>

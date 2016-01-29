@@ -673,9 +673,7 @@ class Pineapple {
     ?mss <http://sismel.it/onto#hasName> ?mss_segnatura ;
          <http://sismel.it/onto#hasManuscriptSectionID> ?mss_section .
     ?mss_section <http://sismel.it/onto#hasOperaID> ?id_opera ;
-                 <http://sismel.it/onto#hasHoldingID> ?id_ente ;
-                 <http://sismel.it/onto#hasStartDate> ?data_mss ;
-                 <http://sismel.it/onto#hasEndDate> ?data_end_mss .
+                 <http://sismel.it/onto#hasHoldingID> ?id_ente .
     ?id_ente <http://sismel.it/onto#hasName> ?nome_ente ;
              <http://sismel.it/onto#belongsToReligiousOrderID> ?id_relig_ente ;
              <http://sismel.it/onto#hasInfo> ?info_ente .
@@ -704,6 +702,9 @@ EOL;
             "where  {\n" .
             "  GRAPH <http://sismel/mdv> {\n" .
             $this->getMedievalDataPatterns() .
+            "OPTIONAL {
+                ?mss_section <http://sismel.it/onto#hasStartDate> ?data_mss ;
+                     <http://sismel.it/onto#hasEndDate> ?data_end_mss . }\n" .
             $this->getExactFilter("?nome_autore", $author_name) .
             $this->getExactFilter("?info_ente", $organisation_name) .
             $this->getExactFilter("?nome_ordine_ente", $organisation_order) .
@@ -726,8 +727,10 @@ EOL;
                 "nome_opera" => $row->nome_opera->getValue(),
                 "mss_segnatura" => $row->mss_segnatura->getValue(),
                 "nome_autore" => $row->nome_autore->getValue(),
-                "data_mss" => property_exists($row, "data_mss") ? $row->data_mss->getValue() : "(unknown)",
-                "data_end_mss" => property_exists($row, "data_end_mss") ? $row->data_end_mss->getValue() : "(unknown)"
+                "data_mss" => property_exists($row, "data_mss")
+                    ? $row->data_mss->getValue() : "",
+                "data_end_mss" => property_exists($row, "data_end_mss")
+                    ? $row->data_end_mss->getValue() : ""
             ]);
         }
 
