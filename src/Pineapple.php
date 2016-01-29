@@ -629,8 +629,8 @@ EOL;
                 "nome_opera" => $row->nome_opera->getValue(),
                 "mss_segnatura" => $row->mss_segnatura->getValue(),
                 "nome_autore" => $row->nome_autore->getValue(),
-                "data_mss" => $row->data_mss->getValue(),
-                "data_end_mss" => $row->data_end_mss->getValue()
+                "data_mss" => property_exists($row, "data_mss") ? $row->data_mss->getValue() : "(unknown)",
+                "data_end_mss" => property_exists($row, "data_end_mss") ? $row->data_end_mss->getValue() : "(unknown)"
             ]);
         }
 
