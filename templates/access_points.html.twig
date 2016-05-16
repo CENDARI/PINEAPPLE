@@ -14,8 +14,7 @@
                         {% for access in accessPoints %}
                             <li>
                                 <a title="{{ access.title }}"
-                                   href="{{ urlFor("mention", {"type": access.type, "name": access.title }) }}">{{
-                                    access.title }}</a>
+                                   href="{{ urlFor("mention", {"type": access.type, "name": "" }) }}{{ access.title }}">{{ access.title }}</a>
                             </li>
                         {% endfor %}
                     </ul>

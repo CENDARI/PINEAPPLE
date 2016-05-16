@@ -276,13 +276,13 @@ $app->get("/medieval", function () use ($app, &$settings, &$api) {
 // BASEURL/resources/f22c70aa-c640-4773-884d-076ac2f536c4.
 // When Pineapple is mounted at http://resources.cendari.dariah.eu
 // this therefore handles URI resolution
-$app->get("/:type/:id+", function ($type, $id_parts) use ($app, &$settings, &$pineapple) {
-    $id = join("/", array_map("urlencode", $id_parts));
+$app->get("/:type/:name+", function ($type, $name_parts) use ($app, &$settings, &$pineapple) {
+    $name = join("/", array_map("urlencode", $name_parts));
     $offset = $app->request->get("offset", 0);
     $limit = $app->request->get("limit", DEFAULT_PAGINATION_LIMIT);
 
-    $data = $pineapple->getConcept($type, $id);
-    $mentions = $pineapple->getMentionResources($type, $id, $offset, $limit);
+    $data = $pineapple->getConcept($type, $name);
+    $mentions = $pineapple->getMentionResources($type, $name, $offset, $limit);
     respond($app, "ontology_resource.html.twig",
         array_merge($data, [
             "mentions" => $mentions,

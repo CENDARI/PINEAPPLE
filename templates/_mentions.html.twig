@@ -5,8 +5,10 @@
         <ul class="reference-list">
             {% for mention in mentionList %}
                 <li>
+                    {# NB: Slim's urlFor strips out parentheses, which is a problem with our URIs #}
+                    {# Therefore hacking it to create a partial URL onto which we append the rest of the URI#}
                     <a title="{{ mention.title }}"
-                       href="{{ urlFor("concept", {"type": mention.type, "id": mention.title }) }}">{{ mention.title }}</a>
+                       href="{{ urlFor("concept", {"type": mention.type, "name": "" }) }}{{ mention.title }}">{{ mention.title }}</a>
                 </li>
             {% endfor %}
         </ul>
